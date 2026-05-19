@@ -1,10 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-// import 'package:dio/dio.dart';
+import 'package:flutter_application_1/features/auth/presentation/screens/student_acadmic_screen.dart';
+import 'package:flutter_application_1/services/auth/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-// import '../../../../services/auth/auth_service.dart';
-import '../../../../widgets/buttons/custom_button.dart';
-import '../../../../widgets/inputs/custom_textfield.dart';
-import 'otp_verification_screen.dart';
+import '../../../student/presentation/screens/student_dashboard_screen.dart';
 
 class StudentRegisterScreen extends StatefulWidget {
   const StudentRegisterScreen({super.key});
@@ -16,496 +16,366 @@ class StudentRegisterScreen extends StatefulWidget {
 
 class _StudentRegisterScreenState
     extends State<StudentRegisterScreen> {
+  final formKey = GlobalKey<FormState>();
 
-  // =========================
-  // PERSONAL INFO
-  // =========================
+  final fullNameController =
+      TextEditingController();
 
-  final fullNameController = TextEditingController();
+  final fatherNameController =
+      TextEditingController();
 
-  final phoneController = TextEditingController();
+  final schoolController =
+      TextEditingController();
 
-  final emailController = TextEditingController();
+  final classController =
+      TextEditingController();
 
-  final genderController = TextEditingController();
+  final districtController =
+      TextEditingController();
 
-  final dobController = TextEditingController();
+  final samagraController =
+      TextEditingController();
 
-  final fatherNameController = TextEditingController();
+  final apaarController =
+      TextEditingController();
 
-  // =========================
-  // GOVERNMENT INFO
-  // =========================
+  final marksController =
+      TextEditingController();
 
-  final samagraController = TextEditingController();
+  bool loading = false;
 
-  final apaarController = TextEditingController();
+  String gender = "Male";
 
-  // =========================
-  // ACADEMIC INFO
-  // =========================
+  Future<void> completeProfile() async {
+    if (!formKey.currentState!.validate()) {
+      return;
+    }
 
-  final schoolController = TextEditingController();
+    try {
+      setState(() {
+        loading = true;
+      });
 
-  final classController = TextEditingController();
+      final prefs =
+          await SharedPreferences.getInstance();
 
-  final marksController = TextEditingController();
+      final token =
+          prefs.getString("accessToken");
 
-  final joiningYearController = TextEditingController();
+      await Dio().post(
+        "${AuthService.baseUrl.replaceAll('/auth', '')}/users/complete-profile",
 
-  final currentYearController = TextEditingController();
+        data: {
+          "fullName":
+              fullNameController.text.trim(),
 
-  // =========================
-  // ADDRESS INFO
-  // =========================
+          "gender": gender,
 
-  final addressController = TextEditingController();
+          "district":
+              districtController.text.trim(),
 
-  final districtController = TextEditingController();
+          "fatherName":
+              fatherNameController.text.trim(),
 
-  final stateController = TextEditingController();
+          "schoolName":
+              schoolController.text.trim(),
 
-  final pincodeController = TextEditingController();
+          "currentClass":
+              classController.text.trim(),
 
-  // =========================
-  // ADDITIONAL INFO
-  // =========================
+          "samagraId":
+              samagraController.text.trim(),
 
-  final categoryController = TextEditingController();
+          "apaarId":
+              apaarController.text.trim(),
 
-  final incomeController = TextEditingController();
+          "marks10th": double.parse(
+            marksController.text.trim(),
+          ),
+        },
 
-  // =========================
-  // BANK INFO
-  // =========================
-
-  final accountNumberController = TextEditingController();
-
-  final ifscController = TextEditingController();
-
-  final bankNameController = TextEditingController();
-
-  // =========================
-  // LOADING
-  // =========================
-
-  bool isLoading = false;
-
-//   Future<void> registerStudent() async {
-//     try {
-//       setState(() {
-//         isLoading = true;
-//       });
-
-//       final response =
-//     await AuthService.sendOtp(
-//   phone: phoneController.text.trim(),
-// );
-
-//       if (response.statusCode == 200 ||
-//           response.statusCode == 201) {
-
-//         if (!mounted) return;
-
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           const SnackBar(
-//             content:
-//                 Text('OTP sent successfully'),
-//           ),
-//         );
-
-//         Navigator.push(
-//           context,
-//           MaterialPageRoute(
-//             builder: (_) =>
-//                 OtpVerificationScreen(
-//               phoneNumber:
-//                   phoneController.text.trim(),
-//             ),
-//           ),
-//         );
-//       }
-//     } on DioException catch (e) {
-//       String errorMessage =
-//           'Registration failed';
-
-//       if (e.response != null &&
-//           e.response?.data != null) {
-
-//         errorMessage =
-//             e.response?.data['message'] ??
-//                 errorMessage;
-//       }
-
-//       if (!mounted) return;
-
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(
-//           content: Text(errorMessage),
-//         ),
-//       );
-//     } catch (e) {
-//       if (!mounted) return;
-
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(
-//           content: Text(e.toString()),
-//         ),
-//       );
-//     } finally {
-//       if (mounted) {
-//         setState(() {
-//           isLoading = false;
-//         });
-//       }
-//     }
-//   }
-
-Future<void> registerStudent() async {
-
-  try {
-
-    setState(() {
-      isLoading = true;
-    });
-
-    // Fake loading delay
-    await Future.delayed(
-      const Duration(seconds: 2),
-    );
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'OTP sent successfully',
+        options: Options(
+          headers: {
+            "Authorization":
+                "Bearer $token",
+          },
         ),
-      ),
-    );
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Profile completed successfully",
+          ),
+        ),
+      );
 
     Navigator.push(
-      context,
-
-      MaterialPageRoute(
-        builder: (_) =>
-            OtpVerificationScreen(
-          phoneNumber:
-              phoneController.text.trim(),
+  context,
+  MaterialPageRoute(
+    builder: (_) =>
+        const StudentAcademicScreen(),
+  ),
+   );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
         ),
-      ),
-    );
-
-  } catch (e) {
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          e.toString(),
-        ),
-      ),
-    );
-
-  } finally {
-
-    if (mounted) {
-
+      );
+    } finally {
       setState(() {
-        isLoading = false;
+        loading = false;
       });
     }
   }
-}
+
+  Widget buildField({
+    required String hint,
+    required TextEditingController controller,
+    TextInputType keyboard =
+        TextInputType.text,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 18),
+
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboard,
+
+        validator: (value) {
+          if (value == null ||
+              value.trim().isEmpty) {
+            return "$hint is required";
+          }
+
+          return null;
+        },
+
+        decoration: InputDecoration(
+          hintText: hint,
+
+          filled: true,
+          fillColor: Colors.white,
+
+          border: OutlineInputBorder(
+            borderRadius:
+                BorderRadius.circular(16),
+
+            borderSide: BorderSide.none,
+          ),
+
+          contentPadding:
+              const EdgeInsets.symmetric(
+            horizontal: 18,
+            vertical: 18,
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor:
+          const Color(0xFFF5F7FB),
+
       appBar: AppBar(
-        title: const Text('Student Registration'),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+
+        title: const Text(
+          "Complete Profile",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
 
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+        child: Form(
+          key: formKey,
 
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 10),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
 
-              const Text(
-                'Create Student Account',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
+            child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
+
+              children: [
+                const Text(
+                  "Student Registration",
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight:
+                        FontWeight.bold,
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 10),
+                const SizedBox(height: 8),
 
-              const Text(
-                'Fill your details to apply for Super 500 scholarship',
-              ),
-
-              const SizedBox(height: 30),
-
-              // ====================================================
-              // PERSONAL INFORMATION
-              // ====================================================
-
-              const Text(
-                'Personal Information',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                const Text(
+                  "Complete your profile to continue",
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 16,
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 20),
+                const SizedBox(height: 30),
 
-              CustomTextField(
-                hintText: 'Full Name',
-                controller: fullNameController,
-              ),
-
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                hintText: 'Mobile Number',
-                controller: phoneController,
-                keyboardType: TextInputType.phone,
-              ),
-
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                hintText: 'Email Address',
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-              ),
-
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                hintText: 'Gender',
-                controller: genderController,
-              ),
-
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                hintText: 'Date of Birth (DD/MM/YYYY)',
-                controller: dobController,
-              ),
-
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                hintText: 'Father Name',
-                controller: fatherNameController,
-              ),
-
-              const SizedBox(height: 30),
-
-              // ====================================================
-              // GOVERNMENT INFORMATION
-              // ====================================================
-
-              const Text(
-                'Government Information',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                buildField(
+                  hint: "Full Name",
+                  controller:
+                      fullNameController,
                 ),
-              ),
 
-              const SizedBox(height: 20),
-
-              CustomTextField(
-                hintText: 'Samagra ID',
-                controller: samagraController,
-                keyboardType: TextInputType.number,
-              ),
-
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                hintText: 'APAAR ID',
-                controller: apaarController,
-              ),
-
-              const SizedBox(height: 30),
-
-              // ====================================================
-              // ACADEMIC INFORMATION
-              // ====================================================
-
-              const Text(
-                'Academic Information',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                buildField(
+                  hint: "Father Name",
+                  controller:
+                      fatherNameController,
                 ),
-              ),
 
-              const SizedBox(height: 20),
-
-              CustomTextField(
-                hintText: 'School Name',
-                controller: schoolController,
-              ),
-
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                hintText: 'Current Class',
-                controller: classController,
-              ),
-
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                hintText: 'Total Marks obtained in 10th Standard',
-                controller: marksController,
-                keyboardType: TextInputType.number,
-              ),
-
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                hintText: 'Joining Year',
-                controller: joiningYearController,
-                keyboardType: TextInputType.number,
-              ),
-
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                hintText: 'Current Academic Year',
-                controller: currentYearController,
-                keyboardType: TextInputType.number,
-              ),
-
-              const SizedBox(height: 30),
-
-              // ====================================================
-              // ADDRESS INFORMATION
-              // ====================================================
-
-              const Text(
-                'Address Information',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                buildField(
+                  hint: "School Name",
+                  controller:
+                      schoolController,
                 ),
-              ),
 
-              const SizedBox(height: 20),
-
-              CustomTextField(
-                hintText: 'Full Address',
-                controller: addressController,
-              ),
-
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                hintText: 'District',
-                controller: districtController,
-              ),
-
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                hintText: 'State',
-                controller: stateController,
-              ),
-
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                hintText: 'Pincode',
-                controller: pincodeController,
-                keyboardType: TextInputType.number,
-              ),
-
-              const SizedBox(height: 30),
-
-              // ====================================================
-              // ADDITIONAL INFORMATION
-              // ====================================================
-
-              const Text(
-                'Additional Information',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                buildField(
+                  hint: "Current Class",
+                  controller:
+                      classController,
                 ),
-              ),
 
-              const SizedBox(height: 20),
-
-              CustomTextField(
-                hintText: 'Category',
-                controller: categoryController,
-              ),
-
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                hintText: 'Annual Family Income',
-                controller: incomeController,
-                keyboardType: TextInputType.number,
-              ),
-
-              const SizedBox(height: 30),
-
-              // ====================================================
-              // BANK INFORMATION
-              // ====================================================
-
-              const Text(
-                'Bank Information',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                buildField(
+                  hint: "District",
+                  controller:
+                      districtController,
                 ),
-              ),
 
-              const SizedBox(height: 20),
+                buildField(
+                  hint: "Samagra ID",
+                  controller:
+                      samagraController,
+                  keyboard:
+                      TextInputType.number,
+                ),
 
-              CustomTextField(
-                hintText: 'Bank Account Number',
-                controller: accountNumberController,
-                keyboardType: TextInputType.number,
-              ),
+                buildField(
+                  hint: "Apaar ID",
+                  controller:
+                      apaarController,
+                ),
 
-              const SizedBox(height: 16),
+                buildField(
+                  hint: "10th Percentage",
+                  controller:
+                      marksController,
+                  keyboard:
+                      TextInputType.number,
+                ),
 
-              CustomTextField(
-                hintText: 'IFSC Code',
-                controller: ifscController,
-              ),
+                const SizedBox(height: 10),
 
-              const SizedBox(height: 16),
+                DropdownButtonFormField(
+                  value: gender,
 
-              CustomTextField(
-                hintText: 'Bank Name',
-                controller: bankNameController,
-              ),
+                  decoration:
+                      InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
 
-              const SizedBox(height: 40),
+                    border:
+                        OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius
+                              .circular(
+                        16,
+                      ),
 
-             CustomButton(
-                text: 'Continue Registration',
-                isLoading: isLoading,
-                onPressed: registerStudent,
-             ),
+                      borderSide:
+                          BorderSide.none,
+                    ),
+                  ),
 
-              const SizedBox(height: 30),
-            ],
+                  items: const [
+                    DropdownMenuItem(
+                      value: "Male",
+                      child: Text("Male"),
+                    ),
+
+                    DropdownMenuItem(
+                      value: "Female",
+                      child: Text("Female"),
+                    ),
+
+                    DropdownMenuItem(
+                      value: "Other",
+                      child: Text("Other"),
+                    ),
+                  ],
+
+                  onChanged: (value) {
+                    setState(() {
+                      gender = value!;
+                    });
+                  },
+                ),
+
+                const SizedBox(height: 35),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 58,
+
+                  child: ElevatedButton(
+                    onPressed: loading
+                        ? null
+                        : completeProfile,
+
+                    style:
+                        ElevatedButton.styleFrom(
+                      backgroundColor:
+                          const Color(
+                        0xFF0A1931,
+                      ),
+
+                      shape:
+                          RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius
+                                .circular(
+                          18,
+                        ),
+                      ),
+                    ),
+
+                    child: loading
+                        ? const CircularProgressIndicator(
+                            color:
+                                Colors.white,
+                          )
+                        : const Text(
+                            "Complete Profile",
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight:
+                                  FontWeight
+                                      .bold,
+                            ),
+                          ),
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+              ],
+            ),
           ),
         ),
       ),

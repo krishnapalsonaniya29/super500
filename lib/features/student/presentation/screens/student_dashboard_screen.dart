@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../theme/app_colors.dart';
 
-//import './student_home_screen.dart';
+// import './student_home_screen.dart';
 import './sessions_screen.dart';
 import './achievements_screen.dart';
 import './expenses_screen.dart';
@@ -28,9 +28,13 @@ class _StudentDashboardScreenState
 
     screens = [
       // HomeScreen(onNavigate: changeTab),
+
       SessionsScreen(onNavigate: changeTab),
+
       AchievementsScreen(onNavigate: changeTab),
+
       ExpensesScreen(onNavigate: changeTab),
+
       ProfileScreen(onNavigate: changeTab),
     ];
   }
@@ -68,7 +72,7 @@ class _StudentDashboardScreenState
 
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
+              color: Colors.black.withOpacity(0.15),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -103,11 +107,6 @@ class _StudentDashboardScreenState
             ),
 
             items: [
-              _buildNavItem(
-                icon: Icons.home_rounded,
-                label: 'Home',
-              ),
-
               _buildNavItem(
                 icon: Icons.calendar_month_rounded,
                 label: 'Sessions',

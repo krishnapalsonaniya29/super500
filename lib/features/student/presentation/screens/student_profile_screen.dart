@@ -1,9 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/features/auth/presentation/screens/role_selection_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../theme/app_colors.dart';
 
+//import '../../../../auth/presentation/screens/role_selection_screen.dart';
+
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  final Function(int)? onNavigate;
+
+  const ProfileScreen({
+    super.key,
+    this.onNavigate,
+  });
+
+  Future<void> logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.remove("accessToken");
+
+    if (!context.mounted) return;
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const RoleSelectionScreen(),
+      ),
+      (route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +53,7 @@ class ProfileScreen extends StatelessWidget {
 
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.08),
+                      color: Colors.black.withOpacity(0.08),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -86,10 +111,14 @@ class ProfileScreen extends StatelessWidget {
                 title: 'Help & Support',
               ),
 
-              _buildProfileTile(
-                icon: Icons.logout_rounded,
-                title: 'Logout',
-                isLogout: true,
+              GestureDetector(
+                onTap: () => logout(context),
+
+                child: _buildProfileTile(
+                  icon: Icons.logout_rounded,
+                  title: 'Logout',
+                  isLogout: true,
+                ),
               ),
             ],
           ),
@@ -113,7 +142,7 @@ class ProfileScreen extends StatelessWidget {
 
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -127,8 +156,8 @@ class ProfileScreen extends StatelessWidget {
 
             decoration: BoxDecoration(
               color: isLogout
-                  ? Colors.red.withValues(alpha: 0.1)
-                  : AppColors.primary.withValues(alpha: 0.1),
+                  ? Colors.red.withOpacity(0.1)
+                  : AppColors.primary.withOpacity(0.1),
 
               borderRadius: BorderRadius.circular(16),
             ),

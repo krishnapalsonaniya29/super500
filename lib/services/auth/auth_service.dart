@@ -1,54 +1,84 @@
 import 'package:dio/dio.dart';
-
-import '../../core/constants/api_constants.dart';
-import '../../core/network/dio_client.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
+  static const String baseUrl =
+      "https://unspeedy-nickie-oratorically.ngrok-free.dev/api/v1/auth";
 
   /// SEND OTP
-  static Future<Response> sendOtp({
-    required String phone,
-  }) async {
+  static Future<Map<String, dynamic>> sendOtp(
+    String phone,
+  ) async {
+    try {
+      final response = await Dio().post(
+        "$baseUrl/send-otp",
+        data: {
+          "phone": phone,
+        },
+      );
 
-    return await DioClient.dio.post(
-      ApiConstants.sendOtp,
-      data: {
-        'phone': phone,
-      },
-    );
+      return response.data;
+    } catch (e) {
+      throw Exception(e.toString());
+    }
   }
 
   /// VERIFY OTP
-  static Future<Response> verifyOtp({
+  static Future<Map<String, dynamic>> verifyOtp({
     required String phone,
     required String otp,
   }) async {
+    try {
+      final response = await Dio().post(
+        "$baseUrl/verify-otp",
+        data: {
+          "phone": phone,
+          "otp": otp,
+        },
+      );
 
-    return await DioClient.dio.post(
-      ApiConstants.verifyOtp,
-      data: {
-        'phone': phone,
-        'otp': otp,
-      },
-    );
+      final accessToken =
+          response.data["data"]["accessToken"];
+
+      final prefs =
+          await SharedPreferences.getInstance();
+
+      await prefs.setString(
+        "accessToken",
+        accessToken,
+      );
+
+      return response.data;
+    } catch (e) {
+      throw Exception(e.toString());
+    }
   }
 
-  /// COMPLETE PROFILE
-  static Future<Response> completeProfile({
-    required Map<String, dynamic> data,
-    required String token,
-  }) async {
+  /// GET TOKEN
+  static Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
 
-    return await DioClient.dio.post(
-      ApiConstants.completeProfile,
-      data: data,
+    return prefs.getString("accessToken");
+  }
+  /// GET CURRENT USER
+static Future<Map<String, dynamic>> getMe() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
 
+    final token = prefs.getString("accessToken");
+
+    final response = await Dio().get(
+      "$baseUrl/me",
       options: Options(
         headers: {
-          'Authorization':
-              'Bearer $token',
+          "Authorization": "Bearer $token",
         },
       ),
     );
+
+    return response.data;
+  } catch (e) {
+    throw Exception(e.toString());
   }
+}
 }

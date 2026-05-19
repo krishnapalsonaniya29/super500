@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../theme/app_colors.dart';
 
 class ExpensesScreen extends StatelessWidget {
-  const ExpensesScreen({super.key});
+  const ExpensesScreen({super.key, required void Function(int index) onNavigate});
 
   @override
   Widget build(BuildContext context) {
