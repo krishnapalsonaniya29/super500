@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   static const String baseUrl =
-      "https://unspeedy-nickie-oratorically.ngrok-free.dev/api/v1/auth";
+      "http://localhost:5000/api/v1/auth";
 
   /// SEND OTP
   static Future<Map<String, dynamic>> sendOtp(

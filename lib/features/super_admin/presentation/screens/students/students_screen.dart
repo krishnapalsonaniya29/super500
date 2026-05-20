@@ -1,0 +1,745 @@
+import 'package:flutter/material.dart';
+
+import '../../../../../services/super_admin/super_admin_service.dart';
+import '../../../../../theme/app_colors.dart';
+
+import 'student_detail_screen.dart';
+
+class StudentsScreen
+    extends StatefulWidget {
+  final Function(int index)
+      onNavigate;
+
+  const StudentsScreen({
+    super.key,
+    required this.onNavigate,
+  });
+
+  @override
+  State<StudentsScreen>
+      createState() =>
+          _StudentsScreenState();
+}
+
+class _StudentsScreenState
+    extends State<
+        StudentsScreen> {
+  List students = [];
+
+  List filteredStudents = [];
+
+  bool loading = true;
+
+  final searchController =
+      TextEditingController();
+
+  String selectedDistrict =
+      "All";
+
+  List<String> districts = [
+    "All",
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    fetchStudents();
+  }
+
+  Future<void> fetchStudents() async {
+    try {
+      final response =
+          await SuperAdminService
+              .getStudents();
+
+      final data =
+          response["data"] ?? [];
+
+      final districtList =
+          data
+              .map<String>(
+                (student) =>
+                    student[
+                        "district"] ??
+                    "",
+              )
+              .where(
+                (district) =>
+                    district
+                        .isNotEmpty,
+              )
+              .toSet()
+              .toList();
+
+      setState(() {
+        students = data;
+
+        filteredStudents =
+            data;
+
+        districts = [
+          "All",
+          ...districtList,
+        ];
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
+  }
+
+  void filterStudents() {
+    final query =
+        searchController.text
+            .toLowerCase();
+
+    setState(() {
+      filteredStudents =
+          students.where(
+        (student) {
+          final name =
+              student["user"]
+                          ?[
+                          "fullName"] ??
+                      "";
+
+          final district =
+              student[
+                      "district"] ??
+                  "";
+
+          final matchesSearch =
+              name
+                  .toLowerCase()
+                  .contains(query);
+
+          final matchesDistrict =
+              selectedDistrict ==
+                      "All" ||
+                  district ==
+                      selectedDistrict;
+
+          return matchesSearch &&
+              matchesDistrict;
+        },
+      ).toList();
+    });
+  }
+
+  Color getStatusColor(
+    String status,
+  ) {
+    switch (status) {
+      case "APPROVED":
+        return Colors.green;
+
+      case "REJECTED":
+        return Colors.red;
+
+      default:
+        return Colors.orange;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor:
+          AppColors.background,
+
+      body: SafeArea(
+        child: loading
+            ? const Center(
+                child:
+                    CircularProgressIndicator(),
+              )
+            : RefreshIndicator(
+                onRefresh:
+                    fetchStudents,
+
+                child:
+                    SingleChildScrollView(
+                  physics:
+                      const AlwaysScrollableScrollPhysics(),
+
+                  padding:
+                      const EdgeInsets.all(
+                    20,
+                  ),
+
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment
+                            .start,
+
+                    children: [
+                      /// HEADER
+                      const Text(
+                        "Students",
+
+                        style:
+                            TextStyle(
+                          fontSize: 30,
+
+                          fontWeight:
+                              FontWeight
+                                  .bold,
+
+                          fontFamily:
+                              'Poppins',
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 8,
+                      ),
+
+                      Text(
+                        "${filteredStudents.length} students found",
+
+                        style:
+                            const TextStyle(
+                          color: AppColors
+                              .textSecondary,
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 24,
+                      ),
+
+                      /// SEARCH
+                      TextField(
+                        controller:
+                            searchController,
+
+                        onChanged:
+                            (_) =>
+                                filterStudents(),
+
+                        decoration:
+                            InputDecoration(
+                          hintText:
+                              "Search student",
+
+                          prefixIcon:
+                              const Icon(
+                            Icons.search,
+                          ),
+
+                          filled: true,
+
+                          fillColor:
+                              Colors.white,
+
+                          border:
+                              OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(
+                              18,
+                            ),
+
+                            borderSide:
+                                BorderSide.none,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 18,
+                      ),
+
+                      /// DISTRICT FILTER
+                      Container(
+                        padding:
+                            const EdgeInsets.symmetric(
+                          horizontal:
+                              16,
+                        ),
+
+                        decoration:
+                            BoxDecoration(
+                          color:
+                              Colors.white,
+
+                          borderRadius:
+                              BorderRadius.circular(
+                            18,
+                          ),
+                        ),
+
+                        child:
+                            DropdownButtonHideUnderline(
+                          child:
+                              DropdownButton<
+                                  String>(
+                            value:
+                                selectedDistrict,
+
+                            isExpanded:
+                                true,
+
+                            items:
+                                districts.map(
+                              (
+                                district,
+                              ) {
+                                return DropdownMenuItem(
+                                  value:
+                                      district,
+
+                                  child:
+                                      Text(
+                                    district,
+                                  ),
+                                );
+                              },
+                            ).toList(),
+
+                            onChanged:
+                                (
+                                  value,
+                                ) {
+                              selectedDistrict =
+                                  value!;
+
+                              filterStudents();
+                            },
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 28,
+                      ),
+
+                      /// EMPTY
+                      if (filteredStudents
+                          .isEmpty)
+                        Container(
+                          width:
+                              double.infinity,
+
+                          padding:
+                              const EdgeInsets.all(
+                            40,
+                          ),
+
+                          decoration:
+                              BoxDecoration(
+                            color:
+                                Colors.white,
+
+                            borderRadius:
+                                BorderRadius.circular(
+                              24,
+                            ),
+                          ),
+
+                          child:
+                              const Column(
+                            children: [
+                              Icon(
+                                Icons
+                                    .school_rounded,
+
+                                size: 70,
+
+                                color: Colors
+                                    .grey,
+                              ),
+
+                              SizedBox(
+                                height: 18,
+                              ),
+
+                              Text(
+                                "No students found",
+
+                                style:
+                                    TextStyle(
+                                  fontSize:
+                                      18,
+
+                                  fontWeight:
+                                      FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                      /// STUDENT LIST
+                      ListView.builder(
+                        shrinkWrap: true,
+
+                        physics:
+                            const NeverScrollableScrollPhysics(),
+
+                        itemCount:
+                            filteredStudents
+                                .length,
+
+                        itemBuilder:
+                            (_, index) {
+                          final student =
+                              filteredStudents[
+                                  index];
+
+                          final user =
+                              student[
+                                  "user"];
+
+                          final status =
+                              student[
+                                      "verificationStatus"] ??
+                                  "PENDING";
+
+                          return Container(
+                            margin:
+                                const EdgeInsets.only(
+                              bottom:
+                                  18,
+                            ),
+
+                            padding:
+                                const EdgeInsets.all(
+                              18,
+                            ),
+
+                            decoration:
+                                BoxDecoration(
+                              color:
+                                  Colors.white,
+
+                              borderRadius:
+                                  BorderRadius.circular(
+                                24,
+                              ),
+
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors
+                                      .black
+                                      .withValues(
+                                        alpha:
+                                            0.04,
+                                      ),
+
+                                  blurRadius:
+                                      10,
+
+                                  offset:
+                                      const Offset(
+                                    0,
+                                    4,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            child:
+                                Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius:
+                                          28,
+
+                                      backgroundColor:
+                                          AppColors.primary,
+
+                                      child:
+                                          Text(
+                                        user["fullName"][0],
+
+                                        style:
+                                            const TextStyle(
+                                          color:
+                                              Colors.white,
+
+                                          fontWeight:
+                                              FontWeight.bold,
+
+                                          fontSize:
+                                              22,
+                                        ),
+                                      ),
+                                    ),
+
+                                    const SizedBox(
+                                      width:
+                                          16,
+                                    ),
+
+                                    Expanded(
+                                      child:
+                                          Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+
+                                        children: [
+                                          Text(
+                                            user["fullName"],
+
+                                            style:
+                                                const TextStyle(
+                                              fontWeight:
+                                                  FontWeight.bold,
+
+                                              fontSize:
+                                                  18,
+                                            ),
+                                          ),
+
+                                          const SizedBox(
+                                            height:
+                                                6,
+                                          ),
+
+                                          Text(
+                                            student["district"] ??
+                                                "No District",
+
+                                            style:
+                                                const TextStyle(
+                                              color:
+                                                  AppColors.textSecondary,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    Container(
+                                      padding:
+                                          const EdgeInsets.symmetric(
+                                        horizontal:
+                                            14,
+
+                                        vertical:
+                                            8,
+                                      ),
+
+                                      decoration:
+                                          BoxDecoration(
+                                        color: getStatusColor(
+                                          status,
+                                        ).withValues(
+                                          alpha:
+                                              0.1,
+                                        ),
+
+                                        borderRadius:
+                                            BorderRadius.circular(
+                                          20,
+                                        ),
+                                      ),
+
+                                      child:
+                                          Text(
+                                        status,
+
+                                        style:
+                                            TextStyle(
+                                          color:
+                                              getStatusColor(
+                                            status,
+                                          ),
+
+                                          fontWeight:
+                                              FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(
+                                  height:
+                                      18,
+                                ),
+
+                                Container(
+                                  width:
+                                      double.infinity,
+
+                                  padding:
+                                      const EdgeInsets.all(
+                                    16,
+                                  ),
+
+                                  decoration:
+                                      BoxDecoration(
+                                    color: AppColors
+                                        .primary
+                                        .withValues(
+                                          alpha:
+                                              0.04,
+                                        ),
+
+                                    borderRadius:
+                                        BorderRadius.circular(
+                                      18,
+                                    ),
+                                  ),
+
+                                  child:
+                                      Column(
+                                    children: [
+                                      buildInfoRow(
+                                        icon:
+                                            Icons.phone,
+
+                                        title:
+                                            "Phone",
+
+                                        value:
+                                            user["phone"] ??
+                                                "-",
+                                      ),
+
+                                      const SizedBox(
+                                        height:
+                                            12,
+                                      ),
+
+                                      buildInfoRow(
+                                        icon:
+                                            Icons.school,
+
+                                        title:
+                                            "School",
+
+                                        value:
+                                            student["schoolName"] ??
+                                                "-",
+                                      ),
+
+                                      const SizedBox(
+                                        height:
+                                            12,
+                                      ),
+
+                                      buildInfoRow(
+                                        icon:
+                                            Icons.grade,
+
+                                        title:
+                                            "10th Marks",
+
+                                        value:
+                                            "${student["marks10th"] ?? 0}%",
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                const SizedBox(
+                                  height:
+                                      18,
+                                ),
+
+                                SizedBox(
+                                  width:
+                                      double.infinity,
+
+                                  child:
+                                      ElevatedButton(
+                                    onPressed:
+                                        () {
+                                      Navigator.push(
+                                        context,
+
+                                        MaterialPageRoute(
+                                          builder:
+                                              (
+                                                _,
+                                              ) =>
+                                                  StudentDetailScreen(
+                                            student:
+                                                student,
+                                          ),
+                                        ),
+                                      );
+                                    },
+
+                                    style:
+                                        ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          AppColors.primary,
+
+                                      padding:
+                                          const EdgeInsets.symmetric(
+                                        vertical:
+                                            14,
+                                      ),
+
+                                      shape:
+                                          RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(
+                                          16,
+                                        ),
+                                      ),
+                                    ),
+
+                                    child:
+                                        const Text(
+                                      "View Details",
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+      ),
+    );
+  }
+
+  Widget buildInfoRow({
+    required IconData icon,
+    required String title,
+    required String value,
+  }) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+
+          size: 18,
+
+          color:
+              AppColors.primary,
+        ),
+
+        const SizedBox(width: 10),
+
+        Text(
+          "$title: ",
+
+          style:
+              const TextStyle(
+            fontWeight:
+                FontWeight.bold,
+          ),
+        ),
+
+        Expanded(
+          child: Text(value),
+        ),
+      ],
+    );
+  }
+}

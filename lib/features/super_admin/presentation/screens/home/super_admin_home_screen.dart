@@ -1,0 +1,644 @@
+import 'package:flutter/material.dart';
+
+import '../../../../../theme/app_colors.dart';
+import '../../../../../services/super_admin/super_admin_service.dart';
+
+class SuperAdminHomeScreen
+    extends StatefulWidget {
+  const SuperAdminHomeScreen({
+    super.key,
+  });
+
+  @override
+  State<SuperAdminHomeScreen>
+      createState() =>
+          _SuperAdminHomeScreenState();
+}
+
+class _SuperAdminHomeScreenState
+    extends State<
+        SuperAdminHomeScreen> {
+  Map<String, dynamic>? stats;
+
+  bool loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    fetchStats();
+  }
+
+  Future<void> fetchStats() async {
+    try {
+      final response =
+          await SuperAdminService
+              .getDashboardStats();
+
+      setState(() {
+        stats = response["data"];
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor:
+          AppColors.background,
+
+      body: SafeArea(
+        child: loading
+            ? const Center(
+                child:
+                    CircularProgressIndicator(),
+              )
+            : RefreshIndicator(
+                onRefresh: fetchStats,
+
+                child:
+                    SingleChildScrollView(
+                  physics:
+                      const AlwaysScrollableScrollPhysics(),
+
+                  padding:
+                      const EdgeInsets.all(
+                    20,
+                  ),
+
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment
+                            .start,
+
+                    children: [
+                      /// HEADER
+                      Row(
+                        mainAxisAlignment:
+                            MainAxisAlignment
+                                .spaceBetween,
+
+                        children: [
+                          Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment
+                                    .start,
+
+                            children: const [
+                              Text(
+                                "Super Admin",
+
+                                style:
+                                    TextStyle(
+                                  fontSize:
+                                      30,
+
+                                  fontWeight:
+                                      FontWeight
+                                          .bold,
+
+                                  fontFamily:
+                                      'Poppins',
+                                ),
+                              ),
+
+                              SizedBox(
+                                height:
+                                    6,
+                              ),
+
+                              Text(
+                                "Scholarship Control Center",
+
+                                style:
+                                    TextStyle(
+                                  color:
+                                      AppColors.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          Container(
+                            padding:
+                                const EdgeInsets.all(
+                              14,
+                            ),
+
+                            decoration:
+                                BoxDecoration(
+                              color:
+                                  Colors.white,
+
+                              borderRadius:
+                                  BorderRadius.circular(
+                                18,
+                              ),
+                            ),
+
+                            child:
+                                const Icon(
+                              Icons
+                                  .admin_panel_settings_rounded,
+
+                              color:
+                                  AppColors.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(
+                        height: 28,
+                      ),
+
+                      /// HERO CARD
+                      Container(
+                        width:
+                            double.infinity,
+
+                        padding:
+                            const EdgeInsets.all(
+                          28,
+                        ),
+
+                        decoration:
+                            BoxDecoration(
+                          borderRadius:
+                              BorderRadius.circular(
+                            30,
+                          ),
+
+                          gradient:
+                              const LinearGradient(
+                            colors: [
+                              Color(
+                                0xFF0A1931,
+                              ),
+
+                              Color(
+                                0xFF132D46,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        child:
+                            Column(
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
+
+                          children: [
+                            const Text(
+                              "Total Scholarship Disbursed",
+
+                              style:
+                                  TextStyle(
+                                color:
+                                    Colors.white70,
+
+                                fontSize:
+                                    15,
+                              ),
+                            ),
+
+                            const SizedBox(
+                              height:
+                                  12,
+                            ),
+
+                            Text(
+                              "₹ ${stats?["totalDisbursed"] ?? 0}",
+
+                              style:
+                                  const TextStyle(
+                                color:
+                                    Colors.white,
+
+                                fontSize:
+                                    38,
+
+                                fontWeight:
+                                    FontWeight.bold,
+                              ),
+                            ),
+
+                            const SizedBox(
+                              height:
+                                  26,
+                            ),
+
+                            Row(
+                              children: [
+                                Expanded(
+                                  child:
+                                      buildMiniStat(
+                                    title:
+                                        "Students",
+
+                                    value:
+                                        "${stats?["totalStudents"] ?? 0}",
+                                  ),
+                                ),
+
+                                Expanded(
+                                  child:
+                                      buildMiniStat(
+                                    title:
+                                        "Mentors",
+
+                                    value:
+                                        "${stats?["totalMentors"] ?? 0}",
+                                  ),
+                                ),
+
+                                Expanded(
+                                  child:
+                                      buildMiniStat(
+                                    title:
+                                        "Admins",
+
+                                    value:
+                                        "${stats?["totalAdmins"] ?? 0}",
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 28,
+                      ),
+
+                      /// MAIN STATS
+                      GridView.count(
+                        shrinkWrap:
+                            true,
+
+                        physics:
+                            const NeverScrollableScrollPhysics(),
+
+                        crossAxisCount:
+                            2,
+
+                        crossAxisSpacing:
+                            18,
+
+                        mainAxisSpacing:
+                            18,
+
+                        childAspectRatio:
+                            1.05,
+
+                        children: [
+                          DashboardStatCard(
+                            title:
+                                "Approved Students",
+
+                            value:
+                                "${stats?["approvedStudents"] ?? 0}",
+
+                            icon:
+                                Icons.verified_rounded,
+                          ),
+
+                          DashboardStatCard(
+                            title:
+                                "Pending Verification",
+
+                            value:
+                                "${stats?["pendingStudents"] ?? 0}",
+
+                            icon:
+                                Icons.pending_actions_rounded,
+                          ),
+
+                          DashboardStatCard(
+                            title:
+                                "Rejected Students",
+
+                            value:
+                                "${stats?["rejectedStudents"] ?? 0}",
+
+                            icon:
+                                Icons.cancel_rounded,
+                          ),
+
+                          DashboardStatCard(
+                            title:
+                                "Platform Users",
+
+                            value:
+                                "${(stats?["totalStudents"] ?? 0) + (stats?["totalMentors"] ?? 0) + (stats?["totalAdmins"] ?? 0)}",
+
+                            icon:
+                                Icons.people_alt_rounded,
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(
+                        height: 32,
+                      ),
+
+                      /// OVERVIEW
+                      const Text(
+                        "System Overview",
+
+                        style:
+                            TextStyle(
+                          fontSize:
+                              22,
+
+                          fontWeight:
+                              FontWeight.bold,
+
+                          fontFamily:
+                              'Poppins',
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 18,
+                      ),
+
+                      buildOverviewTile(
+                        title:
+                            "Total Students",
+
+                        value:
+                            "${stats?["totalStudents"] ?? 0}",
+                      ),
+
+                      buildOverviewTile(
+                        title:
+                            "Total Mentors",
+
+                        value:
+                            "${stats?["totalMentors"] ?? 0}",
+                      ),
+
+                      buildOverviewTile(
+                        title:
+                            "District Admins",
+
+                        value:
+                            "${stats?["totalAdmins"] ?? 0}",
+                      ),
+
+                      buildOverviewTile(
+                        title:
+                            "Pending Student Verification",
+
+                        value:
+                            "${stats?["pendingStudents"] ?? 0}",
+                      ),
+
+                      buildOverviewTile(
+                        title:
+                            "Approved Students",
+
+                        value:
+                            "${stats?["approvedStudents"] ?? 0}",
+                      ),
+
+                      buildOverviewTile(
+                        title:
+                            "Rejected Students",
+
+                        value:
+                            "${stats?["rejectedStudents"] ?? 0}",
+                      ),
+
+                      const SizedBox(
+                        height: 30,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+      ),
+    );
+  }
+
+  Widget buildMiniStat({
+    required String title,
+    required String value,
+  }) {
+    return Column(
+      crossAxisAlignment:
+          CrossAxisAlignment.start,
+
+      children: [
+        Text(
+          title,
+
+          style: const TextStyle(
+            color: Colors.white70,
+          ),
+        ),
+
+        const SizedBox(height: 6),
+
+        Text(
+          value,
+
+          style: const TextStyle(
+            color: Colors.white,
+
+            fontSize: 22,
+
+            fontWeight:
+                FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildOverviewTile({
+    required String title,
+    required String value,
+  }) {
+    return Container(
+      margin:
+          const EdgeInsets.only(
+        bottom: 16,
+      ),
+
+      padding:
+          const EdgeInsets.all(
+        20,
+      ),
+
+      decoration: BoxDecoration(
+        color: Colors.white,
+
+        borderRadius:
+            BorderRadius.circular(
+          22,
+        ),
+
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black
+                .withValues(
+                  alpha: 0.04,
+                ),
+
+            blurRadius: 8,
+
+            offset:
+                const Offset(0, 4),
+          ),
+        ],
+      ),
+
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+
+              style: const TextStyle(
+                fontWeight:
+                    FontWeight.w600,
+              ),
+            ),
+          ),
+
+          Text(
+            value,
+
+            style: const TextStyle(
+              fontSize: 18,
+
+              fontWeight:
+                  FontWeight.bold,
+
+              color:
+                  AppColors.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DashboardStatCard
+    extends StatelessWidget {
+  final String title;
+
+  final String value;
+
+  final IconData icon;
+
+  const DashboardStatCard({
+    super.key,
+    required this.title,
+    required this.value,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding:
+          const EdgeInsets.all(
+        20,
+      ),
+
+      decoration: BoxDecoration(
+        color: Colors.white,
+
+        borderRadius:
+            BorderRadius.circular(
+          24,
+        ),
+
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black
+                .withValues(
+                  alpha: 0.04,
+                ),
+
+            blurRadius: 8,
+
+            offset:
+                const Offset(0, 4),
+          ),
+        ],
+      ),
+
+      child: Column(
+        crossAxisAlignment:
+            CrossAxisAlignment
+                .start,
+
+        children: [
+          Container(
+            padding:
+                const EdgeInsets.all(
+              14,
+            ),
+
+            decoration:
+                BoxDecoration(
+              color: AppColors
+                  .primary
+                  .withValues(
+                    alpha: 0.1,
+                  ),
+
+              borderRadius:
+                  BorderRadius.circular(
+                16,
+              ),
+            ),
+
+            child: Icon(
+              icon,
+
+              color:
+                  AppColors.primary,
+            ),
+          ),
+
+          const Spacer(),
+
+          Text(
+            value,
+
+            style: const TextStyle(
+              fontSize: 30,
+
+              fontWeight:
+                  FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 6),
+
+          Text(
+            title,
+
+            style: const TextStyle(
+              color: AppColors
+                  .textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

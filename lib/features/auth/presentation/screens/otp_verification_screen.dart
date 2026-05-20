@@ -4,11 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../theme/app_colors.dart';
 import '../../../../widgets/buttons/custom_button.dart';
-// import 'package:dio/dio.dart';
-
-// import '../../../../services/auth/auth_service.dart';
-// import '../../../../services/storage/storage_service.dart';
-
+import '../../../../../services/auth/auth_service.dart';
 class OtpVerificationScreen extends StatefulWidget {
   final String phoneNumber;
 
@@ -58,159 +54,131 @@ class _OtpVerificationScreenState
     super.dispose();
   }
 
-// Future<void> verifyOtp() async {
-//   try {
-//     setState(() {
-//       isLoading = true;
-//     });
-
-//     final response =
-//         await AuthService.verifyOtp(
-//       phone: widget.phoneNumber,
-//       otp: otpController.text.trim(),
-//     );
-
-//     if (response.statusCode == 200 ||
-//         response.statusCode == 201) {
-
-//       final data = response.data;
-
-//       final token = data['token'];
-
-//       final role =
-//           data['user']['role'];
-
-//       // SAVE TOKEN
-//       await StorageService.saveToken(token);
-
-//       // SAVE ROLE
-//       await StorageService.saveRole(role);
-
-//       if (!mounted) return;
-
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(
-//           content:
-//               Text('OTP Verified Successfully'),
-//         ),
-//       );
-
-//       // ROLE BASED NAVIGATION
-
-//       if (role == 'STUDENT') {
-//         Navigator.pushNamedAndRemoveUntil(
-//           context,
-//           '/student-dashboard',
-//           (route) => false,
-//         );
-//       }
-
-//       else if (role == 'MENTOR') {
-//         Navigator.pushNamedAndRemoveUntil(
-//           context,
-//           '/mentor-dashboard',
-//           (route) => false,
-//         );
-//       }
-
-//       else if (role == 'ADMIN') {
-//         Navigator.pushNamedAndRemoveUntil(
-//           context,
-//           '/admin-dashboard',
-//           (route) => false,
-//         );
-//       }
-
-//       else if (role == 'SUPER_ADMIN') {
-//         Navigator.pushNamedAndRemoveUntil(
-//           context,
-//           '/super-admin-dashboard',
-//           (route) => false,
-//         );
-//       }
-//     }
-//   } on DioException catch (e) {
-//     String errorMessage =
-//         'OTP Verification Failed';
-
-//     if (e.response != null &&
-//         e.response?.data != null) {
-
-//       errorMessage =
-//           e.response?.data['message'] ??
-//               errorMessage;
-//     }
-
-//     if (!mounted) return;
-
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       SnackBar(
-//         content: Text(errorMessage),
-//       ),
-//     );
-//   } catch (e) {
-//     if (!mounted) return;
-
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       SnackBar(
-//         content: Text(e.toString()),
-//       ),
-//     );
-//   } finally {
-//     if (mounted) {
-//       setState(() {
-//         isLoading = false;
-//       });
-//     }
-//   }
-// }
-
 Future<void> verifyOtp() async {
-
   try {
-
     setState(() {
       isLoading = true;
     });
 
-    // Fake API delay
-    await Future.delayed(
-      const Duration(seconds: 2),
+    final response =
+        await AuthService.verifyOtp(
+      phone: widget.phoneNumber,
+      otp: otpController.text.trim(),
     );
 
-    if (!mounted) return;
+    if (response["success"] == true) {
+      final me =
+          await AuthService.getMe();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'OTP Verified Successfully',
+      final user = me["data"];
+
+      final role = user["role"];
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        const SnackBar(
+          content: Text(
+            'OTP Verified Successfully',
+          ),
         ),
-      ),
-    );
+      );
 
-    // DIRECT NAVIGATION
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/student-dashboard',
-      (route) => false,
-    );
+      /// STUDENT FLOW
+      if (role == "STUDENT") {
+        final studentProfile =
+            user["studentProfile"];
 
+        /// NEW USER
+        if (studentProfile == null) {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/student-register',
+            (route) => false,
+          );
+
+          return;
+        }
+
+        /// PROFILE NOT COMPLETED
+        if (studentProfile[
+                "profileCompleted"] !=
+            true) {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/student-academic',
+            (route) => false,
+          );
+
+          return;
+        }
+
+        /// DOCUMENTS NOT UPLOADED
+        final documents =
+            studentProfile["documents"];
+
+        if (documents == null ||
+            documents.isEmpty ||
+            documents.length < 5) {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/student-document-upload',
+            (route) => false,
+          );
+
+          return;
+        }
+
+        /// EVERYTHING COMPLETED
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/student-dashboard',
+          (route) => false,
+        );
+      }
+
+      /// MENTOR
+      else if (role == "MENTOR") {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/mentor-dashboard',
+          (route) => false,
+        );
+      }
+
+      /// ADMIN
+      else if (role == "ADMIN") {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/admin-dashboard',
+          (route) => false,
+        );
+      }
+
+      /// SUPER ADMIN
+      else if (role ==
+          "SUPER_ADMIN") {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/super-admin-dashboard',
+          (route) => false,
+        );
+      }
+    }
   } catch (e) {
-
     if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context)
+        .showSnackBar(
       SnackBar(
         content: Text(
           e.toString(),
         ),
       ),
     );
-
   } finally {
-
     if (mounted) {
-
       setState(() {
         isLoading = false;
       });

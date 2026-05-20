@@ -1,53 +1,84 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/features/student/presentation/screens/student_academic_screen.dart';
-import 'package:flutter_application_1/services/auth/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import './student_document_upload_screen.dart';
+import '../../../../../services/auth/auth_service.dart';
 
-
-class StudentRegisterScreen extends StatefulWidget {
-  const StudentRegisterScreen({super.key});
+class StudentAcademicScreen extends StatefulWidget {
+  const StudentAcademicScreen({super.key});
 
   @override
-  State<StudentRegisterScreen> createState() =>
-      _StudentRegisterScreenState();
+  State<StudentAcademicScreen> createState() =>
+      _StudentAcademicScreenState();
 }
 
-class _StudentRegisterScreenState
-    extends State<StudentRegisterScreen> {
+class _StudentAcademicScreenState
+    extends State<StudentAcademicScreen> {
   final formKey = GlobalKey<FormState>();
 
-  final fullNameController =
+  final addressController =
       TextEditingController();
 
-  final fatherNameController =
+  final stateController =
       TextEditingController();
 
-  final schoolController =
+  final pincodeController =
       TextEditingController();
 
-  final classController =
+  final annualIncomeController =
       TextEditingController();
 
-  final districtController =
+  final joiningYearController =
       TextEditingController();
 
-  final samagraController =
+  final currentYearController =
       TextEditingController();
 
-  final apaarController =
+  final bankNameController =
       TextEditingController();
 
-  final marksController =
+  final accountNumberController =
       TextEditingController();
+
+  final ifscController =
+      TextEditingController();
+
+  DateTime? selectedDate;
 
   bool loading = false;
 
-  String gender = "Male";
+  String category = "General";
 
-  Future<void> completeProfile() async {
+  Future<void> pickDate() async {
+    final pickedDate = await showDatePicker(
+      context: context,
+      firstDate: DateTime(1990),
+      lastDate: DateTime.now(),
+      initialDate: DateTime(2008),
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        selectedDate = pickedDate;
+      });
+    }
+  }
+
+  Future<void> submitAcademicDetails() async {
     if (!formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (selectedDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Please select date of birth",
+          ),
+        ),
+      );
+
       return;
     }
 
@@ -62,36 +93,46 @@ class _StudentRegisterScreenState
       final token =
           prefs.getString("accessToken");
 
-      await Dio().post(
+      await Dio().put(
         "${AuthService.baseUrl.replaceAll('/auth', '')}/users/complete-profile",
 
         data: {
-          "fullName":
-              fullNameController.text.trim(),
+          "dateOfBirth":
+              selectedDate!.toIso8601String(),
 
-          "gender": gender,
+          "address":
+              addressController.text.trim(),
 
-          "district":
-              districtController.text.trim().toUpperCase(),
+          "state":
+              stateController.text.trim(),
 
-          "fatherName":
-              fatherNameController.text.trim(),
+          "pincode":
+              pincodeController.text.trim(),
 
-          "schoolName":
-              schoolController.text.trim(),
+          "category": category,
 
-          "currentClass":
-              classController.text.trim(),
-
-          "samagraId":
-              samagraController.text.trim(),
-
-          "apaarId":
-              apaarController.text.trim(),
-
-          "marks10th": double.parse(
-            marksController.text.trim(),
+          "annualIncome": double.parse(
+            annualIncomeController.text.trim(),
           ),
+
+          "joiningYear": int.parse(
+            joiningYearController.text.trim(),
+          ),
+
+          "currentYear": int.parse(
+            currentYearController.text.trim(),
+          ),
+
+          "bankName":
+              bankNameController.text.trim(),
+
+          "bankAccountNumber":
+              accountNumberController.text.trim(),
+
+          "ifscCode":
+              ifscController.text.trim(),
+
+          "profileCompleted": true,
         },
 
         options: Options(
@@ -107,18 +148,19 @@ class _StudentRegisterScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            "Profile completed successfully",
+            "Academic details submitted successfully",
           ),
         ),
       );
 
-    Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (_) =>
-        const StudentAcademicScreen(),
-  ),
-   );
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              const StudentDocumentUploadScreen(),
+        ),
+        (route) => false,
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -188,7 +230,7 @@ class _StudentRegisterScreenState
         backgroundColor: Colors.transparent,
 
         title: const Text(
-          "Complete Profile",
+          "Academic Details",
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
@@ -209,7 +251,7 @@ class _StudentRegisterScreenState
 
               children: [
                 const Text(
-                  "Student Registration",
+                  "Complete Academic Profile",
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight:
@@ -220,7 +262,7 @@ class _StudentRegisterScreenState
                 const SizedBox(height: 8),
 
                 const Text(
-                  "Complete your profile to continue",
+                  "Fill remaining details to continue",
                   style: TextStyle(
                     color: Colors.grey,
                     fontSize: 16,
@@ -229,63 +271,74 @@ class _StudentRegisterScreenState
 
                 const SizedBox(height: 30),
 
-                buildField(
-                  hint: "Full Name",
-                  controller:
-                      fullNameController,
-                ),
-
-                buildField(
-                  hint: "Father Name",
-                  controller:
-                      fatherNameController,
-                ),
-
-                buildField(
-                  hint: "School Name",
-                  controller:
-                      schoolController,
-                ),
-
-                buildField(
-                  hint: "Current Class",
-                  controller:
-                      classController,
-                ),
-
-                buildField(
-                  hint: "District",
-                  controller:
-                      districtController,
-                ),
-
-                buildField(
-                  hint: "Samagra ID",
-                  controller:
-                      samagraController,
-                  keyboard:
-                      TextInputType.number,
-                ),
-
-                buildField(
-                  hint: "Apaar ID",
-                  controller:
-                      apaarController,
-                ),
-
-                buildField(
-                  hint: "10th Percentage",
-                  controller:
-                      marksController,
-                  keyboard:
-                      TextInputType.number,
+                const Text(
+                  "Date of Birth",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
 
                 const SizedBox(height: 10),
 
-                DropdownButtonFormField<String>(
-                  initialValue: gender,
+                GestureDetector(
+                  onTap: pickDate,
 
+                  child: Container(
+                    width: double.infinity,
+                    padding:
+                        const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 18,
+                    ),
+
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+
+                      borderRadius:
+                          BorderRadius.circular(
+                        16,
+                      ),
+                    ),
+
+                    child: Text(
+                      selectedDate == null
+                          ? "Select Date of Birth"
+                          : "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}",
+
+                      style: TextStyle(
+                        color:
+                            selectedDate == null
+                                ? Colors.grey
+                                : Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 18),
+
+                buildField(
+                  hint: "Address",
+                  controller:
+                      addressController,
+                ),
+
+                buildField(
+                  hint: "State",
+                  controller:
+                      stateController,
+                ),
+
+                buildField(
+                  hint: "Pincode",
+                  controller:
+                      pincodeController,
+                  keyboard:
+                      TextInputType.number,
+                ),
+
+                DropdownButtonFormField<String>(
+                  initialValue: category,
                   decoration:
                       InputDecoration(
                     filled: true,
@@ -306,26 +359,82 @@ class _StudentRegisterScreenState
 
                   items: const [
                     DropdownMenuItem(
-                      value: "Male",
-                      child: Text("Male"),
+                      value: "General",
+                      child: Text("General"),
                     ),
 
                     DropdownMenuItem(
-                      value: "Female",
-                      child: Text("Female"),
+                      value: "OBC",
+                      child: Text("OBC"),
                     ),
 
                     DropdownMenuItem(
-                      value: "Other",
-                      child: Text("Other"),
+                      value: "SC",
+                      child: Text("SC"),
+                    ),
+
+                    DropdownMenuItem(
+                      value: "ST",
+                      child: Text("ST"),
+                    ),
+
+                    DropdownMenuItem(
+                      value: "EWS",
+                      child: Text("EWS"),
                     ),
                   ],
 
                   onChanged: (value) {
                     setState(() {
-                      gender = value!;
+                      category = value!;
                     });
                   },
+                ),
+
+                const SizedBox(height: 18),
+
+                buildField(
+                  hint: "Annual Family Income",
+                  controller:
+                      annualIncomeController,
+                  keyboard:
+                      TextInputType.number,
+                ),
+
+                buildField(
+                  hint: "Joining Year",
+                  controller:
+                      joiningYearController,
+                  keyboard:
+                      TextInputType.number,
+                ),
+
+                buildField(
+                  hint: "Current Year",
+                  controller:
+                      currentYearController,
+                  keyboard:
+                      TextInputType.number,
+                ),
+
+                buildField(
+                  hint: "Bank Name",
+                  controller:
+                      bankNameController,
+                ),
+
+                buildField(
+                  hint: "Bank Account Number",
+                  controller:
+                      accountNumberController,
+                  keyboard:
+                      TextInputType.number,
+                ),
+
+                buildField(
+                  hint: "IFSC Code",
+                  controller:
+                      ifscController,
                 ),
 
                 const SizedBox(height: 35),
@@ -337,7 +446,7 @@ class _StudentRegisterScreenState
                   child: ElevatedButton(
                     onPressed: loading
                         ? null
-                        : completeProfile,
+                        : submitAcademicDetails,
 
                     style:
                         ElevatedButton.styleFrom(
@@ -362,7 +471,7 @@ class _StudentRegisterScreenState
                                 Colors.white,
                           )
                         : const Text(
-                            "Complete Profile",
+                            "Submit Details",
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight:

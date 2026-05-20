@@ -1,4 +1,4 @@
 class ApiConstants {
   static const String baseUrl =
-      "https://unspeedy-nickie-oratorically.ngrok-free.dev/api/v1/";
+      "http://localhost:5000/api/v1/";
 }

@@ -1,106 +1,435 @@
 import 'package:flutter/material.dart';
 
+import '../../../../theme/app_colors.dart';
 import '../../../../widgets/buttons/custom_button.dart';
 import '../../../../widgets/inputs/custom_textfield.dart';
 
-class SuperAdminLoginScreen extends StatelessWidget {
-  const SuperAdminLoginScreen({super.key});
+import '../../../super_admin/presentation/screens/main/super_admin_dashboard_screen.dart';
+
+class SuperAdminLoginScreen
+    extends StatefulWidget {
+  const SuperAdminLoginScreen({
+    super.key,
+  });
+
+  @override
+  State<SuperAdminLoginScreen>
+      createState() =>
+          _SuperAdminLoginScreenState();
+}
+
+class _SuperAdminLoginScreenState
+    extends State<
+        SuperAdminLoginScreen> {
+  final phoneController =
+      TextEditingController();
+
+  final otpController =
+      TextEditingController();
+
+  bool otpSent = false;
+
+  bool loading = false;
+
+  Future<void> sendOtp() async {
+    setState(() {
+      loading = true;
+    });
+
+    await Future.delayed(
+      const Duration(seconds: 1),
+    );
+
+    setState(() {
+      otpSent = true;
+      loading = false;
+    });
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(
+      const SnackBar(
+        content: Text(
+          "OTP sent successfully",
+        ),
+      ),
+    );
+  }
+
+  Future<void> login() async {
+    setState(() {
+      loading = true;
+    });
+
+    await Future.delayed(
+      const Duration(seconds: 1),
+    );
+
+    if (!mounted) return;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            const SuperAdminDashboardScreen(),
+      ),
+    );
+
+    setState(() {
+      loading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Super Admin Login'),
-      ),
+      backgroundColor:
+          AppColors.background,
 
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding:
+              const EdgeInsets.all(20),
 
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 30),
+            crossAxisAlignment:
+                CrossAxisAlignment
+                    .start,
 
-              const Text(
-                'Welcome Super Admin',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
+            children: [
+              const SizedBox(height: 20),
+
+              /// TOP ICON
+              Center(
+                child: Container(
+                  padding:
+                      const EdgeInsets.all(
+                    24,
+                  ),
+
+                  decoration:
+                      BoxDecoration(
+                    color: Colors.white,
+
+                    shape: BoxShape.circle,
+
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black
+                            .withValues(
+                              alpha: 0.06,
+                            ),
+
+                        blurRadius: 12,
+
+                        offset:
+                            const Offset(
+                          0,
+                          4,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  child: const Icon(
+                    Icons
+                        .admin_panel_settings_rounded,
+
+                    size: 60,
+
+                    color:
+                        AppColors.primary,
+                  ),
                 ),
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 35),
+
+              /// TITLE
+              const Text(
+                'Super Admin Access',
+
+                style: TextStyle(
+                  fontSize: 34,
+
+                  fontWeight:
+                      FontWeight.bold,
+
+                  fontFamily:
+                      'Poppins',
+
+                  color: AppColors
+                      .textPrimary,
+                ),
+              ),
+
+              const SizedBox(height: 12),
 
               const Text(
-                'Login to manage the Super 500 platform',
+                'Secure access to the Super 500 platform control center',
+
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey,
+
+                  height: 1.5,
+
+                  color: AppColors
+                      .textSecondary,
                 ),
               ),
 
               const SizedBox(height: 40),
 
+              /// PHONE
               CustomTextField(
-                hintText: 'Super Admin Email',
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
+                hintText:
+                    'Super Admin Phone Number',
+
+                controller:
+                    phoneController,
+
+                keyboardType:
+                    TextInputType.phone,
               ),
 
               const SizedBox(height: 20),
 
-              CustomTextField(
-                hintText: 'Password',
-                controller: passwordController,
-                obscureText: true,
-              ),
+              /// OTP
+              if (otpSent)
+                CustomTextField(
+                  hintText:
+                      'Enter OTP',
+
+                  controller:
+                      otpController,
+
+                  keyboardType:
+                      TextInputType.number,
+                ),
 
               const SizedBox(height: 30),
 
+              /// BUTTON
               CustomButton(
-                text: 'Login',
+                text: loading
+                    ? "Please wait..."
+                    : otpSent
+                        ? "Login"
+                        : "Send OTP",
+
                 onPressed: () {
-                  
+                  if (loading) return;
+
+                  if (otpSent) {
+                    login();
+                  } else {
+                    sendOtp();
+                  }
                 },
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 35),
 
+              /// SECURITY NOTICE
               Container(
-                padding: const EdgeInsets.all(16),
+                padding:
+                    const EdgeInsets.all(
+                  18,
+                ),
 
-                decoration: BoxDecoration(
+                decoration:
+                    BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
+
+                  borderRadius:
+                      BorderRadius.circular(
+                    22,
+                  ),
 
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
+                      color: Colors.black
+                          .withValues(
+                            alpha: 0.05,
+                          ),
+
                       blurRadius: 10,
-                      offset: const Offset(0, 4),
+
+                      offset:
+                          const Offset(
+                        0,
+                        4,
+                      ),
                     ),
                   ],
                 ),
 
-                child: const Row(
+                child: Row(
+                  crossAxisAlignment:
+                      CrossAxisAlignment
+                          .start,
+
                   children: [
-                    Icon(
-                      Icons.security,
-                      color: Colors.red,
+                    Container(
+                      padding:
+                          const EdgeInsets.all(
+                        10,
+                      ),
+
+                      decoration:
+                          BoxDecoration(
+                        color: Colors.red
+                            .withValues(
+                              alpha: 0.1,
+                            ),
+
+                        borderRadius:
+                            BorderRadius.circular(
+                          14,
+                        ),
+                      ),
+
+                      child: const Icon(
+                        Icons.security,
+
+                        color: Colors.red,
+                      ),
                     ),
 
-                    SizedBox(width: 12),
+                    const SizedBox(width: 14),
 
-                    Expanded(
-                      child: Text(
-                        'Restricted access. Only authorized Labour Department officials can login.',
-                        style: TextStyle(
-                          fontSize: 14,
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment:
+                            CrossAxisAlignment
+                                .start,
+
+                        children: [
+                          Text(
+                            "Restricted Access",
+
+                            style: TextStyle(
+                              fontWeight:
+                                  FontWeight
+                                      .bold,
+
+                              fontSize: 16,
+                            ),
+                          ),
+
+                          SizedBox(height: 6),
+
+                          Text(
+                            "Only authorized Labour Department officials and system owners can access this panel.",
+
+                            style: TextStyle(
+                              fontSize: 14,
+
+                              height: 1.5,
+
+                              color: AppColors
+                                  .textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
+              /// SYSTEM INFO
+              Container(
+                width: double.infinity,
+
+                padding:
+                    const EdgeInsets.all(
+                  20,
+                ),
+
+                decoration:
+                    BoxDecoration(
+                  gradient:
+                      const LinearGradient(
+                    colors: [
+                      Color(
+                        0xFF0A1931,
+                      ),
+
+                      Color(
+                        0xFF132D46,
+                      ),
+                    ],
+                  ),
+
+                  borderRadius:
+                      BorderRadius.circular(
+                    24,
+                  ),
+                ),
+
+                child: const Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment
+                          .start,
+
+                  children: [
+                    Text(
+                      "SYSTEM STATUS",
+
+                      style: TextStyle(
+                        color:
+                            Colors.white70,
+
+                        letterSpacing:
+                            1.2,
+                      ),
+                    ),
+
+                    SizedBox(height: 14),
+
+                    Row(
+                      children: [
+                        Icon(
+                          Icons
+                              .verified_rounded,
+
+                          color:
+                              Colors.green,
                         ),
+
+                        SizedBox(width: 10),
+
+                        Text(
+                          "Platform Secure & Operational",
+
+                          style: TextStyle(
+                            color:
+                                Colors.white,
+
+                            fontSize: 18,
+
+                            fontWeight:
+                                FontWeight
+                                    .bold,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: 14),
+
+                    Text(
+                      "Super 500 Scholarship Management System",
+
+                      style: TextStyle(
+                        color:
+                            Colors.white70,
+
+                        height: 1.5,
                       ),
                     ),
                   ],
