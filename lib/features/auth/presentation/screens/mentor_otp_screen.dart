@@ -4,28 +4,27 @@ import '../../../../theme/app_colors.dart';
 
 import '../../../../widgets/buttons/custom_button.dart';
 import '../../../../widgets/inputs/custom_textfield.dart';
-
-import '../widgets/auth_switch_text.dart';
-
-import 'mentor_register_screen.dart';
-import 'mentor_otp_screen.dart';
 import '../../../../services/auth/auth_service.dart';
-class MentorLoginScreen
+import '../../../mentor/presentation/screens/main/mentor_main_screen.dart';
+class MentorOtpScreen
     extends StatefulWidget {
-  const MentorLoginScreen({
+  final String phone;
+
+  const MentorOtpScreen({
     super.key,
+    required this.phone,
   });
 
   @override
-  State<MentorLoginScreen>
+  State<MentorOtpScreen>
       createState() =>
-          _MentorLoginScreenState();
+          _MentorOtpScreenState();
 }
 
-class _MentorLoginScreenState
-    extends State<MentorLoginScreen> {
+class _MentorOtpScreenState
+    extends State<MentorOtpScreen> {
   final TextEditingController
-  phoneController =
+  otpController =
       TextEditingController();
 
   final GlobalKey<FormState>
@@ -36,64 +35,84 @@ class _MentorLoginScreenState
 
   @override
   void dispose() {
-    phoneController.dispose();
+    otpController.dispose();
 
     super.dispose();
   }
 
-  Future<void> sendOtp() async {
-    if (!_formKey.currentState!
-        .validate()) {
-      return;
-    }
+Future<void> verifyOtp() async {
+  if (!_formKey.currentState!
+      .validate()) {
+    return;
+  }
 
-    setState(() {
-      isLoading = true;
-    });
+  setState(() {
+    isLoading = true;
+  });
 
-    try {
-      Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) => MentorOtpScreen(
-              phone:
-                  phoneController.text,
-            ),
+  try {
+    final response =
+        await AuthService.verifyOtp(
+      phone: widget.phone,
+      otp: otpController.text.trim(),
+    );
+
+    final user =
+        response["data"]["user"];
+
+    final role =
+        user["role"];
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(
+      const SnackBar(
+        content: Text(
+          "Login Successful",
+        ),
       ),
     );
-      await AuthService.sendOtp(
-      phoneController.text.trim(),    
-      );
 
-      if (!mounted) return;
+    /// ROLE BASED NAVIGATION
 
+    if (role == "MENTOR") {
+  Navigator.pushAndRemoveUntil(
+    context,
+
+    MaterialPageRoute(
+      builder:
+          (_) =>
+              const MentorMainScreen(),
+    ),
+
+    (route) => false,
+  );
+} else {
       ScaffoldMessenger.of(context)
           .showSnackBar(
         const SnackBar(
           content: Text(
-            "OTP Sent Successfully",
+            "Unauthorized role",
           ),
         ),
       );
-
-      /// TODO:
-      /// NAVIGATE TO OTP SCREEN
-    } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        SnackBar(
-          content: Text(
-            e.toString(),
-          ),
-        ),
-      );
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
     }
+  } catch (e) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(
+      SnackBar(
+        content: Text(
+          e.toString(),
+        ),
+      ),
+    );
+  } finally {
+    setState(() {
+      isLoading = false;
+    });
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -105,9 +124,6 @@ class _MentorLoginScreenState
         elevation: 0,
         backgroundColor:
             Colors.transparent,
-        title: const Text(
-          'Mentor Login',
-        ),
       ),
 
       body: SafeArea(
@@ -128,7 +144,7 @@ class _MentorLoginScreenState
                 ),
 
                 const Text(
-                  'Welcome Mentor',
+                  "OTP Verification",
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight:
@@ -137,11 +153,11 @@ class _MentorLoginScreenState
                 ),
 
                 const SizedBox(
-                  height: 10,
+                  height: 12,
                 ),
 
                 Text(
-                  'Login to manage students and mentoring sessions',
+                  "Enter the OTP sent to ${widget.phone}",
                   style: TextStyle(
                     color: Colors
                         .grey.shade600,
@@ -155,23 +171,23 @@ class _MentorLoginScreenState
 
                 CustomTextField(
                   hintText:
-                      'Enter Mobile Number',
+                      "Enter OTP",
 
                   controller:
-                      phoneController,
+                      otpController,
 
                   keyboardType:
-                      TextInputType.phone,
+                      TextInputType.number,
 
                   validator: (value) {
                     if (value == null ||
                         value.isEmpty) {
-                      return "Phone number is required";
+                      return "OTP is required";
                     }
 
                     if (value.length <
-                        10) {
-                      return "Enter valid mobile number";
+                        4) {
+                      return "Enter valid OTP";
                     }
 
                     return null;
@@ -184,37 +200,26 @@ class _MentorLoginScreenState
 
                 CustomButton(
                   text: isLoading
-                      ? 'Sending OTP...'
-                      : 'Send OTP',
+                      ? 'Verifying...'
+                      : 'Verify OTP',
 
                   onPressed:
                       isLoading
                           ? null
-                          : sendOtp,
+                          : verifyOtp,
                 ),
 
                 const SizedBox(
-                  height: 30,
+                  height: 20,
                 ),
 
                 Center(
-                  child: AuthSwitchText(
-                    normalText:
-                        "Don't have an account? ",
+                  child: TextButton(
+                    onPressed: () {},
 
-                    actionText:
-                        'Register',
-
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (_) =>
-                                  const MentorRegisterScreen(),
-                        ),
-                      );
-                    },
+                    child: const Text(
+                      "Resend OTP",
+                    ),
                   ),
                 ),
               ],

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../services/auth/auth_service.dart';
+
 import '../../../../theme/app_colors.dart';
 import '../../../../widgets/buttons/custom_button.dart';
 import '../../../../widgets/inputs/custom_textfield.dart';
@@ -31,54 +33,159 @@ class _SuperAdminLoginScreenState
 
   bool loading = false;
 
+  /// ======================================
+  /// SEND OTP
+  /// ======================================
+
   Future<void> sendOtp() async {
-    setState(() {
-      loading = true;
-    });
+    try {
+      if (phoneController.text
+          .trim()
+          .isEmpty) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Enter phone number",
+            ),
+          ),
+        );
 
-    await Future.delayed(
-      const Duration(seconds: 1),
-    );
+        return;
+      }
 
-    setState(() {
-      otpSent = true;
-      loading = false;
-    });
+      setState(() {
+        loading = true;
+      });
 
-    if (!mounted) return;
+      final response =
+          await AuthService.sendOtp(
+        phoneController.text.trim(),
+      );
 
-    ScaffoldMessenger.of(context)
-        .showSnackBar(
-      const SnackBar(
-        content: Text(
-          "OTP sent successfully",
+      if (response["success"] ==
+          true) {
+        setState(() {
+          otpSent = true;
+        });
+
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context)
+            .showSnackBar(
+          const SnackBar(
+            content: Text(
+              "OTP sent successfully",
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString(),
+          ),
         ),
-      ),
-    );
+      );
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
+  /// ======================================
+  /// LOGIN
+  /// ======================================
+
   Future<void> login() async {
-    setState(() {
-      loading = true;
-    });
+    try {
+      if (otpController.text
+          .trim()
+          .isEmpty) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Enter OTP",
+            ),
+          ),
+        );
 
-    await Future.delayed(
-      const Duration(seconds: 1),
-    );
+        return;
+      }
 
-    if (!mounted) return;
+      setState(() {
+        loading = true;
+      });
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) =>
-            const SuperAdminDashboardScreen(),
-      ),
-    );
+      /// VERIFY OTP
+      final response =
+          await AuthService.verifyOtp(
+        phone:
+            phoneController.text.trim(),
 
-    setState(() {
-      loading = false;
-    });
+        otp:
+            otpController.text.trim(),
+      );
+
+      if (response["success"] !=
+          true) {
+        throw Exception(
+          "Login failed",
+        );
+      }
+
+      /// GET USER
+      final me =
+          await AuthService.getMe();
+
+      final user = me["data"];
+
+      final role = user["role"];
+
+      /// BLOCK NON SUPER ADMINS
+      if (role !=
+          "SUPER_ADMIN") {
+        throw Exception(
+          "You are not authorized as Super Admin",
+        );
+      }
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Super Admin Login Successful",
+          ),
+        ),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              const SuperAdminDashboardScreen(),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString(),
+          ),
+        ),
+      );
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   @override
@@ -358,7 +465,6 @@ class _SuperAdminLoginScreenState
                       Color(
                         0xFF0A1931,
                       ),
-
                       Color(
                         0xFF132D46,
                       ),

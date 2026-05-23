@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../services/auth/auth_service.dart';
+
 import '../home/super_admin_home_screen.dart';
 import '../students/students_screen.dart';
 import '../mentors/mentors_screen.dart';
@@ -24,6 +26,8 @@ class _SuperAdminDashboardScreenState
     extends State<
         SuperAdminDashboardScreen> {
   int currentIndex = 0;
+
+  bool loading = true;
 
   late final List<Widget> screens;
 
@@ -50,7 +54,63 @@ class _SuperAdminDashboardScreenState
         onNavigate: changeTab,
       ),
     ];
+
+    validateSuperAdmin();
   }
+
+  /// =====================================
+  /// VALIDATE SUPER ADMIN
+  /// =====================================
+
+  Future<void>
+      validateSuperAdmin() async {
+    try {
+      final me =
+          await AuthService.getMe();
+
+      final user = me["data"];
+
+      final role = user["role"];
+
+      if (role !=
+          "SUPER_ADMIN") {
+        if (!mounted) return;
+
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/',
+          (route) => false,
+        );
+
+        return;
+      }
+
+      setState(() {
+        loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString(),
+          ),
+        ),
+      );
+
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/',
+        (route) => false,
+      );
+    }
+  }
+
+  /// =====================================
+  /// CHANGE TAB
+  /// =====================================
 
   void changeTab(int index) {
     setState(() {
@@ -60,6 +120,15 @@ class _SuperAdminDashboardScreenState
 
   @override
   Widget build(BuildContext context) {
+    if (loading) {
+      return const Scaffold(
+        body: Center(
+          child:
+              CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       body: screens[currentIndex],
 

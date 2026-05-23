@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../services/admin/admin_service.dart';
+
 import '../../../../../theme/app_colors.dart';
 
-import '../../../../../services/super_admin/super_admin_service.dart';
-
-class SuperAdminHomeScreen
+class AdminHomeScreen
     extends StatefulWidget {
-  const SuperAdminHomeScreen({
+  const AdminHomeScreen({
     super.key,
   });
 
   @override
-  State<SuperAdminHomeScreen>
+  State<AdminHomeScreen>
       createState() =>
-          _SuperAdminHomeScreenState();
+          _AdminHomeScreenState();
 }
 
-class _SuperAdminHomeScreenState
+class _AdminHomeScreenState
     extends State<
-        SuperAdminHomeScreen> {
+        AdminHomeScreen> {
   Map<String, dynamic>? stats;
 
   bool loading = true;
@@ -29,14 +29,15 @@ class _SuperAdminHomeScreenState
   void initState() {
     super.initState();
 
-    fetchStats();
+    fetchDashboard();
   }
 
   /// =====================================
-  /// FETCH DASHBOARD STATS
+  /// FETCH DASHBOARD
   /// =====================================
 
-  Future<void> fetchStats() async {
+  Future<void>
+      fetchDashboard() async {
     try {
       if (mounted) {
         setState(() {
@@ -46,13 +47,13 @@ class _SuperAdminHomeScreenState
       }
 
       final response =
-          await SuperAdminService
+          await AdminService
               .getDashboardStats();
 
       if (response["success"] !=
           true) {
         throw Exception(
-          "Failed to fetch dashboard stats",
+          "Failed to load dashboard",
         );
       }
 
@@ -68,7 +69,7 @@ class _SuperAdminHomeScreenState
 
       setState(() {
         errorMessage =
-            e.toString();
+            "Failed to load dashboard";
       });
     } finally {
       if (mounted) {
@@ -92,86 +93,51 @@ class _SuperAdminHomeScreenState
                     CircularProgressIndicator(),
               )
 
-            /// ERROR STATE
+            /// ERROR
             : errorMessage != null
                 ? Center(
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.all(
-                        24,
-                      ),
+                    child: Column(
+                      mainAxisAlignment:
+                          MainAxisAlignment
+                              .center,
 
-                      child: Column(
-                        mainAxisAlignment:
-                            MainAxisAlignment
-                                .center,
+                      children: [
+                        const Icon(
+                          Icons.error,
+                          color:
+                              Colors.red,
+                          size: 70,
+                        ),
 
-                        children: [
-                          const Icon(
-                            Icons
-                                .error_outline_rounded,
+                        const SizedBox(
+                          height: 16,
+                        ),
 
-                            size: 70,
+                        Text(
+                          errorMessage!,
+                        ),
 
-                            color: Colors.red,
+                        const SizedBox(
+                          height: 20,
+                        ),
+
+                        ElevatedButton(
+                          onPressed:
+                              fetchDashboard,
+
+                          child:
+                              const Text(
+                            "Retry",
                           ),
-
-                          const SizedBox(
-                            height: 18,
-                          ),
-
-                          const Text(
-                            "Failed to load dashboard",
-
-                            style: TextStyle(
-                              fontSize: 22,
-
-                              fontWeight:
-                                  FontWeight
-                                      .bold,
-                            ),
-                          ),
-
-                          const SizedBox(
-                            height: 10,
-                          ),
-
-                          Text(
-                            errorMessage!,
-
-                            textAlign:
-                                TextAlign
-                                    .center,
-
-                            style:
-                                const TextStyle(
-                              color: AppColors
-                                  .textSecondary,
-                            ),
-                          ),
-
-                          const SizedBox(
-                            height: 24,
-                          ),
-
-                          ElevatedButton(
-                            onPressed:
-                                fetchStats,
-
-                            child:
-                                const Text(
-                              "Retry",
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   )
 
-                /// SUCCESS STATE
+                /// SUCCESS
                 : RefreshIndicator(
                     onRefresh:
-                        fetchStats,
+                        fetchDashboard,
 
                     child:
                         SingleChildScrollView(
@@ -204,7 +170,7 @@ class _SuperAdminHomeScreenState
                                 children:
                                     const [
                                   Text(
-                                    "Super Admin",
+                                    "District Admin",
 
                                     style:
                                         TextStyle(
@@ -212,8 +178,7 @@ class _SuperAdminHomeScreenState
                                           30,
 
                                       fontWeight:
-                                          FontWeight
-                                              .bold,
+                                          FontWeight.bold,
 
                                       fontFamily:
                                           'Poppins',
@@ -226,7 +191,7 @@ class _SuperAdminHomeScreenState
                                   ),
 
                                   Text(
-                                    "Scholarship Control Center",
+                                    "District Management Dashboard",
 
                                     style:
                                         TextStyle(
@@ -308,7 +273,7 @@ class _SuperAdminHomeScreenState
 
                               children: [
                                 const Text(
-                                  "Total Scholarship Disbursed",
+                                  "District Scholarship Distribution",
 
                                   style:
                                       TextStyle(
@@ -326,7 +291,7 @@ class _SuperAdminHomeScreenState
                                 ),
 
                                 Text(
-                                  "₹ ${stats?["totalDisbursed"] ?? 0}",
+                                  "₹ ${stats?["totalExpenses"] ?? 0}",
 
                                   style:
                                       const TextStyle(
@@ -343,7 +308,7 @@ class _SuperAdminHomeScreenState
 
                                 const SizedBox(
                                   height:
-                                      26,
+                                      24,
                                 ),
 
                                 Row(
@@ -374,10 +339,10 @@ class _SuperAdminHomeScreenState
                                       child:
                                           buildMiniStat(
                                         title:
-                                            "Admins",
+                                            "Pending",
 
                                         value:
-                                            "${stats?["totalAdmins"] ?? 0}",
+                                            "${stats?["pendingStudents"] ?? 0}",
                                       ),
                                     ),
                                   ],
@@ -411,7 +376,7 @@ class _SuperAdminHomeScreenState
                                 1.05,
 
                             children: [
-                              DashboardStatCard(
+                              DashboardCard(
                                 title:
                                     "Approved Students",
 
@@ -422,7 +387,7 @@ class _SuperAdminHomeScreenState
                                     Icons.verified_rounded,
                               ),
 
-                              DashboardStatCard(
+                              DashboardCard(
                                 title:
                                     "Pending Verification",
 
@@ -433,32 +398,105 @@ class _SuperAdminHomeScreenState
                                     Icons.pending_actions_rounded,
                               ),
 
-                              DashboardStatCard(
+                              DashboardCard(
                                 title:
-                                    "Rejected Students",
+                                    "District Mentors",
 
                                 value:
-                                    "${stats?["rejectedStudents"] ?? 0}",
+                                    "${stats?["totalMentors"] ?? 0}",
 
                                 icon:
-                                    Icons.cancel_rounded,
+                                    Icons.groups_rounded,
                               ),
 
-                              DashboardStatCard(
+                              DashboardCard(
                                 title:
-                                    "Platform Users",
+                                    "District Students",
 
                                 value:
-                                    "${(stats?["totalStudents"] ?? 0) + (stats?["totalMentors"] ?? 0) + (stats?["totalAdmins"] ?? 0)}",
+                                    "${stats?["totalStudents"] ?? 0}",
 
                                 icon:
-                                    Icons.people_alt_rounded,
+                                    Icons.school_rounded,
                               ),
                             ],
                           ),
 
                           const SizedBox(
-                            height: 32,
+                            height: 30,
+                          ),
+
+                          /// QUICK ACTIONS
+                          const Text(
+                            "Quick Actions",
+
+                            style:
+                                TextStyle(
+                              fontSize:
+                                  22,
+
+                              fontWeight:
+                                  FontWeight.bold,
+
+                              fontFamily:
+                                  'Poppins',
+                            ),
+                          ),
+
+                          const SizedBox(
+                            height: 18,
+                          ),
+
+                          buildQuickAction(
+                            icon:
+                                Icons
+                                    .verified_user_rounded,
+
+                            title:
+                                "Verify Students",
+
+                            subtitle:
+                                "Approve or reject district students",
+                          ),
+
+                          buildQuickAction(
+                            icon:
+                                Icons
+                                    .description_rounded,
+
+                            title:
+                                "Verify Documents",
+
+                            subtitle:
+                                "Approve pending student documents",
+                          ),
+
+                          buildQuickAction(
+                            icon:
+                                Icons
+                                    .currency_rupee_rounded,
+
+                            title:
+                                "Approve Expenses",
+
+                            subtitle:
+                                "Review student financial requests",
+                          ),
+
+                          buildQuickAction(
+                            icon:
+                                Icons
+                                    .groups_rounded,
+
+                            title:
+                                "Manage Mentors",
+
+                            subtitle:
+                                "Assign and verify district mentors",
+                          ),
+
+                          const SizedBox(
+                            height: 100,
                           ),
                         ],
                       ),
@@ -502,9 +540,111 @@ class _SuperAdminHomeScreenState
       ],
     );
   }
+
+  Widget buildQuickAction({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
+    return Container(
+      margin:
+          const EdgeInsets.only(
+        bottom: 18,
+      ),
+
+      padding:
+          const EdgeInsets.all(
+        20,
+      ),
+
+      decoration: BoxDecoration(
+        color: Colors.white,
+
+        borderRadius:
+            BorderRadius.circular(
+          24,
+        ),
+      ),
+
+      child: Row(
+        children: [
+          Container(
+            padding:
+                const EdgeInsets.all(
+              14,
+            ),
+
+            decoration:
+                BoxDecoration(
+              color: AppColors
+                  .primary
+                  .withValues(
+                    alpha: 0.1,
+                  ),
+
+              borderRadius:
+                  BorderRadius.circular(
+                16,
+              ),
+            ),
+
+            child: Icon(
+              icon,
+
+              color:
+                  AppColors.primary,
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment
+                      .start,
+
+              children: [
+                Text(
+                  title,
+
+                  style:
+                      const TextStyle(
+                    fontSize: 17,
+
+                    fontWeight:
+                        FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(
+                  height: 6,
+                ),
+
+                Text(
+                  subtitle,
+
+                  style:
+                      const TextStyle(
+                    color: AppColors
+                        .textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const Icon(
+            Icons.arrow_forward_ios,
+            size: 18,
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-class DashboardStatCard
+class DashboardCard
     extends StatelessWidget {
   final String title;
 
@@ -512,7 +652,7 @@ class DashboardStatCard
 
   final IconData icon;
 
-  const DashboardStatCard({
+  const DashboardCard({
     super.key,
     required this.title,
     required this.value,

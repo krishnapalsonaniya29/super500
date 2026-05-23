@@ -1,32 +1,35 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../services/super_admin/super_admin_service.dart';
+import '../../../../../services/admin/admin_service.dart';
+
 import '../../../../../theme/app_colors.dart';
+import 'pending_mentors_screen.dart';
+class MentorsScreen
+    extends StatefulWidget {
+  final Function(int index)
+      onNavigate;
 
-import 'create_admin_screen.dart';
-
-class AdminsScreen extends StatefulWidget {
-  final Function(int index) onNavigate;
-
-  const AdminsScreen({
+  const MentorsScreen({
     super.key,
     required this.onNavigate,
   });
 
   @override
-  State<AdminsScreen> createState() =>
-      _AdminsScreenState();
+  State<MentorsScreen>
+      createState() =>
+          _MentorsScreenState();
 }
 
-class _AdminsScreenState
-    extends State<AdminsScreen> {
-  List admins = [];
+class _MentorsScreenState
+    extends State<
+        MentorsScreen> {
+  List mentors = [];
 
-  List filteredAdmins = [];
+  List filteredMentors = [];
 
   bool loading = true;
 
-  bool deleting = false;
+  bool actionLoading = false;
 
   String searchQuery = "";
 
@@ -44,14 +47,14 @@ class _AdminsScreenState
   void initState() {
     super.initState();
 
-    fetchAdmins();
+    fetchMentors();
   }
 
   /// =====================================
-  /// FETCH ADMINS
+  /// FETCH MENTORS
   /// =====================================
 
-  Future<void> fetchAdmins() async {
+  Future<void> fetchMentors() async {
     try {
       setState(() {
         loading = true;
@@ -59,20 +62,18 @@ class _AdminsScreenState
       });
 
       final response =
-          await SuperAdminService
-              .getAdmins();
+          await AdminService
+              .getMentors();
 
-      final data =
+      mentors =
           response["data"] ?? [];
-
-      admins = data;
 
       applySearch();
     } catch (e) {
       debugPrint(e.toString());
 
       errorMessage =
-          "Failed to load admins";
+          "Failed to load mentors";
     } finally {
       if (mounted) {
         setState(() {
@@ -87,17 +88,12 @@ class _AdminsScreenState
   /// =====================================
 
   void applySearch() {
-    filteredAdmins =
-        admins.where((admin) {
-      final user = admin["user"];
+    filteredMentors =
+        mentors.where((mentor) {
+      final user = mentor["user"];
 
       final name =
           (user["fullName"] ?? "")
-              .toString()
-              .toLowerCase();
-
-      final district =
-          (admin["district"] ?? "")
               .toString()
               .toLowerCase();
 
@@ -105,14 +101,19 @@ class _AdminsScreenState
           (user["phone"] ?? "")
               .toString();
 
+      final district =
+          (mentor["district"] ?? "")
+              .toString()
+              .toLowerCase();
+
       return name.contains(
-            searchQuery.toLowerCase(),
-          ) ||
-          district.contains(
             searchQuery.toLowerCase(),
           ) ||
           phone.contains(
             searchQuery,
+          ) ||
+          district.contains(
+            searchQuery.toLowerCase(),
           );
     }).toList();
 
@@ -126,11 +127,11 @@ class _AdminsScreenState
   /// =====================================
 
   int get totalPages =>
-      (filteredAdmins.length /
+      (filteredMentors.length /
               itemsPerPage)
           .ceil();
 
-  List get paginatedAdmins {
+  List get paginatedMentors {
     final start =
         (currentPage - 1) *
             itemsPerPage;
@@ -139,32 +140,33 @@ class _AdminsScreenState
         start + itemsPerPage;
 
     if (end >
-        filteredAdmins.length) {
-      end = filteredAdmins.length;
+        filteredMentors.length) {
+      end =
+          filteredMentors.length;
     }
 
-    return filteredAdmins.sublist(
+    return filteredMentors.sublist(
       start,
       end,
     );
   }
 
   /// =====================================
-  /// DELETE ADMIN
+  /// VERIFY MENTOR
   /// =====================================
 
-  Future<void> deleteAdmin(
+  Future<void> verifyMentor(
     String id,
   ) async {
     try {
       setState(() {
-        deleting = true;
+        actionLoading = true;
       });
 
-      await SuperAdminService
-          .deleteAdmin(id);
+      await AdminService
+          .verifyMentor(id);
 
-      await fetchAdmins();
+      await fetchMentors();
 
       if (!mounted) return;
 
@@ -174,7 +176,7 @@ class _AdminsScreenState
           backgroundColor:
               Colors.green,
           content: Text(
-            "Admin deleted successfully",
+            "Mentor verified successfully",
           ),
         ),
       );
@@ -187,81 +189,32 @@ class _AdminsScreenState
           backgroundColor:
               Colors.red,
           content: Text(
-            "Failed to delete admin",
+            "Failed to verify mentor",
           ),
         ),
       );
     } finally {
       if (mounted) {
         setState(() {
-          deleting = false;
+          actionLoading = false;
         });
       }
     }
   }
 
-  /// =====================================
-  /// CONFIRM DELETE
-  /// =====================================
-
-  void confirmDelete(
-    String id,
-    String name,
-  ) {
-    showDialog(
-      context: context,
-      builder:
-          (_) => AlertDialog(
-        title:
-            const Text(
-          "Delete Admin",
-        ),
-        content: Text(
-          "Are you sure you want to delete $name?",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(
-                context,
-              );
-            },
-            child:
-                const Text(
-              "Cancel",
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(
-                context,
-              );
-
-              await deleteAdmin(
-                id,
-              );
-            },
-            style:
-                ElevatedButton.styleFrom(
-              backgroundColor:
-                  Colors.red,
-            ),
-            child:
-                const Text(
-              "Delete",
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Color getStatusColor(
-    bool active,
+    String status,
   ) {
-    return active
-        ? Colors.green
-        : Colors.red;
+    switch (status) {
+      case "APPROVED":
+        return Colors.green;
+
+      case "REJECTED":
+        return Colors.red;
+
+      default:
+        return Colors.orange;
+    }
   }
 
   @override
@@ -270,36 +223,6 @@ class _AdminsScreenState
       backgroundColor:
           AppColors.background,
 
-      floatingActionButton:
-          FloatingActionButton.extended(
-        backgroundColor:
-            AppColors.primary,
-
-        onPressed: () async {
-          final created =
-              await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder:
-                  (_) =>
-                      const CreateAdminScreen(),
-            ),
-          );
-
-          if (created == true) {
-            fetchAdmins();
-          }
-        },
-
-        icon: const Icon(
-          Icons.add,
-        ),
-
-        label: const Text(
-          "Create Admin",
-        ),
-      ),
-
       body: SafeArea(
         child: loading
             ? const Center(
@@ -307,32 +230,38 @@ class _AdminsScreenState
                     CircularProgressIndicator(),
               )
 
-            /// ERROR STATE
+            /// ERROR
             : errorMessage != null
                 ? Center(
                     child: Column(
                       mainAxisAlignment:
                           MainAxisAlignment
                               .center,
+
                       children: [
                         const Icon(
                           Icons.error,
                           color:
                               Colors.red,
-                          size: 60,
+                          size: 70,
                         ),
+
                         const SizedBox(
                           height: 16,
                         ),
+
                         Text(
                           errorMessage!,
                         ),
+
                         const SizedBox(
                           height: 20,
                         ),
+
                         ElevatedButton(
                           onPressed:
-                              fetchAdmins,
+                              fetchMentors,
+
                           child:
                               const Text(
                             "Retry",
@@ -345,7 +274,7 @@ class _AdminsScreenState
                 /// SUCCESS
                 : RefreshIndicator(
                     onRefresh:
-                        fetchAdmins,
+                        fetchMentors,
 
                     child:
                         SingleChildScrollView(
@@ -365,14 +294,16 @@ class _AdminsScreenState
                         children: [
                           /// HEADER
                           const Text(
-                            "District Admins",
+                            "District Mentors",
+
                             style:
                                 TextStyle(
                               fontSize:
                                   30,
+
                               fontWeight:
-                                  FontWeight
-                                      .bold,
+                                  FontWeight.bold,
+
                               fontFamily:
                                   'Poppins',
                             ),
@@ -383,7 +314,8 @@ class _AdminsScreenState
                           ),
 
                           Text(
-                            "${filteredAdmins.length} admins found",
+                            "${filteredMentors.length} mentors found",
+
                             style:
                                 const TextStyle(
                               color: AppColors
@@ -411,7 +343,7 @@ class _AdminsScreenState
                             decoration:
                                 InputDecoration(
                               hintText:
-                                  "Search admin, district, phone",
+                                  "Search mentors",
 
                               prefixIcon:
                                   const Icon(
@@ -436,12 +368,61 @@ class _AdminsScreenState
                             ),
                           ),
 
-                          const SizedBox(
-                            height: 24,
+                          SizedBox(
+                            width: double.infinity,
+
+                            height: 54,
+
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (_) =>
+                                            const PendingMentorsScreen(),
+                                  ),
+                                );
+
+                                fetchMentors();
+                              },
+
+                              style:
+                                  ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Colors.orange,
+
+                                shape:
+                                    RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(
+                                    18,
+                                  ),
+                                ),
+                              ),
+
+                              icon: const Icon(
+                                Icons.pending_actions,
+                              ),
+
+                              label: const Text(
+                                "Pending Approval Mentors",
+
+                                style: TextStyle(
+                                  fontSize: 16,
+
+                                  fontWeight:
+                                      FontWeight.bold,
+                                ),
+                              ),
+                            ),
                           ),
 
+
+                         
+
                           /// EMPTY
-                          if (filteredAdmins
+                          if (filteredMentors
                               .isEmpty)
                             Container(
                               width:
@@ -468,21 +449,25 @@ class _AdminsScreenState
                                 children: [
                                   Icon(
                                     Icons
-                                        .search_off_rounded,
+                                        .groups_outlined,
                                     size: 70,
                                     color:
                                         Colors.grey,
                                   ),
+
                                   SizedBox(
                                     height:
                                         18,
                                   ),
+
                                   Text(
-                                    "No admins found",
+                                    "No mentors found",
+
                                     style:
                                         TextStyle(
                                       fontSize:
                                           18,
+
                                       fontWeight:
                                           FontWeight.bold,
                                     ),
@@ -500,22 +485,22 @@ class _AdminsScreenState
                                 const NeverScrollableScrollPhysics(),
 
                             itemCount:
-                                paginatedAdmins
+                                paginatedMentors
                                     .length,
 
                             itemBuilder:
                                 (_, index) {
-                              final admin =
-                                  paginatedAdmins[
+                              final mentor =
+                                  paginatedMentors[
                                       index];
 
                               final user =
-                                  admin[
+                                  mentor[
                                       "user"];
 
-                              final active =
-                                  user["isActive"] ??
-                                      true;
+                              final status =
+                                  mentor["verificationStatus"] ??
+                                      "PENDING";
 
                               return Container(
                                 margin:
@@ -548,15 +533,19 @@ class _AdminsScreenState
                                         CircleAvatar(
                                           radius:
                                               28,
+
                                           backgroundColor:
                                               AppColors.primary,
+
                                           child:
                                               Text(
                                             user["fullName"][0],
+
                                             style:
                                                 const TextStyle(
                                               color:
                                                   Colors.white,
+
                                               fontWeight:
                                                   FontWeight.bold,
                                             ),
@@ -573,23 +562,28 @@ class _AdminsScreenState
                                               Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
+
                                             children: [
                                               Text(
                                                 user["fullName"],
+
                                                 style:
                                                     const TextStyle(
                                                   fontSize:
                                                       18,
+
                                                   fontWeight:
                                                       FontWeight.bold,
                                                 ),
                                               ),
+
                                               const SizedBox(
                                                 height:
                                                     6,
                                               ),
+
                                               Text(
-                                                admin["district"] ??
+                                                mentor["district"] ??
                                                     "-",
                                               ),
                                             ],
@@ -601,33 +595,36 @@ class _AdminsScreenState
                                               const EdgeInsets.symmetric(
                                             horizontal:
                                                 12,
+
                                             vertical:
                                                 6,
                                           ),
+
                                           decoration:
                                               BoxDecoration(
                                             color:
                                                 getStatusColor(
-                                              active,
+                                              status,
                                             ).withValues(
                                               alpha:
                                                   0.1,
                                             ),
+
                                             borderRadius:
                                                 BorderRadius.circular(
                                               16,
                                             ),
                                           ),
+
                                           child:
                                               Text(
-                                            active
-                                                ? "Active"
-                                                : "Inactive",
+                                            status,
+
                                             style:
                                                 TextStyle(
                                               color:
                                                   getStatusColor(
-                                                active,
+                                                status,
                                               ),
                                             ),
                                           ),
@@ -659,10 +656,12 @@ class _AdminsScreenState
                                       icon:
                                           Icons.school,
                                       title:
-                                          "Students",
+                                          "Students Assigned",
                                       value:
-                                          admin["studentCount"]
-                                              .toString(),
+                                          (mentor["students"] as List?)
+                                                  ?.length
+                                                  .toString() ??
+                                              "0",
                                     ),
 
                                     const SizedBox(
@@ -672,12 +671,12 @@ class _AdminsScreenState
 
                                     buildInfoRow(
                                       icon:
-                                          Icons.groups,
+                                          Icons.location_city,
                                       title:
-                                          "Mentors",
+                                          "District",
                                       value:
-                                          admin["mentorCount"]
-                                              .toString(),
+                                          mentor["district"] ??
+                                              "-",
                                     ),
 
                                     const SizedBox(
@@ -688,25 +687,27 @@ class _AdminsScreenState
                                     SizedBox(
                                       width:
                                           double.infinity,
+
                                       child:
                                           ElevatedButton(
                                         onPressed:
-                                            deleting
+                                            actionLoading
                                                 ? null
                                                 : () {
-                                                    confirmDelete(
-                                                      admin["id"],
-                                                      user["fullName"],
+                                                    verifyMentor(
+                                                      mentor["id"],
                                                     );
                                                   },
+
                                         style:
                                             ElevatedButton.styleFrom(
                                           backgroundColor:
-                                              Colors.red,
+                                              Colors.green,
                                         ),
+
                                         child:
                                             const Text(
-                                          "Delete Admin",
+                                          "Verify Mentor",
                                         ),
                                       ),
                                     ),
@@ -725,6 +726,7 @@ class _AdminsScreenState
                             Row(
                               mainAxisAlignment:
                                   MainAxisAlignment.center,
+
                               children: [
                                 IconButton(
                                   onPressed:
@@ -736,6 +738,7 @@ class _AdminsScreenState
                                               });
                                             }
                                           : null,
+
                                   icon:
                                       const Icon(
                                     Icons
@@ -745,6 +748,7 @@ class _AdminsScreenState
 
                                 Text(
                                   "$currentPage / $totalPages",
+
                                   style:
                                       const TextStyle(
                                     fontWeight:
@@ -762,6 +766,7 @@ class _AdminsScreenState
                                               });
                                             }
                                           : null,
+
                                   icon:
                                       const Icon(
                                     Icons
@@ -795,17 +800,21 @@ class _AdminsScreenState
           color:
               AppColors.primary,
         ),
+
         const SizedBox(
           width: 10,
         ),
+
         Text(
           "$title: ",
+
           style:
               const TextStyle(
             fontWeight:
                 FontWeight.bold,
           ),
         ),
+
         Expanded(
           child: Text(
             value,

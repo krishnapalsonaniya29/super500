@@ -2,12 +2,12 @@ import 'package:dio/dio.dart';
 
 import '../../core/network/dio_client.dart';
 
-class SuperAdminService {
+class AdminService {
   static final Dio _dio =
       DioClient.instance;
 
   static const String baseUrl =
-      "/v1/super-admin";
+      "/v1/admin";
 
   /// =====================================
   /// DASHBOARD STATS
@@ -24,7 +24,7 @@ class SuperAdminService {
   }
 
   /// =====================================
-  /// GET ALL STUDENTS
+  /// GET DISTRICT STUDENTS
   /// =====================================
 
   static Future<Map<String, dynamic>>
@@ -38,21 +38,7 @@ class SuperAdminService {
   }
 
   /// =====================================
-  /// GET ALL ADMINS
-  /// =====================================
-
-  static Future<Map<String, dynamic>>
-      getAdmins() async {
-    final response =
-        await _dio.get(
-      "$baseUrl/admins",
-    );
-
-    return response.data;
-  }
-
-  /// =====================================
-  /// GET ALL MENTORS
+  /// GET DISTRICT MENTORS
   /// =====================================
 
   static Future<Map<String, dynamic>>
@@ -81,10 +67,10 @@ class SuperAdminService {
   /// REJECT STUDENT
   /// =====================================
 
-  static Future rejectStudent(
-    String id,
-    String reason,
-  ) async {
+  static Future rejectStudent({
+    required String id,
+    required String reason,
+  }) async {
     return await _dio.put(
       "$baseUrl/reject-student/$id",
 
@@ -96,84 +82,88 @@ class SuperAdminService {
   }
 
   /// =====================================
-  /// SUSPEND USER
+  /// VERIFY MENTOR
   /// =====================================
 
-  static Future suspendUser(
+  static Future verifyMentor(
     String id,
   ) async {
     return await _dio.put(
-      "$baseUrl/suspend-user/$id",
+      "$baseUrl/verify-mentor/$id",
     );
   }
 
   /// =====================================
-  /// ACTIVATE USER
+  /// APPROVE DOCUMENT
   /// =====================================
 
-  static Future activateUser(
+  static Future approveDocument(
     String id,
   ) async {
     return await _dio.put(
-      "$baseUrl/activate-user/$id",
+      "$baseUrl/approve-document/$id",
     );
   }
 
   /// =====================================
-  /// DELETE USER
+  /// REJECT DOCUMENT
   /// =====================================
 
-  static Future deleteUser(
-    String id,
-  ) async {
-    return await _dio.delete(
-      "$baseUrl/delete-user/$id",
-    );
-  }
-
-  /// =====================================
-  /// CREATE ADMIN
-  /// =====================================
-
-  static Future createAdmin({
-    required String fullName,
-    required String phone,
-    required String district,
+  static Future rejectDocument({
+    required String id,
+    required String remarks,
   }) async {
-    return await _dio.post(
-      "$baseUrl/create-admin",
+    return await _dio.put(
+      "$baseUrl/reject-document/$id",
 
       data: {
-        "fullName": fullName,
-
-        "phone": phone,
-
-        "district": district,
+        "remarks": remarks,
       },
     );
   }
 
   /// =====================================
-  /// DELETE ADMIN
+  /// APPROVE EXPENSE
   /// =====================================
 
-  static Future deleteAdmin(
+  static Future approveExpense(
     String id,
   ) async {
-    return await _dio.delete(
-      "$baseUrl/delete-admin/$id",
+    return await _dio.put(
+      "$baseUrl/approve-expense/$id",
     );
   }
 
   /// =====================================
-  /// DELETE MENTOR
+  /// REJECT EXPENSE
   /// =====================================
 
-  static Future deleteMentor(
+  static Future rejectExpense(
     String id,
   ) async {
-    return await _dio.delete(
-      "$baseUrl/delete-mentor/$id",
+    return await _dio.put(
+      "$baseUrl/reject-expense/$id",
+    );
+  }
+
+  /// =====================================
+  /// ASSIGN MENTOR
+  /// =====================================
+
+  static Future assignMentor({
+    required String studentId,
+    required String mentorId,
+  }) async {
+    return await _dio.put(
+      "$baseUrl/assign-mentor",
+
+      data: {
+        "studentId":
+            studentId,
+
+        "mentorId":
+            mentorId,
+      },
     );
   }
 }

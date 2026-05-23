@@ -1,30 +1,31 @@
 import 'package:flutter/material.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../services/auth/auth_service.dart';
-import '../../../../../services/super_admin/super_admin_service.dart';
+import '../../../../../services/admin/admin_service.dart';
 
 import '../../../../../theme/app_colors.dart';
 
-class SuperAdminProfileScreen
+class AdminProfileScreen
     extends StatefulWidget {
   final Function(int index)
       onNavigate;
 
-  const SuperAdminProfileScreen({
+  const AdminProfileScreen({
     super.key,
     required this.onNavigate,
   });
 
   @override
-  State<SuperAdminProfileScreen>
+  State<AdminProfileScreen>
       createState() =>
-          _SuperAdminProfileScreenState();
+          _AdminProfileScreenState();
 }
 
-class _SuperAdminProfileScreenState
+class _AdminProfileScreenState
     extends State<
-        SuperAdminProfileScreen> {
+        AdminProfileScreen> {
   bool loading = true;
 
   String? errorMessage;
@@ -55,7 +56,7 @@ class _SuperAdminProfileScreenState
           await AuthService.getMe();
 
       final dashboard =
-          await SuperAdminService
+          await AdminService
               .getDashboardStats();
 
       user = me["data"];
@@ -115,6 +116,7 @@ class _SuperAdminProfileScreenState
                       mainAxisAlignment:
                           MainAxisAlignment
                               .center,
+
                       children: [
                         const Icon(
                           Icons.error,
@@ -204,7 +206,7 @@ class _SuperAdminProfileScreenState
                                   ),
 
                                   Text(
-                                    "Super Admin Control Center",
+                                    "District Admin Control Center",
 
                                     style:
                                         TextStyle(
@@ -307,7 +309,7 @@ class _SuperAdminProfileScreenState
                                     child:
                                         Text(
                                       (user?["fullName"] ??
-                                              "S")[0]
+                                              "A")[0]
                                           .toUpperCase(),
 
                                       style:
@@ -332,7 +334,7 @@ class _SuperAdminProfileScreenState
 
                                 Text(
                                   user?["fullName"] ??
-                                      "Super Admin",
+                                      "District Admin",
 
                                   style:
                                       const TextStyle(
@@ -352,14 +354,16 @@ class _SuperAdminProfileScreenState
                                       8,
                                 ),
 
-                                const Text(
-                                  "Labour Department Control Authority",
+                                Text(
+                                  user?["adminProfile"]
+                                          ?["district"] ??
+                                      "District Administration",
 
                                   textAlign:
                                       TextAlign.center,
 
                                   style:
-                                      TextStyle(
+                                      const TextStyle(
                                     color:
                                         Colors.white70,
 
@@ -379,10 +383,10 @@ class _SuperAdminProfileScreenState
                                       child:
                                           buildProfileStat(
                                         title:
-                                            "Admins",
+                                            "Students",
 
                                         value:
-                                            "${stats?["totalAdmins"] ?? 0}",
+                                            "${stats?["totalStudents"] ?? 0}",
                                       ),
                                     ),
 
@@ -401,10 +405,10 @@ class _SuperAdminProfileScreenState
                                       child:
                                           buildProfileStat(
                                         title:
-                                            "Students",
+                                            "Pending",
 
                                         value:
-                                            "${stats?["totalStudents"] ?? 0}",
+                                            "${stats?["pendingStudents"] ?? 0}",
                                       ),
                                     ),
                                   ],
@@ -452,6 +456,19 @@ class _SuperAdminProfileScreenState
 
                           buildInfoTile(
                             icon:
+                                Icons.location_city,
+
+                            title:
+                                "District",
+
+                            value:
+                                user?["adminProfile"]
+                                        ?["district"] ??
+                                    "-",
+                          ),
+
+                          buildInfoTile(
+                            icon:
                                 Icons.security_rounded,
 
                             title:
@@ -494,7 +511,7 @@ class _SuperAdminProfileScreenState
                             height: 32,
                           ),
 
-                          /// SYSTEM STATUS
+                          /// DISTRICT ANALYTICS
                           Container(
                             width:
                                 double.infinity,
@@ -523,7 +540,7 @@ class _SuperAdminProfileScreenState
 
                               children: [
                                 const Text(
-                                  "System Status",
+                                  "District Analytics",
 
                                   style:
                                       TextStyle(
@@ -537,51 +554,47 @@ class _SuperAdminProfileScreenState
 
                                 const SizedBox(
                                   height:
-                                      18,
+                                      20,
                                 ),
 
-                                buildStatusRow(
+                                buildAnalyticsRow(
                                   title:
-                                      "Server",
+                                      "Approved Students",
 
-                                  status:
-                                      "Operational",
-
-                                  color:
-                                      Colors.green,
+                                  value:
+                                      "${stats?["approvedStudents"] ?? 0}",
                                 ),
 
-                                buildStatusRow(
+                                buildAnalyticsRow(
                                   title:
-                                      "Database",
+                                      "Pending Students",
 
-                                  status:
-                                      "Connected",
-
-                                  color:
-                                      Colors.green,
+                                  value:
+                                      "${stats?["pendingStudents"] ?? 0}",
                                 ),
 
-                                buildStatusRow(
+                                buildAnalyticsRow(
                                   title:
-                                      "Authentication",
+                                      "Total Students",
 
-                                  status:
-                                      "Secure",
-
-                                  color:
-                                      Colors.green,
+                                  value:
+                                      "${stats?["totalStudents"] ?? 0}",
                                 ),
 
-                                buildStatusRow(
+                                buildAnalyticsRow(
                                   title:
-                                      "Scholarship Engine",
+                                      "Total Mentors",
 
-                                  status:
-                                      "Running",
+                                  value:
+                                      "${stats?["totalMentors"] ?? 0}",
+                                ),
 
-                                  color:
-                                      Colors.green,
+                                buildAnalyticsRow(
+                                  title:
+                                      "Scholarship Distribution",
+
+                                  value:
+                                      "₹ ${stats?["totalExpenses"] ?? 0}",
                                 ),
                               ],
                             ),
@@ -771,10 +784,9 @@ class _SuperAdminProfileScreenState
     );
   }
 
-  Widget buildStatusRow({
+  Widget buildAnalyticsRow({
     required String title,
-    required String status,
-    required Color color,
+    required String value,
   }) {
     return Padding(
       padding:
@@ -795,35 +807,15 @@ class _SuperAdminProfileScreenState
             ),
           ),
 
-          Container(
-            padding:
-                const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 8,
-            ),
+          Text(
+            value,
 
-            decoration:
-                BoxDecoration(
+            style: const TextStyle(
+              fontWeight:
+                  FontWeight.bold,
+
               color:
-                  color.withValues(
-                alpha: 0.1,
-              ),
-
-              borderRadius:
-                  BorderRadius.circular(
-                20,
-              ),
-            ),
-
-            child: Text(
-              status,
-
-              style: TextStyle(
-                color: color,
-
-                fontWeight:
-                    FontWeight.bold,
-              ),
+                  AppColors.primary,
             ),
           ),
         ],

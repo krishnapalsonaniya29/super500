@@ -1,32 +1,35 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../services/super_admin/super_admin_service.dart';
+import '../../../../../services/admin/admin_service.dart';
+
 import '../../../../../theme/app_colors.dart';
 
-import 'create_admin_screen.dart';
+class PendingDocumentsScreen
+    extends StatefulWidget {
+  final Function(int index)
+      onNavigate;
 
-class AdminsScreen extends StatefulWidget {
-  final Function(int index) onNavigate;
-
-  const AdminsScreen({
+  const PendingDocumentsScreen({
     super.key,
     required this.onNavigate,
   });
 
   @override
-  State<AdminsScreen> createState() =>
-      _AdminsScreenState();
+  State<PendingDocumentsScreen>
+      createState() =>
+          _PendingDocumentsScreenState();
 }
 
-class _AdminsScreenState
-    extends State<AdminsScreen> {
-  List admins = [];
+class _PendingDocumentsScreenState
+    extends State<
+        PendingDocumentsScreen> {
+  List documents = [];
 
-  List filteredAdmins = [];
+  List filteredDocuments = [];
 
   bool loading = true;
 
-  bool deleting = false;
+  bool actionLoading = false;
 
   String searchQuery = "";
 
@@ -44,14 +47,14 @@ class _AdminsScreenState
   void initState() {
     super.initState();
 
-    fetchAdmins();
+    fetchDocuments();
   }
 
   /// =====================================
-  /// FETCH ADMINS
+  /// FETCH DOCUMENTS
   /// =====================================
 
-  Future<void> fetchAdmins() async {
+  Future<void> fetchDocuments() async {
     try {
       setState(() {
         loading = true;
@@ -59,20 +62,41 @@ class _AdminsScreenState
       });
 
       final response =
-          await SuperAdminService
-              .getAdmins();
+          await AdminService
+              .getStudents();
 
-      final data =
+      final students =
           response["data"] ?? [];
 
-      admins = data;
+      List pendingDocs = [];
+
+      for (final student
+          in students) {
+        final studentDocs =
+            student["documents"] ??
+                [];
+
+        for (final doc
+            in studentDocs) {
+          if (doc["verified"] !=
+              true) {
+            pendingDocs.add({
+              ...doc,
+              "student":
+                  student,
+            });
+          }
+        }
+      }
+
+      documents = pendingDocs;
 
       applySearch();
     } catch (e) {
       debugPrint(e.toString());
 
       errorMessage =
-          "Failed to load admins";
+          "Failed to load documents";
     } finally {
       if (mounted) {
         setState(() {
@@ -87,32 +111,30 @@ class _AdminsScreenState
   /// =====================================
 
   void applySearch() {
-    filteredAdmins =
-        admins.where((admin) {
-      final user = admin["user"];
+    filteredDocuments =
+        documents.where((doc) {
+      final student =
+          doc["student"];
+
+      final user =
+          student["user"];
 
       final name =
           (user["fullName"] ?? "")
               .toString()
               .toLowerCase();
 
-      final district =
-          (admin["district"] ?? "")
+      final type =
+          (doc["documentType"] ??
+                  "")
               .toString()
               .toLowerCase();
-
-      final phone =
-          (user["phone"] ?? "")
-              .toString();
 
       return name.contains(
             searchQuery.toLowerCase(),
           ) ||
-          district.contains(
+          type.contains(
             searchQuery.toLowerCase(),
-          ) ||
-          phone.contains(
-            searchQuery,
           );
     }).toList();
 
@@ -126,11 +148,11 @@ class _AdminsScreenState
   /// =====================================
 
   int get totalPages =>
-      (filteredAdmins.length /
+      (filteredDocuments.length /
               itemsPerPage)
           .ceil();
 
-  List get paginatedAdmins {
+  List get paginatedDocuments {
     final start =
         (currentPage - 1) *
             itemsPerPage;
@@ -139,32 +161,33 @@ class _AdminsScreenState
         start + itemsPerPage;
 
     if (end >
-        filteredAdmins.length) {
-      end = filteredAdmins.length;
+        filteredDocuments.length) {
+      end =
+          filteredDocuments.length;
     }
 
-    return filteredAdmins.sublist(
+    return filteredDocuments.sublist(
       start,
       end,
     );
   }
 
   /// =====================================
-  /// DELETE ADMIN
+  /// APPROVE DOCUMENT
   /// =====================================
 
-  Future<void> deleteAdmin(
+  Future<void> approveDocument(
     String id,
   ) async {
     try {
       setState(() {
-        deleting = true;
+        actionLoading = true;
       });
 
-      await SuperAdminService
-          .deleteAdmin(id);
+      await AdminService
+          .approveDocument(id);
 
-      await fetchAdmins();
+      await fetchDocuments();
 
       if (!mounted) return;
 
@@ -173,8 +196,9 @@ class _AdminsScreenState
         const SnackBar(
           backgroundColor:
               Colors.green,
+
           content: Text(
-            "Admin deleted successfully",
+            "Document approved successfully",
           ),
         ),
       );
@@ -186,39 +210,109 @@ class _AdminsScreenState
         const SnackBar(
           backgroundColor:
               Colors.red,
+
           content: Text(
-            "Failed to delete admin",
+            "Failed to approve document",
           ),
         ),
       );
     } finally {
       if (mounted) {
         setState(() {
-          deleting = false;
+          actionLoading = false;
         });
       }
     }
   }
 
   /// =====================================
-  /// CONFIRM DELETE
+  /// REJECT DOCUMENT
   /// =====================================
 
-  void confirmDelete(
+  Future<void> rejectDocument({
+    required String id,
+    required String remarks,
+  }) async {
+    try {
+      setState(() {
+        actionLoading = true;
+      });
+
+      await AdminService
+          .rejectDocument(
+        id: id,
+        remarks: remarks,
+      );
+
+      await fetchDocuments();
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        const SnackBar(
+          backgroundColor:
+              Colors.orange,
+
+          content: Text(
+            "Document rejected",
+          ),
+        ),
+      );
+    } catch (e) {
+      debugPrint(e.toString());
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        const SnackBar(
+          backgroundColor:
+              Colors.red,
+
+          content: Text(
+            "Failed to reject document",
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          actionLoading = false;
+        });
+      }
+    }
+  }
+
+  /// =====================================
+  /// REJECTION DIALOG
+  /// =====================================
+
+  void showRejectDialog(
     String id,
-    String name,
   ) {
+    final controller =
+        TextEditingController();
+
     showDialog(
       context: context,
       builder:
           (_) => AlertDialog(
         title:
             const Text(
-          "Delete Admin",
+          "Reject Document",
         ),
-        content: Text(
-          "Are you sure you want to delete $name?",
+
+        content: TextField(
+          controller: controller,
+
+          maxLines: 3,
+
+          decoration:
+              const InputDecoration(
+            hintText:
+                "Enter rejection remarks",
+          ),
         ),
+
         actions: [
           TextButton(
             onPressed: () {
@@ -226,42 +320,40 @@ class _AdminsScreenState
                 context,
               );
             },
+
             child:
                 const Text(
               "Cancel",
             ),
           ),
+
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(
                 context,
               );
 
-              await deleteAdmin(
-                id,
+              await rejectDocument(
+                id: id,
+                remarks:
+                    controller.text,
               );
             },
+
             style:
                 ElevatedButton.styleFrom(
               backgroundColor:
                   Colors.red,
             ),
+
             child:
                 const Text(
-              "Delete",
+              "Reject",
             ),
           ),
         ],
       ),
     );
-  }
-
-  Color getStatusColor(
-    bool active,
-  ) {
-    return active
-        ? Colors.green
-        : Colors.red;
   }
 
   @override
@@ -270,36 +362,6 @@ class _AdminsScreenState
       backgroundColor:
           AppColors.background,
 
-      floatingActionButton:
-          FloatingActionButton.extended(
-        backgroundColor:
-            AppColors.primary,
-
-        onPressed: () async {
-          final created =
-              await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder:
-                  (_) =>
-                      const CreateAdminScreen(),
-            ),
-          );
-
-          if (created == true) {
-            fetchAdmins();
-          }
-        },
-
-        icon: const Icon(
-          Icons.add,
-        ),
-
-        label: const Text(
-          "Create Admin",
-        ),
-      ),
-
       body: SafeArea(
         child: loading
             ? const Center(
@@ -307,32 +369,38 @@ class _AdminsScreenState
                     CircularProgressIndicator(),
               )
 
-            /// ERROR STATE
+            /// ERROR
             : errorMessage != null
                 ? Center(
                     child: Column(
                       mainAxisAlignment:
                           MainAxisAlignment
                               .center,
+
                       children: [
                         const Icon(
                           Icons.error,
                           color:
                               Colors.red,
-                          size: 60,
+                          size: 70,
                         ),
+
                         const SizedBox(
                           height: 16,
                         ),
+
                         Text(
                           errorMessage!,
                         ),
+
                         const SizedBox(
                           height: 20,
                         ),
+
                         ElevatedButton(
                           onPressed:
-                              fetchAdmins,
+                              fetchDocuments,
+
                           child:
                               const Text(
                             "Retry",
@@ -345,7 +413,7 @@ class _AdminsScreenState
                 /// SUCCESS
                 : RefreshIndicator(
                     onRefresh:
-                        fetchAdmins,
+                        fetchDocuments,
 
                     child:
                         SingleChildScrollView(
@@ -365,14 +433,16 @@ class _AdminsScreenState
                         children: [
                           /// HEADER
                           const Text(
-                            "District Admins",
+                            "Pending Documents",
+
                             style:
                                 TextStyle(
                               fontSize:
                                   30,
+
                               fontWeight:
-                                  FontWeight
-                                      .bold,
+                                  FontWeight.bold,
+
                               fontFamily:
                                   'Poppins',
                             ),
@@ -383,7 +453,8 @@ class _AdminsScreenState
                           ),
 
                           Text(
-                            "${filteredAdmins.length} admins found",
+                            "${filteredDocuments.length} pending documents",
+
                             style:
                                 const TextStyle(
                               color: AppColors
@@ -411,7 +482,7 @@ class _AdminsScreenState
                             decoration:
                                 InputDecoration(
                               hintText:
-                                  "Search admin, district, phone",
+                                  "Search documents",
 
                               prefixIcon:
                                   const Icon(
@@ -440,57 +511,6 @@ class _AdminsScreenState
                             height: 24,
                           ),
 
-                          /// EMPTY
-                          if (filteredAdmins
-                              .isEmpty)
-                            Container(
-                              width:
-                                  double.infinity,
-
-                              padding:
-                                  const EdgeInsets.all(
-                                40,
-                              ),
-
-                              decoration:
-                                  BoxDecoration(
-                                color:
-                                    Colors.white,
-
-                                borderRadius:
-                                    BorderRadius.circular(
-                                  24,
-                                ),
-                              ),
-
-                              child:
-                                  const Column(
-                                children: [
-                                  Icon(
-                                    Icons
-                                        .search_off_rounded,
-                                    size: 70,
-                                    color:
-                                        Colors.grey,
-                                  ),
-                                  SizedBox(
-                                    height:
-                                        18,
-                                  ),
-                                  Text(
-                                    "No admins found",
-                                    style:
-                                        TextStyle(
-                                      fontSize:
-                                          18,
-                                      fontWeight:
-                                          FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
                           /// LIST
                           ListView.builder(
                             shrinkWrap:
@@ -500,22 +520,20 @@ class _AdminsScreenState
                                 const NeverScrollableScrollPhysics(),
 
                             itemCount:
-                                paginatedAdmins
+                                paginatedDocuments
                                     .length,
 
                             itemBuilder:
                                 (_, index) {
-                              final admin =
-                                  paginatedAdmins[
+                              final doc =
+                                  paginatedDocuments[
                                       index];
 
-                              final user =
-                                  admin[
-                                      "user"];
+                              final student =
+                                  doc["student"];
 
-                              final active =
-                                  user["isActive"] ??
-                                      true;
+                              final user =
+                                  student["user"];
 
                               return Container(
                                 margin:
@@ -542,21 +560,28 @@ class _AdminsScreenState
 
                                 child:
                                     Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+
                                   children: [
                                     Row(
                                       children: [
                                         CircleAvatar(
                                           radius:
                                               28,
+
                                           backgroundColor:
                                               AppColors.primary,
+
                                           child:
                                               Text(
                                             user["fullName"][0],
+
                                             style:
                                                 const TextStyle(
                                               color:
                                                   Colors.white,
+
                                               fontWeight:
                                                   FontWeight.bold,
                                             ),
@@ -573,63 +598,31 @@ class _AdminsScreenState
                                               Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
+
                                             children: [
                                               Text(
                                                 user["fullName"],
+
                                                 style:
                                                     const TextStyle(
                                                   fontSize:
                                                       18,
+
                                                   fontWeight:
                                                       FontWeight.bold,
                                                 ),
                                               ),
+
                                               const SizedBox(
                                                 height:
                                                     6,
                                               ),
+
                                               Text(
-                                                admin["district"] ??
+                                                doc["documentType"] ??
                                                     "-",
                                               ),
                                             ],
-                                          ),
-                                        ),
-
-                                        Container(
-                                          padding:
-                                              const EdgeInsets.symmetric(
-                                            horizontal:
-                                                12,
-                                            vertical:
-                                                6,
-                                          ),
-                                          decoration:
-                                              BoxDecoration(
-                                            color:
-                                                getStatusColor(
-                                              active,
-                                            ).withValues(
-                                              alpha:
-                                                  0.1,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(
-                                              16,
-                                            ),
-                                          ),
-                                          child:
-                                              Text(
-                                            active
-                                                ? "Active"
-                                                : "Inactive",
-                                            style:
-                                                TextStyle(
-                                              color:
-                                                  getStatusColor(
-                                                active,
-                                              ),
-                                            ),
                                           ),
                                         ),
                                       ],
@@ -657,12 +650,12 @@ class _AdminsScreenState
 
                                     buildInfoRow(
                                       icon:
-                                          Icons.school,
+                                          Icons.description,
                                       title:
-                                          "Students",
+                                          "Document",
                                       value:
-                                          admin["studentCount"]
-                                              .toString(),
+                                          doc["documentType"] ??
+                                              "-",
                                     ),
 
                                     const SizedBox(
@@ -672,12 +665,12 @@ class _AdminsScreenState
 
                                     buildInfoRow(
                                       icon:
-                                          Icons.groups,
+                                          Icons.link,
                                       title:
-                                          "Mentors",
+                                          "URL",
                                       value:
-                                          admin["mentorCount"]
-                                              .toString(),
+                                          doc["fileUrl"] ??
+                                              "-",
                                     ),
 
                                     const SizedBox(
@@ -685,30 +678,63 @@ class _AdminsScreenState
                                           22,
                                     ),
 
-                                    SizedBox(
-                                      width:
-                                          double.infinity,
-                                      child:
-                                          ElevatedButton(
-                                        onPressed:
-                                            deleting
-                                                ? null
-                                                : () {
-                                                    confirmDelete(
-                                                      admin["id"],
-                                                      user["fullName"],
-                                                    );
-                                                  },
-                                        style:
-                                            ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              Colors.red,
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child:
+                                              ElevatedButton(
+                                            onPressed:
+                                                actionLoading
+                                                    ? null
+                                                    : () {
+                                                        approveDocument(
+                                                          doc["id"],
+                                                        );
+                                                      },
+
+                                            style:
+                                                ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  Colors.green,
+                                            ),
+
+                                            child:
+                                                const Text(
+                                              "Approve",
+                                            ),
+                                          ),
                                         ),
-                                        child:
-                                            const Text(
-                                          "Delete Admin",
+
+                                        const SizedBox(
+                                          width:
+                                              14,
                                         ),
-                                      ),
+
+                                        Expanded(
+                                          child:
+                                              ElevatedButton(
+                                            onPressed:
+                                                actionLoading
+                                                    ? null
+                                                    : () {
+                                                        showRejectDialog(
+                                                          doc["id"],
+                                                        );
+                                                      },
+
+                                            style:
+                                                ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  Colors.red,
+                                            ),
+
+                                            child:
+                                                const Text(
+                                              "Reject",
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
@@ -725,6 +751,7 @@ class _AdminsScreenState
                             Row(
                               mainAxisAlignment:
                                   MainAxisAlignment.center,
+
                               children: [
                                 IconButton(
                                   onPressed:
@@ -736,6 +763,7 @@ class _AdminsScreenState
                                               });
                                             }
                                           : null,
+
                                   icon:
                                       const Icon(
                                     Icons
@@ -745,6 +773,7 @@ class _AdminsScreenState
 
                                 Text(
                                   "$currentPage / $totalPages",
+
                                   style:
                                       const TextStyle(
                                     fontWeight:
@@ -762,6 +791,7 @@ class _AdminsScreenState
                                               });
                                             }
                                           : null,
+
                                   icon:
                                       const Icon(
                                     Icons
@@ -795,17 +825,21 @@ class _AdminsScreenState
           color:
               AppColors.primary,
         ),
+
         const SizedBox(
           width: 10,
         ),
+
         Text(
           "$title: ",
+
           style:
               const TextStyle(
             fontWeight:
                 FontWeight.bold,
           ),
         ),
+
         Expanded(
           child: Text(
             value,
