@@ -23,33 +23,67 @@ class DioClient {
       },
     ),
   )
+    // ..interceptors.add(
+    //   InterceptorsWrapper(
+    //     onRequest:
+    //         (
+    //           options,
+    //           handler,
+    //         ) async {
+    //       final prefs =
+    //           await SharedPreferences.getInstance();
+
+    //       final token =
+    //           prefs.getString(
+    //         "accessToken",
+    //       );
+    //       print("INTERCEPTOR TOKEN => $token",);
+    //       if (token != null &&
+    //         token.isNotEmpty &&
+    //         token != "null") {
+    //         options.headers[
+    //                 "Authorization"] =
+    //             "Bearer $token";
+    //       }
+
+    //       return handler.next(
+    //         options,
+    //       );
+    //     },
+    //   ),
+    // )
     ..interceptors.add(
-      InterceptorsWrapper(
-        onRequest:
-            (
-              options,
-              handler,
-            ) async {
-          final prefs =
-              await SharedPreferences.getInstance();
+  InterceptorsWrapper(
+    onRequest: (
+      options,
+      handler,
+    ) async {
+      final prefs =
+          await SharedPreferences.getInstance();
 
-          final token =
-              prefs.getString(
-            "accessToken",
-          );
+      final token =
+          prefs.getString(
+        "accessToken",
+      );
 
-          if (token != null) {
-            options.headers[
-                    "Authorization"] =
-                "Bearer $token";
-          }
+      print(
+        "INTERCEPTOR TOKEN => $token",
+      );
 
-          return handler.next(
-            options,
-          );
-        },
-      ),
-    )
+      if (token != null &&
+          token.isNotEmpty &&
+          token != "null") {
+        options.headers[
+                "Authorization"] =
+            "Bearer $token";
+      }
+
+      return handler.next(
+        options,
+      );
+    },
+  ),
+)
     ..interceptors.add(
       LogInterceptor(
         request: true,

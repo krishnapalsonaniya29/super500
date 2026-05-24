@@ -3,7 +3,6 @@ import 'package:flutter_application_1/features/auth/presentation/screens/student
 import 'package:flutter_application_1/services/auth/auth_service.dart';
 
 
-import '../../../../widgets/buttons/custom_button.dart';
 import '../../../../widgets/inputs/custom_textfield.dart';
 import '../../../student/presentation/screens/student_dashboard_screen.dart';
 import '../../../student/presentation/screens/student_academic_screen.dart';
@@ -169,71 +168,355 @@ Future<void> verifyOtp() async {
         title: const Text('Student Login'),
       ),
 
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+      body: SafeArea(
+  child: SingleChildScrollView(
+    padding:
+        const EdgeInsets.all(
+      24,
+    ),
 
-        child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+    child: Column(
+      crossAxisAlignment:
+          CrossAxisAlignment.start,
+
+      children: [
+        const SizedBox(
+          height: 30,
+        ),
+
+        /// =====================================
+        /// HEADER
+        /// =====================================
+
+        Center(
+          child: Column(
+            children: [
+              Container(
+                height: 90,
+                width: 90,
+
+                decoration:
+                    BoxDecoration(
+                  color:
+                      Colors.blue
+                          .withOpacity(
+                    0.1,
+                  ),
+
+                  borderRadius:
+                      BorderRadius.circular(
+                    24,
+                  ),
+                ),
+
+                child: const Icon(
+                  Icons.school,
+
+                  size: 50,
+
+                  color: Colors.blue,
+                ),
+              ),
+
+              const SizedBox(
+                height: 24,
+              ),
+
+              const Text(
+                "Student Login",
+
+                style: TextStyle(
+                  fontSize: 30,
+
+                  fontWeight:
+                      FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(
+                height: 10,
+              ),
+
+              Text(
+                "Login to continue your scholarship journey",
+
+                textAlign:
+                    TextAlign.center,
+
+                style: TextStyle(
+                  color:
+                      Colors.grey[700],
+
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(
+          height: 50,
+        ),
+
+        /// =====================================
+        /// PHONE FIELD
+        /// =====================================
+
+        const Text(
+          "Mobile Number",
+
+          style: TextStyle(
+            fontWeight:
+                FontWeight.w600,
+          ),
+        ),
+
+        const SizedBox(
+          height: 10,
+        ),
+
+        CustomTextField(
+          hintText:
+              'Enter Mobile Number',
+
+          controller:
+              phoneController,
+
+          keyboardType:
+              TextInputType.phone,
+        ),
+
+        const SizedBox(
+          height: 24,
+        ),
+
+        /// =====================================
+        /// OTP FIELD
+        /// =====================================
+
+        if (otpSent) ...[
+          const Text(
+            "OTP",
+
+            style: TextStyle(
+              fontWeight:
+                  FontWeight.w600,
+            ),
+          ),
+
+          const SizedBox(
+            height: 10,
+          ),
+
+          CustomTextField(
+            hintText:
+                'Enter OTP',
+
+            controller:
+                otpController,
+
+            keyboardType:
+                TextInputType.number,
+          ),
+
+          const SizedBox(
+            height: 12,
+          ),
+
+          Align(
+            alignment:
+                Alignment.centerRight,
+
+            child: TextButton(
+              onPressed: loading
+                  ? null
+                  : () {
+                      setState(() {
+                        otpSent =
+                            false;
+
+                        otpController
+                            .clear();
+                      });
+                    },
+
+              child: const Text(
+                "Change Number",
+              ),
+            ),
+          ),
+        ],
+
+        const SizedBox(
+          height: 20,
+        ),
+
+        /// =====================================
+        /// LOGIN BUTTON
+        /// =====================================
+
+        SizedBox(
+          width:
+              double.infinity,
+
+          height: 56,
+
+          child: ElevatedButton(
+            onPressed: () {
+              if (loading) return;
+
+              if (otpSent) {
+                verifyOtp();
+              } else {
+                sendOtp();
+              }
+            },
+
+            style:
+                ElevatedButton.styleFrom(
+              backgroundColor:
+                  Colors.blue,
+
+              foregroundColor:
+                  Colors.white,
+
+              shape:
+                  RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(
+                  16,
+                ),
+              ),
+            ),
+
+            child: Text(
+              loading
+                  ? "Please wait..."
+                  : otpSent
+                      ? "Verify OTP"
+                      : "Send OTP",
+
+              style:
+                  const TextStyle(
+                fontSize: 16,
+
+                fontWeight:
+                    FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+
+        const SizedBox(
+          height: 30,
+        ),
+
+        /// =====================================
+        /// REGISTER SECTION
+        /// =====================================
+
+        Row(
+          mainAxisAlignment:
+              MainAxisAlignment
+                  .center,
 
           children: [
-            const SizedBox(height: 30),
+            Text(
+              "Not registered yet?",
 
-            const Text(
-              'Welcome Student',
               style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
+                color:
+                    Colors.grey[700],
               ),
             ),
 
-            const SizedBox(height: 10),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
 
-            const Text(
-              'Login to continue your scholarship journey',
-            ),
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const StudentRegisterScreen(),
+                  ),
+                );
+              },
 
-            const SizedBox(height: 40),
+              child: const Text(
+                "Register Here",
 
-            CustomTextField(
-              hintText: 'Enter Mobile Number',
-              controller: phoneController,
-              keyboardType:
-                  TextInputType.phone,
-            ),
-
-            const SizedBox(height: 20),
-
-            if (otpSent)
-              CustomTextField(
-                hintText: 'Enter OTP',
-                controller: otpController,
-                keyboardType:
-                    TextInputType.number,
-              ),
-
-            const SizedBox(height: 24),
-
-            CustomButton(
-                  text: loading
-                      ? 'Please wait...'
-                      : otpSent
-                          ? 'Verify OTP'
-                          : 'Send OTP',
-
-                  onPressed: () {
-                    if (loading) return;
-
-                    if (otpSent) {
-                      verifyOtp();
-                    } else {
-                      sendOtp();
-                    }
-                  },
+                style: TextStyle(
+                  fontWeight:
+                      FontWeight.bold,
                 ),
+              ),
+            ),
           ],
         ),
-      ),
+
+        const SizedBox(
+          height: 40,
+        ),
+
+        /// =====================================
+        /// DEMO OTP INFO
+        /// =====================================
+
+        Container(
+          padding:
+              const EdgeInsets.all(
+            16,
+          ),
+
+          decoration:
+              BoxDecoration(
+            color:
+                Colors.orange
+                    .withOpacity(
+              0.08,
+            ),
+
+            borderRadius:
+                BorderRadius.circular(
+              16,
+            ),
+          ),
+
+          child: Row(
+            crossAxisAlignment:
+                CrossAxisAlignment
+                    .start,
+
+            children: [
+              const Icon(
+                Icons.info_outline,
+
+                color: Colors.orange,
+              ),
+
+              const SizedBox(
+                width: 12,
+              ),
+
+              Expanded(
+                child: Text(
+                  "Use OTP 999999 for demo login during development.",
+
+                  style: TextStyle(
+                    color:
+                        Colors.grey[800],
+
+                    height: 1.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  ),
+),
     );
   }
 }

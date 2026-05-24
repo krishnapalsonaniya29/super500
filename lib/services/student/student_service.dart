@@ -52,19 +52,19 @@ class StudentService {
   /// GET SESSIONS
   /// ====================================
 
-  static Future<Map<String, dynamic>>
-      getStudentSessions() async {
+static Future<List<dynamic>>
+    getStudentSessions() async {
+  final response =
+      await DioClient.instance.get(
+    "/v1/auth/me",
+  );
 
-    final response =
-        await _dio.get(
-      "$baseUrl/sessions",
-
-      options:
-          await _getOptions(),
-    );
-
-    return response.data;
-  }
+  return response
+              .data["data"]
+          ["studentProfile"]
+      ["sessions"] ??
+      [];
+}
 
   /// ====================================
   /// GET REPORTS
