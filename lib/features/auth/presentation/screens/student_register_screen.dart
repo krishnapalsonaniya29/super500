@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/features/student/presentation/screens/student_academic_screen.dart';
 import 'package:flutter_application_1/services/auth/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import '../../../../core/network/dio_client.dart';
 
 
 class StudentRegisterScreen extends StatefulWidget {
@@ -55,53 +55,64 @@ class _StudentRegisterScreenState
       setState(() {
         loading = true;
       });
+      //final token = await AuthService.getToken();
+    
 
-      final prefs =
-          await SharedPreferences.getInstance();
+// final response = await DioClient.instance.post(
+//   "http://localhost:5000/api/v1/auth/complete-profile",
+final response =
+    await DioClient.instance.post(
+  "/v1/auth/complete-profile",
 
-      final token =
-          prefs.getString("accessToken");
+  data: {
+    "fullName":
+        fullNameController.text.trim(),
 
-      await Dio().post(
-        "${AuthService.baseUrl.replaceAll('/auth', '')}/users/complete-profile",
+    "gender": gender,
 
-        data: {
-          "fullName":
-              fullNameController.text.trim(),
+    "district":
+        districtController.text
+            .trim()
+            .toUpperCase(),
 
-          "gender": gender,
+    "fatherName":
+        fatherNameController.text
+            .trim(),
 
-          "district":
-              districtController.text.trim().toUpperCase(),
+    "schoolName":
+        schoolController.text
+            .trim(),
 
-          "fatherName":
-              fatherNameController.text.trim(),
+    "currentClass":
+        classController.text
+            .trim(),
 
-          "schoolName":
-              schoolController.text.trim(),
+    "samagraId":
+        samagraController.text
+            .trim(),
 
-          "currentClass":
-              classController.text.trim(),
+    "apaarId":
+        apaarController.text
+            .trim(),
 
-          "samagraId":
-              samagraController.text.trim(),
+    "marks10th":
+        double.parse(
+      marksController.text.trim(),
+    ),
+  },
+);
 
-          "apaarId":
-              apaarController.text.trim(),
+//   options: Options(
+//     headers: {
+//       "Authorization":
+//           "Bearer $token",
+//     },
+//   ),
+// );
 
-          "marks10th": double.parse(
-            marksController.text.trim(),
-          ),
-        },
-
-        options: Options(
-          headers: {
-            "Authorization":
-                "Bearer $token",
-          },
-        ),
-      );
-
+debugPrint(
+  "REGISTER RESPONSE => ${response.data}",
+);
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -120,12 +131,24 @@ class _StudentRegisterScreenState
   ),
    );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString()),
-        ),
-      );
-    } finally {
+  if (e is DioException) {
+    debugPrint(
+      "ERROR STATUS => ${e.response?.statusCode}",
+    );
+
+    debugPrint(
+      "ERROR DATA => ${e.response?.data}",
+    );
+  }
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        e.toString(),
+      ),
+    ),
+  );
+} finally {
       setState(() {
         loading = false;
       });

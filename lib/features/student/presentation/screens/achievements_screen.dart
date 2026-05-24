@@ -47,7 +47,7 @@ class _AchievementsScreenState
             data["studentProfile"]
                     ?["achievements"] ??
                 [];
-      });
+      }); 
     } catch (e) {
       debugPrint(e.toString());
     } finally {

@@ -1,520 +1,342 @@
+// lib/features/student/presentation/screens/expenses_screen.dart
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-import '../../../../../theme/app_colors.dart';
-import '../../../../../services/auth/auth_service.dart';
+import '../../../../theme/app_colors.dart';
+import '../../../../services/student/student_service.dart';
 
-class ExpensesScreen extends StatefulWidget {
-  final Function(int index) onNavigate;
-
+class ExpensesScreen
+    extends StatefulWidget {
+  final Function(int index)
+      onNavigate;
+ 
   const ExpensesScreen({
     super.key,
     required this.onNavigate,
   });
 
   @override
-  State<ExpensesScreen> createState() =>
-      _ExpensesScreenState();
+  State<ExpensesScreen>
+      createState() =>
+          _ExpensesScreenState();
 }
 
 class _ExpensesScreenState
     extends State<ExpensesScreen> {
-  Map<String, dynamic>? userData;
+  bool isLoading = true;
 
   List expenses = [];
 
-  bool loading = true;
-
-  /// DEMO SCHOLARSHIP DATA
-  double totalScholarship =
-      120000;
-
-  double disbursedAmount =
-      75000;
+  double totalExpense = 0;
 
   @override
   void initState() {
     super.initState();
-    fetchData();
+
+    loadExpenses();
   }
 
-  Future<void> fetchData() async {
+  /// =====================================
+  /// LOAD EXPENSES
+  /// =====================================
+
+  Future<void> loadExpenses() async {
     try {
+      setState(() {
+        isLoading = true;
+      });
+
       final response =
-          await AuthService.getMe();
+          await StudentService
+              .getExpenses();
 
-      final data = response["data"];
-
-      final fetchedExpenses =
-          data["studentProfile"]
-                  ?["expenses"] ??
+      expenses =
+          response["data"]["expenses"] ??
               [];
 
-      setState(() {
-        userData = data;
-
-        expenses = fetchedExpenses;
-      });
-    } catch (e) {
-      debugPrint(e.toString());
-    } finally {
-      setState(() {
-        loading = false;
-      });
-    }
-  }
-
-  double get totalExpenses {
-    double total = 0;
-
-    for (var expense in expenses) {
-      total +=
-          (expense["amount"] ?? 0)
+      totalExpense =
+          (response["data"]
+                      ["totalExpense"] ??
+                  0)
               .toDouble();
+    } catch (e) {
+      debugPrint(
+        "Expenses Error: $e",
+      );
     }
 
-    return total;
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
-  double get availableBalance {
-    return disbursedAmount -
-        totalExpenses;
-  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor:
+          AppColors.background,
 
-  void showAddExpenseDialog() {
-    final titleController =
-        TextEditingController();
+      appBar: AppBar(
+        backgroundColor:
+            Colors.transparent,
 
-    final amountController =
-        TextEditingController();
+        elevation: 0,
 
-    final descriptionController =
-        TextEditingController();
+        title: const Text(
+          "My Expenses",
 
-    String selectedCategory =
-        "BOOKS";
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-
-      shape:
-          const RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.vertical(
-          top: Radius.circular(28),
+          style: TextStyle(
+            fontWeight:
+                FontWeight.bold,
+          ),
         ),
       ),
 
-      builder: (_) {
-        return StatefulBuilder(
-          builder:
-              (context, setModalState) {
-            return Padding(
-              padding: EdgeInsets.only(
-                left: 24,
-                right: 24,
-                top: 24,
-
-                bottom:
-                    MediaQuery.of(
-                              context,
-                            )
-                            .viewInsets
-                            .bottom +
-                        24,
-              ),
-
+      body: isLoading
+          ? const Center(
               child:
-                  SingleChildScrollView(
-                child: Column(
-                  mainAxisSize:
-                      MainAxisSize.min,
+                  CircularProgressIndicator(),
+            )
+          : Column(
+              children: [
+                /// SUMMARY CARD
+                _buildSummaryCard(),
 
-                  crossAxisAlignment:
-                      CrossAxisAlignment
-                          .start,
+                /// EXPENSE LIST
+                Expanded(
+                  child:
+                      expenses.isEmpty
+                          ? _buildEmptyState()
+                          : RefreshIndicator(
+                              onRefresh:
+                                  loadExpenses,
 
-                  children: [
-                    const Text(
-                      "Add Expense",
-
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight:
-                            FontWeight
-                                .bold,
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 24,
-                    ),
-
-                    TextField(
-                      controller:
-                          titleController,
-
-                      decoration:
-                          InputDecoration(
-                        labelText:
-                            "Expense Title",
-
-                        border:
-                            OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(
-                            18,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 18,
-                    ),
-
-                    TextField(
-                      controller:
-                          amountController,
-
-                      keyboardType:
-                          TextInputType
-                              .number,
-
-                      decoration:
-                          InputDecoration(
-                        labelText:
-                            "Amount",
-
-                        prefixText:
-                            "₹ ",
-
-                        border:
-                            OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(
-                            18,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 18,
-                    ),
-
-                    DropdownButtonFormField<String>(
-                      initialValue: selectedCategory,
-                      items: const [
-                        DropdownMenuItem(
-                          value: "BOOKS",
-
-                          child: Text(
-                            "Books",
-                          ),
-                        ),
-
-                        DropdownMenuItem(
-                          value:
-                              "TRAVEL",
-
-                          child: Text(
-                            "Travel",
-                          ),
-                        ),
-
-                        DropdownMenuItem(
-                          value:
-                              "EXAM_FEES",
-
-                          child: Text(
-                            "Exam Fees",
-                          ),
-                        ),
-
-                        DropdownMenuItem(
-                          value:
-                              "HOSTEL",
-
-                          child: Text(
-                            "Hostel",
-                          ),
-                        ),
-
-                        DropdownMenuItem(
-                          value:
-                              "OTHER",
-
-                          child: Text(
-                            "Other",
-                          ),
-                        ),
-                      ],
-
-                      onChanged: (value) {
-                        setModalState(() {
-                          selectedCategory =
-                              value!;
-                        });
-                      },
-
-                      decoration:
-                          InputDecoration(
-                        labelText:
-                            "Expense Category",
-
-                        border:
-                            OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(
-                            18,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 18,
-                    ),
-
-                    TextField(
-                      controller:
-                          descriptionController,
-
-                      maxLines: 4,
-
-                      decoration:
-                          InputDecoration(
-                        labelText:
-                            "Description",
-
-                        border:
-                            OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(
-                            18,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-                    Container(
-                      padding:
-                          const EdgeInsets.all(
-                        16,
-                      ),
-
-                      decoration:
-                          BoxDecoration(
-                        color: AppColors
-                            .primary
-                            .withValues(
-                              alpha:
-                                  0.05,
-                            ),
-
-                        borderRadius:
-                            BorderRadius.circular(
-                          18,
-                        ),
-                      ),
-
-                      child: const Row(
-                        children: [
-                          Icon(
-                            Icons
-                                .upload_file,
-
-                            color:
-                                AppColors
-                                    .primary,
-                          ),
-
-                          SizedBox(
-                            width: 12,
-                          ),
-
-                          Expanded(
-                            child: Text(
-                              "Receipt upload support will be added later.",
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 28,
-                    ),
-
-                    SizedBox(
-                      width:
-                          double.infinity,
-
-                      height: 56,
-
-                      child:
-                          ElevatedButton(
-                        onPressed: () {
-                          if (titleController
-                                  .text
-                                  .trim()
-                                  .isEmpty ||
-                              amountController
-                                  .text
-                                  .trim()
-                                  .isEmpty) {
-                            return;
-                          }
-
-                          setState(() {
-                            expenses.insert(
-                              0,
-                              {
-                                "title":
-                                    titleController
-                                        .text
-                                        .trim(),
-
-                                "amount":
-                                    double.parse(
-                                  amountController
-                                      .text
-                                      .trim(),
+                              child:
+                                  ListView.builder(
+                                padding:
+                                    const EdgeInsets.all(
+                                  16,
                                 ),
 
-                                "description":
-                                    descriptionController
-                                        .text
-                                        .trim(),
+                                itemCount:
+                                    expenses
+                                        .length,
 
-                                "expenseCategory":
-                                    selectedCategory,
+                                itemBuilder:
+                                    (
+                                      context,
+                                      index,
+                                    ) {
+                                  final expense =
+                                      expenses[
+                                          index];
 
-                                "approved":
-                                    false,
-                              },
-                            );
-                          });
-
-                          Navigator.pop(
-                            context,
-                          );
-                        },
-
-                        style:
-                            ElevatedButton.styleFrom(
-                          backgroundColor:
-                              AppColors
-                                  .primary,
-
-                          shape:
-                              RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(
-                              18,
+                                  return _buildExpenseCard(
+                                    expense,
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-                        ),
-
-                        child: const Text(
-                          "Add Expense",
-
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight:
-                                FontWeight
-                                    .bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
-              ),
-            );
-          },
-        );
-      },
+              ],
+            ),
     );
   }
 
-  Widget buildExpenseTile({
-    required String title,
-    required String amount,
-    required String category,
-    required bool approved,
-  }) {
+  /// =====================================
+  /// SUMMARY CARD
+  /// =====================================
+
+  Widget _buildSummaryCard() {
     return Container(
       margin:
-          const EdgeInsets.only(
-        bottom: 18,
+          const EdgeInsets.all(
+        16,
       ),
 
       padding:
-          const EdgeInsets.all(20),
+          const EdgeInsets.all(
+        22,
+      ),
+
+      decoration: BoxDecoration(
+        gradient:
+            const LinearGradient(
+          colors: [
+            Color(0xFF0A1931),
+            Color(0xFF13294B),
+          ],
+        ),
+
+        borderRadius:
+            BorderRadius.circular(
+          24,
+        ),
+      ),
+
+      child: Row(
+        children: [
+          Container(
+            padding:
+                const EdgeInsets.all(
+              14,
+            ),
+
+            decoration:
+                BoxDecoration(
+              color: Colors.white
+                  .withValues(
+                alpha: 0.15,
+              ),
+
+              borderRadius:
+                  BorderRadius.circular(
+                16,
+              ),
+            ),
+
+            child: const Icon(
+              Icons
+                  .account_balance_wallet,
+
+              color: Colors.white,
+
+              size: 34,
+            ),
+          ),
+
+          const SizedBox(
+            width: 18,
+          ),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment
+                      .start,
+
+              children: [
+                const Text(
+                  "Total Expenses",
+
+                  style: TextStyle(
+                    color:
+                        Colors.white70,
+
+                    fontSize: 14,
+                  ),
+                ),
+
+                const SizedBox(
+                  height: 6,
+                ),
+
+                Text(
+                  "₹${totalExpense.toStringAsFixed(0)}",
+
+                  style:
+                      const TextStyle(
+                    color:
+                        Colors.white,
+
+                    fontSize: 30,
+
+                    fontWeight:
+                        FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// =====================================
+  /// EXPENSE CARD
+  /// =====================================
+
+  Widget _buildExpenseCard(
+    Map<String, dynamic>
+        expense,
+  ) {
+    final createdAt =
+        expense["createdAt"];
+
+    return Container(
+      margin:
+          const EdgeInsets.only(
+        bottom: 16,
+      ),
+
+      padding:
+          const EdgeInsets.all(
+        18,
+      ),
 
       decoration: BoxDecoration(
         color: Colors.white,
 
         borderRadius:
             BorderRadius.circular(
-          24,
+          20,
         ),
 
         boxShadow: [
           BoxShadow(
-            color: Colors.black
-                .withValues(
-                  alpha: 0.05,
-                ),
+            color:
+                Colors.black
+                    .withValues(
+              alpha: 0.05,
+            ),
 
             blurRadius: 10,
-
-            offset:
-                const Offset(0, 4),
           ),
         ],
       ),
 
       child: Column(
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
+
         children: [
+          /// HEADER
           Row(
             children: [
               Container(
                 padding:
                     const EdgeInsets.all(
-                  14,
+                  12,
                 ),
 
                 decoration:
                     BoxDecoration(
-                  color: AppColors
-                      .primary
+                  color: Colors.red
                       .withValues(
-                        alpha: 0.1,
-                      ),
+                    alpha: 0.1,
+                  ),
 
                   borderRadius:
                       BorderRadius.circular(
-                    16,
+                    14,
                   ),
                 ),
 
                 child: const Icon(
                   Icons
-                      .payments_rounded,
+                      .currency_rupee,
 
-                  color:
-                      AppColors.primary,
+                  color: Colors.red,
                 ),
               ),
 
-              const SizedBox(width: 16),
+              const SizedBox(
+                width: 14,
+              ),
 
               Expanded(
                 child: Column(
@@ -524,7 +346,9 @@ class _ExpensesScreenState
 
                   children: [
                     Text(
-                      title,
+                      expense[
+                              "title"] ??
+                          "Expense",
 
                       style:
                           const TextStyle(
@@ -532,24 +356,22 @@ class _ExpensesScreenState
 
                         fontWeight:
                             FontWeight
-                                .w600,
-
-                        fontFamily:
-                            'Poppins',
+                                .bold,
                       ),
                     ),
 
                     const SizedBox(
-                      height: 6,
+                      height: 4,
                     ),
 
                     Text(
-                      category,
+                      expense[
+                              "category"] ??
+                          "General",
 
-                      style:
-                          const TextStyle(
-                        color: AppColors
-                            .textSecondary,
+                      style: TextStyle(
+                        color: Colors
+                            .grey[700],
                       ),
                     ),
                   ],
@@ -557,85 +379,72 @@ class _ExpensesScreenState
               ),
 
               Text(
-                amount,
+                "₹${expense["amount"] ?? 0}",
 
                 style:
                     const TextStyle(
+                  color: Colors.red,
+
                   fontSize: 18,
 
                   fontWeight:
                       FontWeight.bold,
-
-                  color:
-                      Color(
-                    0xFFD4AF37,
-                  ),
-
-                  fontFamily:
-                      'Poppins',
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(
+            height: 18,
+          ),
 
+          /// DESCRIPTION
+          Text(
+            expense["description"] ??
+                "No description available",
+
+            style: TextStyle(
+              color:
+                  Colors.grey[800],
+
+              height: 1.5,
+            ),
+          ),
+
+          const SizedBox(
+            height: 16,
+          ),
+
+          /// DATE
           Row(
-            mainAxisAlignment:
-                MainAxisAlignment
-                    .spaceBetween,
-
             children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 6,
-                ),
+              const Icon(
+                Icons.calendar_month,
+                size: 18,
+                color: Colors.blue,
+              ),
 
-                decoration:
-                    BoxDecoration(
-                  color: approved
-                      ? Colors.green
-                          .withValues(
-                            alpha:
-                                0.1,
-                          )
-                      : Colors.orange
-                          .withValues(
-                            alpha:
-                                0.1,
-                          ),
-
-                  borderRadius:
-                      BorderRadius.circular(
-                    20,
-                  ),
-                ),
-
-                child: Text(
-                  approved
-                      ? "Approved"
-                      : "Pending",
-
-                  style: TextStyle(
-                    color: approved
-                        ? Colors.green
-                        : Colors.orange,
-
-                    fontWeight:
-                        FontWeight
-                            .w600,
-                  ),
-                ),
+              const SizedBox(
+                width: 8,
               ),
 
               Text(
-                "Receipt Pending",
+                createdAt != null
+                    ? DateFormat(
+                        "dd MMM yyyy",
+                      ).format(
+                        DateTime.parse(
+                          createdAt,
+                        ),
+                      )
+                    : "No Date",
 
                 style: TextStyle(
-                  color: Colors
-                      .grey.shade600,
+                  color:
+                      Colors.grey[700],
+
+                  fontWeight:
+                      FontWeight.w500,
                 ),
               ),
             ],
@@ -645,433 +454,65 @@ class _ExpensesScreenState
     );
   }
 
-  Widget buildFinanceCard({
-    required String title,
-    required String amount,
-    required Color color,
-  }) {
-    return Expanded(
-      child: Container(
+  /// =====================================
+  /// EMPTY STATE
+  /// =====================================
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
         padding:
             const EdgeInsets.all(
-          20,
-        ),
-
-        decoration: BoxDecoration(
-          color: Colors.white,
-
-          borderRadius:
-              BorderRadius.circular(
-            24,
-          ),
-
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black
-                  .withValues(
-                    alpha: 0.05,
-                  ),
-
-              blurRadius: 10,
-
-              offset:
-                  const Offset(0, 4),
-            ),
-          ],
+          30,
         ),
 
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          mainAxisAlignment:
+              MainAxisAlignment.center,
 
           children: [
-            Text(
-              title,
-
-              style: const TextStyle(
-                color: AppColors
-                    .textSecondary,
-
-                fontSize: 14,
-              ),
+            Icon(
+              Icons
+                  .account_balance_wallet,
+              size: 90,
+              color: Colors.grey[400],
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(
+              height: 20,
+            ),
 
-            Text(
-              amount,
+            const Text(
+              "No Expenses Found",
 
               style: TextStyle(
-                color: color,
-
-                fontSize: 24,
+                fontSize: 22,
 
                 fontWeight:
                     FontWeight.bold,
               ),
             ),
+
+            const SizedBox(
+              height: 10,
+            ),
+
+            Text(
+              "Your expense records will appear here.",
+
+              textAlign:
+                  TextAlign.center,
+
+              style: TextStyle(
+                color:
+                    Colors.grey[700],
+
+                height: 1.5,
+              ),
+            ),
           ],
         ),
       ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor:
-          AppColors.background,
-
-      floatingActionButton:
-          FloatingActionButton.extended(
-        onPressed:
-            showAddExpenseDialog,
-
-        backgroundColor:
-            AppColors.primary,
-
-        icon: const Icon(
-          Icons.add,
-        ),
-
-        label: const Text(
-          "Add Expense",
-        ),
-      ),
-
-      body: loading
-          ? const Center(
-              child:
-                  CircularProgressIndicator(),
-            )
-          : SafeArea(
-              child:
-                  SingleChildScrollView(
-                padding:
-                    const EdgeInsets.all(
-                  20,
-                ),
-
-                child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment
-                          .start,
-
-                  children: [
-                    const Text(
-                      'Scholarship & Expenses',
-
-                      style: TextStyle(
-                        fontSize: 30,
-
-                        fontWeight:
-                            FontWeight
-                                .bold,
-
-                        fontFamily:
-                            'Poppins',
-
-                        color: AppColors
-                            .textPrimary,
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 25,
-                    ),
-
-                    /// MAIN CARD
-                    Container(
-                      width:
-                          double.infinity,
-
-                      padding:
-                          const EdgeInsets.all(
-                        28,
-                      ),
-
-                      decoration:
-                          BoxDecoration(
-                        borderRadius:
-                            BorderRadius.circular(
-                          30,
-                        ),
-
-                        gradient:
-                            const LinearGradient(
-                          colors: [
-                            Color(
-                              0xFF0A1931,
-                            ),
-
-                            Color(
-                              0xFF1B3358,
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment
-                                .start,
-
-                        children: [
-                          const Text(
-                            'Total Scholarship',
-
-                            style: TextStyle(
-                              color: Colors
-                                  .white70,
-
-                              fontFamily:
-                                  'Poppins',
-                            ),
-                          ),
-
-                          const SizedBox(
-                            height: 10,
-                          ),
-
-                          Text(
-                            '₹ ${totalScholarship.toStringAsFixed(0)}',
-
-                            style:
-                                const TextStyle(
-                              color:
-                                  Colors
-                                      .white,
-
-                              fontSize: 36,
-
-                              fontWeight:
-                                  FontWeight
-                                      .bold,
-
-                              fontFamily:
-                                  'Poppins',
-                            ),
-                          ),
-
-                          const SizedBox(
-                            height: 20,
-                          ),
-
-                          Row(
-                            children: [
-                              Expanded(
-                                child:
-                                    buildMiniFinanceInfo(
-                                  "Disbursed",
-
-                                  "₹ ${disbursedAmount.toStringAsFixed(0)}",
-                                ),
-                              ),
-
-                              Expanded(
-                                child:
-                                    buildMiniFinanceInfo(
-                                  "Available",
-
-                                  "₹ ${availableBalance.toStringAsFixed(0)}",
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 24,
-                    ),
-
-                    Row(
-                      children: [
-                        buildFinanceCard(
-                          title:
-                              "Total Expenses",
-
-                          amount:
-                              "₹ ${totalExpenses.toStringAsFixed(0)}",
-
-                          color:
-                              Colors.red,
-                        ),
-
-                        const SizedBox(
-                          width: 16,
-                        ),
-
-                        buildFinanceCard(
-                          title:
-                              "Available Balance",
-
-                          amount:
-                              "₹ ${availableBalance.toStringAsFixed(0)}",
-
-                          color:
-                              Colors.green,
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(
-                      height: 32,
-                    ),
-
-                    const Text(
-                      'Expense History',
-
-                      style: TextStyle(
-                        fontSize: 22,
-
-                        fontWeight:
-                            FontWeight.bold,
-
-                        fontFamily:
-                            'Poppins',
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-                    if (expenses.isEmpty)
-                      Container(
-                        width:
-                            double.infinity,
-
-                        padding:
-                            const EdgeInsets.all(
-                          28,
-                        ),
-
-                        decoration:
-                            BoxDecoration(
-                          color:
-                              Colors.white,
-
-                          borderRadius:
-                              BorderRadius.circular(
-                            24,
-                          ),
-
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors
-                                  .black
-                                  .withValues(
-                                    alpha:
-                                        0.05,
-                                  ),
-
-                              blurRadius:
-                                  10,
-
-                              offset:
-                                  const Offset(
-                                0,
-                                4,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons
-                                  .receipt_long_outlined,
-
-                              size: 60,
-
-                              color:
-                                  Colors.grey
-                                      .shade400,
-                            ),
-
-                            const SizedBox(
-                              height: 16,
-                            ),
-
-                            const Text(
-                              "No expenses added yet.",
-
-                              style: TextStyle(
-                                fontSize: 16,
-
-                                color: AppColors
-                                    .textSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    else
-                      ...expenses.map(
-                        (expense) {
-                          return buildExpenseTile(
-                            title:
-                                expense[
-                                        "title"] ??
-                                    "",
-
-                            amount:
-                                "₹ ${(expense["amount"] ?? 0).toString()}",
-
-                            category:
-                                expense[
-                                        "expenseCategory"] ??
-                                    "OTHER",
-
-                            approved:
-                                expense[
-                                        "approved"] ??
-                                    false,
-                          );
-                        },
-                      ),
-                  ],
-                ),
-              ),
-            ),
-    );
-  }
-
-  Widget buildMiniFinanceInfo(
-    String title,
-    String value,
-  ) {
-    return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
-
-      children: [
-        Text(
-          title,
-
-          style: const TextStyle(
-            color: Colors.white70,
-          ),
-        ),
-
-        const SizedBox(height: 6),
-
-        Text(
-          value,
-
-          style: const TextStyle(
-            color: Colors.white,
-
-            fontSize: 20,
-
-            fontWeight:
-                FontWeight.bold,
-          ),
-        ),
-      ],
     );
   }
 }

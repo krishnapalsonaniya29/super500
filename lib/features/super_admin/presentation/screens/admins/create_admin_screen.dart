@@ -29,101 +29,169 @@ class _CreateAdminScreenState
 
   bool loading = false;
 
- Future<void> createAdmin() async {
-  if (nameController.text
-          .trim()
-          .isEmpty ||
-      phoneController.text
-          .trim()
-          .isEmpty ||
-      districtController.text
-          .trim()
-          .isEmpty) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(
-      const SnackBar(
-        content: Text(
-          "Please fill all fields",
+  /// =====================================
+  /// CREATE ADMIN
+  /// =====================================
+
+  Future<void> createAdmin() async {
+    FocusScope.of(context).unfocus();
+
+    /// VALIDATION
+    if (nameController.text
+            .trim()
+            .isEmpty ||
+        phoneController.text
+            .trim()
+            .isEmpty ||
+        districtController.text
+            .trim()
+            .isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Please fill all fields",
+          ),
         ),
-      ),
-    );
+      );
 
-    return;
-  }
+      return;
+    }
 
-  if (phoneController.text
-          .trim()
-          .length !=
-      10) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(
-      const SnackBar(
-        content: Text(
-          "Enter valid 10 digit phone number",
+    /// PHONE VALIDATION
+    if (phoneController.text
+            .trim()
+            .length !=
+        10) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Enter valid 10 digit phone number",
+          ),
         ),
-      ),
-    );
+      );
 
-    return;
-  }
-
-  try {
-    setState(() {
-      loading = true;
-    });
-
-    await SuperAdminService.createAdmin(
-      fullName:
-          nameController.text
-              .trim(),
-
-      phone:
-          phoneController.text
-              .trim(),
-
-      district:
-          districtController.text
-              .trim()
-              .toUpperCase(),
-    );
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context)
-        .showSnackBar(
-      const SnackBar(
-        content: Text(
-          "Admin created successfully",
-        ),
-      ),
-    );
-
-    Navigator.pop(context);
-  } catch (e) {
-    String message =
-        "Failed to create admin";
+      return;
+    }
 
     try {
-      message = e
-              .toString()
-              .split("message:")
-              .last
-              .replaceAll("}", "")
-              .trim();
-    } catch (_) {}
+      setState(() {
+        loading = true;
+      });
 
-    ScaffoldMessenger.of(context)
-        .showSnackBar(
-      SnackBar(
-        content: Text(message),
-      ),
-    );
-  } finally {
-    setState(() {
-      loading = false;
-    });
+      final response =
+          await SuperAdminService
+              .createAdmin(
+        fullName:
+            nameController.text.trim(),
+
+        phone:
+            phoneController.text.trim(),
+
+        district:
+            districtController.text
+                .trim()
+                .toUpperCase(),
+      );
+
+      /// SUCCESS CHECK
+      if (response.data["success"] !=
+          true) {
+        throw Exception(
+          response.data["message"] ??
+              "Failed to create admin",
+        );
+      }
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        SnackBar(
+          backgroundColor:
+              Colors.green,
+
+          content: Text(
+            response.data["message"] ??
+                "Admin created successfully",
+          ),
+        ),
+      );
+
+      /// CLEAR FORM
+      nameController.clear();
+
+      phoneController.clear();
+
+      districtController.clear();
+
+      Navigator.pop(
+        context,
+        true,
+      );
+    } catch (e) {
+      String message =
+          "Failed to create admin";
+
+      /// DIO ERROR PARSING
+      try {
+        final error =
+            e.toString();
+
+        if (error.contains(
+          "District already has admin",
+        )) {
+          message =
+              "This district already has an admin";
+        } else if (error.contains(
+          "Phone already exists",
+        )) {
+          message =
+              "Phone number already registered";
+        } else if (error.contains(
+          "Unauthorized",
+        )) {
+          message =
+              "Session expired. Login again.";
+        } else {
+          message = error;
+        }
+      } catch (_) {}
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        SnackBar(
+          backgroundColor:
+              Colors.red,
+
+          content: Text(
+            message,
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          loading = false;
+        });
+      }
+    }
   }
-}
+
+  @override
+  void dispose() {
+    nameController.dispose();
+
+    phoneController.dispose();
+
+    districtController.dispose();
+
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -171,7 +239,6 @@ class _CreateAdminScreenState
                       Color(
                         0xFF0A1931,
                       ),
-
                       Color(
                         0xFF132D46,
                       ),
@@ -234,7 +301,6 @@ class _CreateAdminScreenState
 
               const SizedBox(height: 32),
 
-              /// FORM TITLE
               const Text(
                 "Admin Details",
 
@@ -251,7 +317,6 @@ class _CreateAdminScreenState
 
               const SizedBox(height: 22),
 
-              /// FULL NAME
               buildTextField(
                 controller:
                     nameController,
@@ -265,7 +330,6 @@ class _CreateAdminScreenState
 
               const SizedBox(height: 20),
 
-              /// PHONE
               buildTextField(
                 controller:
                     phoneController,
@@ -282,7 +346,6 @@ class _CreateAdminScreenState
 
               const SizedBox(height: 20),
 
-              /// DISTRICT
               TextField(
                 controller:
                     districtController,
@@ -297,32 +360,38 @@ class _CreateAdminScreenState
 
                     selection:
                         TextSelection.collapsed(
-                      offset: value.length,
+                      offset:
+                          value.length,
                     ),
                   );
                 },
 
-                decoration: InputDecoration(
+                decoration:
+                    InputDecoration(
                   hintText:
                       "District (UPPERCASE)",
 
                   helperText:
                       "Example: BHOPAL",
 
-                  prefixIcon: const Icon(
-                    Icons.location_city_rounded,
+                  prefixIcon:
+                      const Icon(
+                    Icons
+                        .location_city_rounded,
                   ),
 
                   filled: true,
 
-                  fillColor: Colors.white,
+                  fillColor:
+                      Colors.white,
 
                   contentPadding:
                       const EdgeInsets.symmetric(
                     vertical: 20,
                   ),
 
-                  border: OutlineInputBorder(
+                  border:
+                      OutlineInputBorder(
                     borderRadius:
                         BorderRadius.circular(
                       22,
@@ -334,121 +403,8 @@ class _CreateAdminScreenState
                 ),
               ),
 
-              const SizedBox(height: 32),
-
-              /// INFO CARD
-              Container(
-                padding:
-                    const EdgeInsets.all(
-                  18,
-                ),
-
-                decoration:
-                    BoxDecoration(
-                  color: Colors.white,
-
-                  borderRadius:
-                      BorderRadius.circular(
-                    22,
-                  ),
-
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black
-                          .withValues(
-                            alpha: 0.05,
-                          ),
-
-                      blurRadius: 10,
-
-                      offset:
-                          const Offset(
-                        0,
-                        4,
-                      ),
-                    ),
-                  ],
-                ),
-
-                child: Row(
-                  crossAxisAlignment:
-                      CrossAxisAlignment
-                          .start,
-
-                  children: [
-                    Container(
-                      padding:
-                          const EdgeInsets.all(
-                        12,
-                      ),
-
-                      decoration:
-                          BoxDecoration(
-                        color: AppColors
-                            .primary
-                            .withValues(
-                              alpha:
-                                  0.1,
-                            ),
-
-                        borderRadius:
-                            BorderRadius.circular(
-                          14,
-                        ),
-                      ),
-
-                      child: const Icon(
-                        Icons.info_rounded,
-
-                        color:
-                            AppColors
-                                .primary,
-                      ),
-                    ),
-
-                    const SizedBox(width: 14),
-
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment
-                                .start,
-
-                        children: [
-                          Text(
-                            "Admin Responsibilities",
-
-                            style: TextStyle(
-                              fontWeight:
-                                  FontWeight
-                                      .bold,
-
-                              fontSize: 16,
-                            ),
-                          ),
-
-                          SizedBox(height: 8),
-
-                          Text(
-                            "• Verify students\n• Review documents\n• Manage district mentors\n• Monitor scholarship disbursement\n• Track student performance",
-
-                            style: TextStyle(
-                              color: AppColors
-                                  .textSecondary,
-
-                              height: 1.6,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
               const SizedBox(height: 40),
 
-              /// CREATE BUTTON
               SizedBox(
                 width: double.infinity,
 
@@ -475,10 +431,17 @@ class _CreateAdminScreenState
                   ),
 
                   child: loading
-                      ? const CircularProgressIndicator(
-                          color:
-                              Colors
-                                  .white,
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child:
+                              CircularProgressIndicator(
+                            strokeWidth:
+                                2.5,
+
+                            color:
+                                Colors.white,
+                          ),
                         )
                       : const Text(
                           "Create Admin",

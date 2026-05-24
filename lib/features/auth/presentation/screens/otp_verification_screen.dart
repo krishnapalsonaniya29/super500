@@ -12,7 +12,7 @@ class OtpVerificationScreen extends StatefulWidget {
     super.key,
     required this.phoneNumber,
   });
-
+ 
   @override
   State<OtpVerificationScreen> createState() =>
       _OtpVerificationScreenState();
@@ -65,6 +65,7 @@ Future<void> verifyOtp() async {
       phone: widget.phoneNumber,
       otp: otpController.text.trim(),
     );
+    
 
     if (response["success"] == true) {
       final me =
