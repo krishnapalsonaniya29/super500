@@ -52,21 +52,23 @@ class _MentorLoginScreenState
     });
 
     try {
-      Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) => MentorOtpScreen(
-              phone:
-                  phoneController.text,
-            ),
-      ),
-    );
       await AuthService.sendOtp(
-      phoneController.text.trim(),    
+        phoneController.text.trim(),
       );
 
       if (!mounted) return;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (_) => MentorOtpScreen(
+                phone:
+                    phoneController.text
+                        .trim(),
+              ),
+        ),
+      );
 
       ScaffoldMessenger.of(context)
           .showSnackBar(
@@ -76,9 +78,6 @@ class _MentorLoginScreenState
           ),
         ),
       );
-
-      /// TODO:
-      /// NAVIGATE TO OTP SCREEN
     } catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(

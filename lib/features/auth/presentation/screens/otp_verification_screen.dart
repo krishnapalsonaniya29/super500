@@ -7,10 +7,12 @@ import '../../../../widgets/buttons/custom_button.dart';
 import '../../../../../services/auth/auth_service.dart';
 class OtpVerificationScreen extends StatefulWidget {
   final String phoneNumber;
+  final String role;
 
   const OtpVerificationScreen({
     super.key,
     required this.phoneNumber,
+    required this.role,
   });
  
   @override
@@ -64,14 +66,14 @@ Future<void> verifyOtp() async {
         await AuthService.verifyOtp(
       phone: widget.phoneNumber,
       otp: otpController.text.trim(),
+      role: widget.role,
     );
     
 
     if (response["success"] == true) {
-      final me =
-          await AuthService.getMe();
-
-      final user = me["data"];
+      final user =
+          await AuthService
+              .getCurrentUser();
 
       final role = user["role"];
 

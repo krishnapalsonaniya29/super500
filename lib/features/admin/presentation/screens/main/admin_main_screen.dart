@@ -59,12 +59,9 @@ class _AdminMainScreenState
 
   Future<void> validateAdmin() async {
     try {
-      final me =
-          await AuthService.getMe();
-
-      final user = me["data"];
-
-      final role = user["role"];
+      final role =
+          await AuthService
+              .getCurrentUserRole();
 
       if (role != "ADMIN") {
         if (!mounted) return;

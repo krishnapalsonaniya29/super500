@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
 
 import '../../core/network/dio_client.dart';
 
 import '../auth/auth_service.dart';
 
 class StudentService {
-
   static final Dio _dio =
       DioClient.instance;
 
@@ -126,15 +126,127 @@ static Future<List<dynamic>>
 
   static Future<Map<String, dynamic>>
       getProfile() async {
+    final options =
+        await _getOptions();
 
+    try {
+      final response =
+          await _dio.get(
+        "$baseUrl/profile",
+        options: options,
+      );
+
+      return Map<String, dynamic>.from(
+        response.data,
+      );
+    } on DioException catch (error) {
+      if (error.type !=
+          DioExceptionType.connectionError) {
+        rethrow;
+      }
+
+      final fallbackResponse =
+          await _dio.get(
+        "/v1/auth/me",
+        options: options,
+      );
+
+      return Map<String, dynamic>.from(
+        fallbackResponse.data,
+      );
+    }
+  }
+
+  /// ====================================
+  /// FETCH SAMAGRA DETAILS
+  /// ====================================
+
+  static Future<Map<String, dynamic>>
+      fetchSamagra(
+    String samagraId,
+  ) async {
     final response =
-        await _dio.get(
-      "$baseUrl/profile",
-
-      options:
-          await _getOptions(),
+        await _dio.post(
+      "$baseUrl/fetch-samagra",
+      data: {
+        "samagraId": samagraId,
+      },
+      options: await _getOptions(),
     );
 
-    return response.data;
+    return Map<String, dynamic>.from(
+      response.data,
+    );
+  }
+
+  /// ====================================
+  /// COMPLETE PROFILE
+  /// ====================================
+
+  static Future<Map<String, dynamic>>
+      completeProfile({
+    required Map<String, dynamic>
+        payload,
+  }) async {
+    final response =
+        await _dio.post(
+      "$baseUrl/complete-profile",
+      data: payload,
+      options: await _getOptions(),
+    );
+
+    return Map<String, dynamic>.from(
+      response.data,
+    );
+  }
+
+  static Future<List<dynamic>>
+      getMyDocuments() async {
+    final response =
+        await _dio.get(
+      "/v1/documents/my-documents",
+      options: await _getOptions(),
+    );
+
+    return (response.data["data"] as List?) ??
+        const [];
+  }
+
+  static Future<Map<String, dynamic>>
+      uploadDocuments({
+    required Map<String, MultipartFile>
+        files,
+  }) async {
+    final response =
+        await _dio.post(
+      "/v1/documents/upload",
+      data: FormData.fromMap(files),
+      options: Options(
+        headers: {
+          "Authorization":
+              "Bearer ${await AuthService.getToken()}",
+          "Content-Type":
+              "multipart/form-data",
+        },
+      ),
+    );
+
+    return Map<String, dynamic>.from(
+      response.data,
+    );
+  }
+
+  static MultipartFile buildMultipartFile({
+    required List<int> bytes,
+    required String filename,
+    required String contentType,
+  }) {
+    return MultipartFile.fromBytes(
+      bytes,
+      filename: filename,
+      contentType: MediaType.parse(
+        contentType,
+      ),
+    );
   }
 }

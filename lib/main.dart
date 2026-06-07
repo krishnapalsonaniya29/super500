@@ -178,6 +178,9 @@ class Super500App
               return OtpVerificationScreen(
                 phoneNumber:
                     args["phone"],
+                role:
+                    (args["role"] ?? "STUDENT")
+                        .toString(),
               );
             },
           },

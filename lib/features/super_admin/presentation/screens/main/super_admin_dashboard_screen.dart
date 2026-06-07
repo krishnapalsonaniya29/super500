@@ -65,12 +65,9 @@ class _SuperAdminDashboardScreenState
   Future<void>
       validateSuperAdmin() async {
     try {
-      final me =
-          await AuthService.getMe();
-
-      final user = me["data"];
-
-      final role = user["role"];
+      final role =
+          await AuthService
+              .getCurrentUserRole();
 
       if (role !=
           "SUPER_ADMIN") {

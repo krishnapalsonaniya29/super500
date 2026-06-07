@@ -129,6 +129,7 @@ class _SuperAdminLoginScreenState
 
         otp:
             otpController.text.trim(),
+        role: "SUPER_ADMIN",
       );
 
       if (response["success"] !=
@@ -139,12 +140,9 @@ class _SuperAdminLoginScreenState
       }
 
       /// GET USER
-      final me =
-          await AuthService.getMe();
-
-      final user = me["data"];
-
-      final role = user["role"];
+      final role =
+          await AuthService
+              .getCurrentUserRole();
 
       /// BLOCK NON SUPER ADMINS
       if (role !=

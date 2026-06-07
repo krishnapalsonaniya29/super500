@@ -126,12 +126,9 @@ class _SplashScreenState
         return;
       }
 
-      final response =
-          await AuthService.getMe();
-
-      final user = response["data"];
-
-      final role = user["role"];
+      final role =
+          await AuthService
+              .getCurrentUserRole();
 
       if (!mounted) return;
 

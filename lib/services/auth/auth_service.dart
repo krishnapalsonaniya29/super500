@@ -167,6 +167,68 @@ import '../../core/network/dio_client.dart';
 class AuthService {
   static const String baseUrl =
       "/v1/auth";
+  static const Set<String> _allowedRoles = {
+    "STUDENT",
+    "MENTOR",
+    "ADMIN",
+    "SUPER_ADMIN",
+  };
+
+  static Map<String, dynamic>? _asMap(
+    dynamic value,
+  ) {
+    if (value is Map<String, dynamic>) {
+      return value;
+    }
+
+    if (value is Map) {
+      return Map<String, dynamic>.from(
+        value,
+      );
+    }
+
+    return null;
+  }
+
+  static String _formatError(
+    Object error,
+  ) {
+    if (error is DioException) {
+      final data = _asMap(
+        error.response?.data,
+      );
+      final message = data?["message"]
+          ?.toString()
+          .trim();
+
+      if (message != null &&
+          message.isNotEmpty) {
+        return message;
+      }
+
+      return error.message ??
+          "Request failed";
+    }
+
+    return error.toString();
+  }
+
+  static String _normalizeRole(
+    String role,
+  ) {
+    final normalized =
+        role.trim().toUpperCase();
+
+    if (!_allowedRoles.contains(
+      normalized,
+    )) {
+      throw Exception(
+        "Invalid role: $role",
+      );
+    }
+
+    return normalized;
+  }
 
   /// =========================
   /// SEND OTP
@@ -194,7 +256,9 @@ class AuthService {
     } catch (e) {
       print("SEND OTP ERROR => $e");
 
-      throw Exception(e.toString());
+      throw Exception(
+        _formatError(e),
+      );
     }
   }
 
@@ -230,7 +294,9 @@ class AuthService {
         "MENTOR REGISTER ERROR => $e",
       );
 
-      throw Exception(e.toString());
+      throw Exception(
+        _formatError(e),
+      );
     }
   }
 
@@ -241,14 +307,19 @@ class AuthService {
       verifyOtp({
     required String phone,
     required String otp,
+    required String role,
   }) async {
     try {
+      final normalizedRole =
+          _normalizeRole(role);
+
       final response =
           await DioClient.instance.post(
         "$baseUrl/verify-otp",
         data: {
           "phone": phone,
           "otp": otp,
+          "role": normalizedRole,
         },
       );
 
@@ -261,6 +332,10 @@ class AuthService {
           response.data["accessToken"] ??
               response.data["data"]
                   ?["accessToken"];
+      final refreshToken =
+          response.data["refreshToken"] ??
+              response.data["data"]
+                  ?["refreshToken"];
 
       print(
         "EXTRACTED TOKEN => $accessToken",
@@ -286,6 +361,17 @@ class AuthService {
         accessToken.toString(),
       );
 
+      if (refreshToken != null &&
+          refreshToken
+              .toString()
+              .trim()
+              .isNotEmpty) {
+        await prefs.setString(
+          "refreshToken",
+          refreshToken.toString(),
+        );
+      }
+
       /// VERIFY SAVED TOKEN
       final saved =
           prefs.getString(
@@ -304,7 +390,9 @@ class AuthService {
         "VERIFY OTP ERROR => $e",
       );
 
-      throw Exception(e.toString());
+      throw Exception(
+        _formatError(e),
+      );
     }
   }
 
@@ -353,6 +441,12 @@ class AuthService {
       final response =
           await DioClient.instance.get(
         "$baseUrl/me",
+        options: Options(
+          headers: {
+            "Authorization":
+                "Bearer $token",
+          },
+        ),
       );
 
       print(
@@ -365,8 +459,45 @@ class AuthService {
     } catch (e) {
       print("GET ME ERROR => $e");
 
-      throw Exception(e.toString());
+      throw Exception(
+        _formatError(e),
+      );
     }
+  }
+
+  static Future<Map<String, dynamic>>
+      getCurrentUser() async {
+    final response = await getMe();
+
+    final user = _asMap(
+      response["data"],
+    );
+
+    if (user == null) {
+      throw Exception(
+        "User data missing from profile response",
+      );
+    }
+
+    return user;
+  }
+
+  static Future<String> getCurrentUserRole() async {
+    final user =
+        await getCurrentUser();
+
+    final role = user["role"]
+        ?.toString()
+        .trim();
+
+    if (role == null ||
+        role.isEmpty) {
+      throw Exception(
+        "User role missing from profile response",
+      );
+    }
+
+    return role;
   }
 
   /// =========================
@@ -378,6 +509,9 @@ class AuthService {
 
     await prefs.remove(
       "accessToken",
+    );
+    await prefs.remove(
+      "refreshToken",
     );
 
     print("TOKEN REMOVED");

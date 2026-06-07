@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/features/auth/presentation/screens/student_register_screen.dart';
 import 'package:flutter_application_1/services/auth/auth_service.dart';
 
-
 import '../../../../widgets/inputs/custom_textfield.dart';
 import '../../../student/presentation/screens/student_dashboard_screen.dart';
-import '../../../student/presentation/screens/student_academic_screen.dart';
-
 import '../../../student/presentation/screens/student_document_upload_screen.dart';
 class StudentLoginScreen extends StatefulWidget {
   const StudentLoginScreen({super.key});
@@ -27,6 +24,20 @@ class _StudentLoginScreenState
   bool loading = false;
 
 Future<void> sendOtp() async {
+  if (phoneController.text
+      .trim()
+      .length != 10) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          "Enter a valid 10-digit phone number",
+        ),
+      ),
+    );
+
+    return;
+  }
+
   try {
     setState(() {
       loading = true;
@@ -66,6 +77,20 @@ Future<void> sendOtp() async {
 
 
 Future<void> verifyOtp() async {
+  if (otpController.text
+      .trim()
+      .length != 6) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          "Enter a valid 6-digit OTP",
+        ),
+      ),
+    );
+
+    return;
+  }
+
   try {
     setState(() {
       loading = true;
@@ -75,19 +100,20 @@ Future<void> verifyOtp() async {
         await AuthService.verifyOtp(
       phone: phoneController.text.trim(),
       otp: otpController.text.trim(),
+      role: "STUDENT",
     );
 
     if (response["success"] == true) {
-      final me =
-          await AuthService.getMe();
-
       if (!mounted) return;
 
-      final studentProfile =
-          me["data"]["studentProfile"];
+      final data =
+          Map<String, dynamic>.from(
+        response["data"] ?? {},
+      );
+      final profileCompleted =
+          data["profileCompleted"] == true;
 
-      /// NEW USER
-      if (studentProfile == null) {
+      if (!profileCompleted) {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
@@ -100,42 +126,43 @@ Future<void> verifyOtp() async {
         return;
       }
 
-      /// PROFILE NOT COMPLETED
-      if (studentProfile[
-              "profileCompleted"] !=
-          true) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (_) =>
-                const StudentAcademicScreen(),
-          ),
-          (route) => false,
+      Map<String, dynamic>? currentUser;
+      try {
+        currentUser =
+            await AuthService
+                .getCurrentUser();
+      } catch (e) {
+        debugPrint(
+          "STUDENT LOGIN GET CURRENT USER ERROR => $e",
         );
-
-        return;
       }
 
-      /// DOCUMENTS CHECK
-      final documents =
-          studentProfile["documents"];
+      if (!mounted) return;
 
-      if (documents == null ||
-          documents.isEmpty ||
-          documents.length < 5) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (_) =>
-                const StudentDocumentUploadScreen(),
-          ),
-          (route) => false,
-        );
+      final studentProfile =
+          currentUser?["studentProfile"];
 
-        return;
+      if (studentProfile is Map) {
+        final documents =
+            (studentProfile["documents"]
+                    as List?)
+                ?.cast<dynamic>() ??
+            const [];
+
+        if (documents.length < 5) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  const StudentDocumentUploadScreen(),
+            ),
+            (route) => false,
+          );
+
+          return;
+        }
       }
 
-      /// EVERYTHING COMPLETED
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(

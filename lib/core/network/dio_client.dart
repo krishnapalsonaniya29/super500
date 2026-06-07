@@ -5,7 +5,7 @@ class DioClient {
   static final Dio instance = Dio(
     BaseOptions(
       baseUrl:
-          "http://localhost:5000/api",
+          "https://unspeedy-nickie-oratorically.ngrok-free.dev/api",
 
       connectTimeout:
           const Duration(
@@ -20,6 +20,10 @@ class DioClient {
       headers: {
         "Content-Type":
             "application/json",
+        "Accept":
+            "application/json",
+        "ngrok-skip-browser-warning":
+            "true",
       },
     ),
   )
@@ -77,6 +81,11 @@ class DioClient {
                 "Authorization"] =
             "Bearer $token";
       }
+
+      options.headers.putIfAbsent(
+        "ngrok-skip-browser-warning",
+        () => "true",
+      );
 
       return handler.next(
         options,

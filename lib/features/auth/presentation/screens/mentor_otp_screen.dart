@@ -55,10 +55,24 @@ Future<void> verifyOtp() async {
         await AuthService.verifyOtp(
       phone: widget.phone,
       otp: otpController.text.trim(),
+      role: "MENTOR",
+    );
+
+    if (response["success"] != true) {
+      throw Exception(
+        "OTP verification failed",
+      );
+    }
+
+    final data =
+        Map<String, dynamic>.from(
+      response["data"] ?? {},
     );
 
     final user =
-        response["data"]["user"];
+        Map<String, dynamic>.from(
+      data["user"] ?? {},
+    );
 
     final role =
         user["role"];

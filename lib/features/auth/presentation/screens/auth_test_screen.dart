@@ -56,6 +56,7 @@ class _AuthTestScreenState
       final data = await AuthService.verifyOtp(
         phone: phoneController.text.trim(),
         otp: otpController.text.trim(),
+        role: "STUDENT",
       );
 
       setState(() {
