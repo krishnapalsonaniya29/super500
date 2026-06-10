@@ -627,7 +627,7 @@ class _StudentsScreenState
                                       "Details",
 
                                   color:
-                                      AppColors.primary,
+                                      Colors.orange,
 
                                   onTap: () {
                                     Navigator.push(
@@ -671,7 +671,7 @@ class _StudentsScreenState
                                       "Assign Mentor",
 
                                   color:
-                                      Colors.purple,
+                                      Colors.orange,
 
                                   onTap: () async {
                                     await Navigator.push(

@@ -106,6 +106,7 @@ class _AchievementsScreenState
                     fontSize: 24,
                     fontWeight:
                         FontWeight.bold,
+                    color: Color.fromARGB(255, 242, 243, 244),
                   ),
                 ),
 
@@ -180,8 +181,7 @@ class _AchievementsScreenState
                       Icon(
                         Icons.info_outline,
                         color:
-                            AppColors
-                                .primary,
+                            Color.fromARGB(255, 232, 234, 236),
                       ),
 
                       SizedBox(width: 12),
@@ -254,6 +254,9 @@ class _AchievementsScreenState
                         fontWeight:
                             FontWeight.bold,
                         fontSize: 16,
+
+                        color:
+                            Colors.white,
                       ),
                     ),
                   ),

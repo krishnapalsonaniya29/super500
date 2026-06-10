@@ -442,48 +442,48 @@ Future<void> verifyOtp() async {
         /// REGISTER SECTION
         /// =====================================
 
-        Row(
-          mainAxisAlignment:
-              MainAxisAlignment
-                  .center,
+        // Row(
+        //   mainAxisAlignment:
+        //       MainAxisAlignment
+        //           .center,
 
-          children: [
-            Text(
-              "Not registered yet?",
+        //   children: [
+        //     Text(
+        //       "Not registered yet?",
 
-              style: TextStyle(
-                color:
-                    Colors.grey[700],
-              ),
-            ),
+        //       style: TextStyle(
+        //         color:
+        //             Colors.grey[700],
+        //       ),
+        //     ),
 
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
+        //     TextButton(
+        //       onPressed: () {
+        //         Navigator.push(
+        //           context,
 
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        const StudentRegisterScreen(),
-                  ),
-                );
-              },
+        //           MaterialPageRoute(
+        //             builder: (_) =>
+        //                 const StudentRegisterScreen(),
+        //           ),
+        //         );
+        //       },
 
-              child: const Text(
-                "Register Here",
+        //       child: const Text(
+        //         "Register Here",
 
-                style: TextStyle(
-                  fontWeight:
-                      FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
+        //         style: TextStyle(
+        //           fontWeight:
+        //               FontWeight.bold,
+        //         ),
+        //       ),
+        //     ),
+        //   ],
+        // ),
 
-        const SizedBox(
-          height: 40,
-        ),
+        // const SizedBox(
+        //   height: 40,
+        // ),
 
         /// =====================================
         /// DEMO OTP INFO

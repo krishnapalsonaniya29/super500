@@ -35,9 +35,11 @@ class _MentorsScreenState
           await SuperAdminService
               .getMentors();
 
-      setState(() {
-        mentors = response["data"];
-      });
+     setState(() {
+  mentors =
+      (response["data"] as List?) ??
+          [];
+});
     } catch (e) {
       debugPrint(e.toString());
     } finally {
@@ -97,10 +99,14 @@ class _MentorsScreenState
 
         icon: const Icon(
           Icons.person_add_alt_1,
+          color: Colors.white,
         ),
-
+        
         label: const Text(
           "Add Mentor",
+          style: TextStyle(
+            color: Colors.white,
+          ),
         ),
       ),
 
@@ -419,374 +425,676 @@ class _MentorsScreenState
       ),
     );
   }
-
   Widget buildMentorCard({
-    required dynamic mentor,
-  }) {
-    final user = mentor["user"];
+  required dynamic mentor,
+}) {
+  final user = mentor["user"] ?? {};
 
-    final students =
-        mentor["students"] ?? [];
+  final students =
+      (mentor["students"] as List?) ?? [];
 
-    return Container(
-      margin:
-          const EdgeInsets.only(
-        bottom: 18,
+  final fullName =
+      (user["fullName"] ?? "")
+          .toString();
+
+  final firstLetter =
+      fullName.isNotEmpty
+          ? fullName[0].toUpperCase()
+          : "?";
+
+  return Container(
+    margin: const EdgeInsets.only(
+      bottom: 18,
+    ),
+    padding: const EdgeInsets.all(
+      20,
+    ),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius:
+          BorderRadius.circular(
+        24,
       ),
-
-      padding:
-          const EdgeInsets.all(
-        20,
-      ),
-
-      decoration: BoxDecoration(
-        color: Colors.white,
-
-        borderRadius:
-            BorderRadius.circular(
-          24,
-        ),
-
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black
-                .withValues(
-                  alpha: 0.05,
-                ),
-
-            blurRadius: 10,
-
-            offset:
-                const Offset(0, 4),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black
+              .withValues(
+            alpha: 0.05,
           ),
-        ],
-      ),
+          blurRadius: 10,
+          offset:
+              const Offset(0, 4),
+        ),
+      ],
+    ),
+    child: Column(
+      children: [
+        Row(
+          children: [
+            CircleAvatar(
+              radius: 28,
+              backgroundColor:
+                  AppColors.primary,
+              child: Text(
+                firstLetter,
+                style:
+                    const TextStyle(
+                  color:
+                      Colors.white,
+                  fontWeight:
+                      FontWeight.bold,
+                  fontSize: 22,
+                ),
+              ),
+            ),
 
-      child: Column(
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 28,
+            const SizedBox(
+              width: 16,
+            ),
 
-                backgroundColor:
-                    AppColors.primary,
-
-                child: Text(
-                  user["fullName"][
-                      0],
-
-                  style:
-                      const TextStyle(
-                    color:
-                        Colors.white,
-
-                    fontWeight:
-                        FontWeight
-                            .bold,
-
-                    fontSize: 22,
+            Expanded(
+              child: Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment
+                        .start,
+                children: [
+                  Text(
+                    fullName.isNotEmpty
+                        ? fullName
+                        : "Unknown Mentor",
+                    style:
+                        const TextStyle(
+                      fontSize: 18,
+                      fontWeight:
+                          FontWeight
+                              .bold,
+                    ),
                   ),
-                ),
+
+                  const SizedBox(
+                    height: 6,
+                  ),
+
+                  Text(
+                    (mentor["district"] ??
+                            "No District")
+                        .toString(),
+                    style:
+                        const TextStyle(
+                      color: AppColors
+                          .textSecondary,
+                    ),
+                  ),
+                ],
               ),
+            ),
 
-              const SizedBox(
-                width: 16,
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 8,
               ),
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment
-                          .start,
-
-                  children: [
-                    Text(
-                      user["fullName"],
-
-                      style:
-                          const TextStyle(
-                        fontSize: 18,
-
-                        fontWeight:
-                            FontWeight
-                                .bold,
+              decoration:
+                  BoxDecoration(
+                color: (user["isActive"] ==
+                        true)
+                    ? Colors.green
+                        .withValues(
+                        alpha: 0.1,
+                      )
+                    : Colors.red
+                        .withValues(
+                        alpha: 0.1,
                       ),
-                    ),
-
-                    const SizedBox(
-                      height: 6,
-                    ),
-
-                    Text(
-                      mentor[
-                              "district"] ??
-                          "No District",
-
-                      style:
-                          const TextStyle(
-                        color: AppColors
-                            .textSecondary,
-                      ),
-                    ),
-                  ],
+                borderRadius:
+                    BorderRadius
+                        .circular(
+                  20,
                 ),
               ),
-
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
-                ),
-
-                decoration:
-                    BoxDecoration(
+              child: Text(
+                (user["isActive"] ==
+                        true)
+                    ? "Active"
+                    : "Inactive",
+                style: TextStyle(
                   color:
                       (user["isActive"] ==
                               true)
-                          ? Colors.green
-                              .withValues(
-                                alpha:
-                                    0.1,
-                              )
-                          : Colors.red
-                              .withValues(
-                                alpha:
-                                    0.1,
-                              ),
-
-                  borderRadius:
-                      BorderRadius.circular(
-                    20,
-                  ),
+                          ? Colors
+                              .green
+                          : Colors.red,
+                  fontWeight:
+                      FontWeight
+                          .w600,
                 ),
+              ),
+            ),
+          ],
+        ),
 
-                child: Text(
-                  (user["isActive"] ==
-                          true)
-                      ? "Active"
-                      : "Inactive",
+        const SizedBox(
+          height: 20,
+        ),
 
-                  style: TextStyle(
+        Row(
+          children: [
+            Expanded(
+              child: buildInfoTile(
+                title: "Students",
+                value: students.length
+                    .toString(),
+              ),
+            ),
+
+            const SizedBox(
+              width: 14,
+            ),
+
+            Expanded(
+              child: buildInfoTile(
+                title: "District",
+                value: (mentor[
+                            "district"] ??
+                        "-")
+                    .toString(),
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(
+          height: 18,
+        ),
+
+        Container(
+          width:
+              double.infinity,
+          padding:
+              const EdgeInsets.all(
+            16,
+          ),
+          decoration:
+              BoxDecoration(
+            color: AppColors.primary
+                .withValues(
+              alpha: 0.04,
+            ),
+            borderRadius:
+                BorderRadius
+                    .circular(
+              18,
+            ),
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.phone,
+                    size: 18,
                     color:
-                        (user["isActive"] ==
-                                true)
-                            ? Colors
-                                .green
-                            : Colors.red,
-
-                    fontWeight:
-                        FontWeight
-                            .w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(
-            height: 20,
-          ),
-
-          Row(
-            children: [
-              Expanded(
-                child:
-                    buildInfoTile(
-                  title:
-                      "Students",
-
-                  value: students
-                      .length
-                      .toString(),
-                ),
-              ),
-
-              const SizedBox(
-                width: 14,
-              ),
-
-              Expanded(
-                child:
-                    buildInfoTile(
-                  title:
-                      "District",
-
-                  value:
-                      mentor[
-                              "district"] ??
-                          "-",
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(
-            height: 18,
-          ),
-
-          Container(
-            width:
-                double.infinity,
-
-            padding:
-                const EdgeInsets.all(
-              16,
-            ),
-
-            decoration:
-                BoxDecoration(
-              color: AppColors
-                  .primary
-                  .withValues(
-                    alpha: 0.04,
-                  ),
-
-              borderRadius:
-                  BorderRadius.circular(
-                18,
-              ),
-            ),
-
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.phone,
-
-                      size: 18,
-
-                      color:
-                          AppColors
-                              .primary,
-                    ),
-
-                    const SizedBox(
-                      width: 10,
-                    ),
-
-                    Text(
-                      user["phone"] ??
-                          "-",
-                    ),
-                  ],
-                ),
-
-                const SizedBox(
-                  height: 12,
-                ),
-
-                Row(
-                  children: [
-                    const Icon(
-                      Icons
-                          .workspace_premium_rounded,
-
-                      size: 18,
-
-                      color:
-                          AppColors
-                              .primary,
-                    ),
-
-                    const SizedBox(
-                      width: 10,
-                    ),
-
-                    Expanded(
-                      child: Text(
-                        mentor["specialization"] ??
-                            "No Specialization",
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(
-            height: 20,
-          ),
-
-          Row(
-            children: [
-              Expanded(
-                child:
-                    ElevatedButton(
-                  onPressed: () {},
-
-                  style:
-                      ElevatedButton.styleFrom(
-                    backgroundColor:
                         AppColors
                             .primary,
-
-                    padding:
-                        const EdgeInsets.symmetric(
-                      vertical: 14,
-                    ),
-
-                    shape:
-                        RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(
-                        16,
-                      ),
-                    ),
                   ),
 
-                  child: const Text(
-                    "View Students",
+                  const SizedBox(
+                    width: 10,
                   ),
-                ),
+
+                  Text(
+                    (user["phone"] ??
+                            "-")
+                        .toString(),
+                  ),
+                ],
               ),
 
               const SizedBox(
-                width: 14,
+                height: 12,
               ),
 
-              Expanded(
-                child:
-                    ElevatedButton(
-                  onPressed: () {
-                    removeMentor(
-                      mentor["id"],
-                    );
-                  },
-
-                  style:
-                      ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Colors.red,
-
-                    padding:
-                        const EdgeInsets.symmetric(
-                      vertical: 14,
-                    ),
-
-                    shape:
-                        RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(
-                        16,
-                      ),
-                    ),
+              Row(
+                children: [
+                  const Icon(
+                    Icons
+                        .workspace_premium_rounded,
+                    size: 18,
+                    color:
+                        AppColors
+                            .primary,
                   ),
 
-                  child: const Text(
-                    "Remove",
+                  const SizedBox(
+                    width: 10,
                   ),
-                ),
+
+                  Expanded(
+                    child: Text(
+                      (mentor["specialization"] ??
+                              "No Specialization")
+                          .toString(),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
-    );
-  }
+        ),
+
+        const SizedBox(
+          height: 20,
+        ),
+
+        Row(
+          children: [
+            Expanded(
+              child:
+                  ElevatedButton(
+                onPressed: () {},
+                child: const Text(
+                  "View Students",
+                ),
+              ),
+            ),
+
+            const SizedBox(
+              width: 14,
+            ),
+
+            Expanded(
+              child:
+                  ElevatedButton(
+                onPressed: () {
+                  removeMentor(
+                    mentor["id"]
+                        .toString(),
+                  );
+                },
+                style:
+                    ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Colors.red,
+                ),
+                child: const Text(
+                  "Remove",
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+  // Widget buildMentorCard({
+  //   required dynamic mentor,
+  // }) {
+  //   final user = mentor["user"];
+
+  //   final students =
+  //       mentor["students"] ?? [];
+
+  //   return Container(
+  //     margin:
+  //         const EdgeInsets.only(
+  //       bottom: 18,
+  //     ),
+
+  //     padding:
+  //         const EdgeInsets.all(
+  //       20,
+  //     ),
+
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+
+  //       borderRadius:
+  //           BorderRadius.circular(
+  //         24,
+  //       ),
+
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.black
+  //               .withValues(
+  //                 alpha: 0.05,
+  //               ),
+
+  //           blurRadius: 10,
+
+  //           offset:
+  //               const Offset(0, 4),
+  //         ),
+  //       ],
+  //     ),
+
+  //     child: Column(
+  //       children: [
+  //         Row(
+  //           children: [
+  //             CircleAvatar(
+  //               radius: 28,
+
+  //               backgroundColor:
+  //                   AppColors.primary,
+
+  //               child: Text(
+  //                 user["fullName"][
+  //                     0],
+
+  //                 style:
+  //                     const TextStyle(
+  //                   color:
+  //                       Colors.white,
+
+  //                   fontWeight:
+  //                       FontWeight
+  //                           .bold,
+
+  //                   fontSize: 22,
+  //                 ),
+  //               ),
+  //             ),
+
+  //             const SizedBox(
+  //               width: 16,
+  //             ),
+
+  //             Expanded(
+  //               child: Column(
+  //                 crossAxisAlignment:
+  //                     CrossAxisAlignment
+  //                         .start,
+
+  //                 children: [
+  //                   Text(
+  //                     user["fullName"],
+
+  //                     style:
+  //                         const TextStyle(
+  //                       fontSize: 18,
+
+  //                       fontWeight:
+  //                           FontWeight
+  //                               .bold,
+  //                     ),
+  //                   ),
+
+  //                   const SizedBox(
+  //                     height: 6,
+  //                   ),
+
+  //                   Text(
+  //                     mentor[
+  //                             "district"] ??
+  //                         "No District",
+
+  //                     style:
+  //                         const TextStyle(
+  //                       color: AppColors
+  //                           .textSecondary,
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+
+  //             Container(
+  //               padding:
+  //                   const EdgeInsets.symmetric(
+  //                 horizontal: 14,
+  //                 vertical: 8,
+  //               ),
+
+  //               decoration:
+  //                   BoxDecoration(
+  //                 color:
+  //                     (user["isActive"] ==
+  //                             true)
+  //                         ? Colors.green
+  //                             .withValues(
+  //                               alpha:
+  //                                   0.1,
+  //                             )
+  //                         : Colors.red
+  //                             .withValues(
+  //                               alpha:
+  //                                   0.1,
+  //                             ),
+
+  //                 borderRadius:
+  //                     BorderRadius.circular(
+  //                   20,
+  //                 ),
+  //               ),
+
+  //               child: Text(
+  //                 (user["isActive"] ==
+  //                         true)
+  //                     ? "Active"
+  //                     : "Inactive",
+
+  //                 style: TextStyle(
+  //                   color:
+  //                       (user["isActive"] ==
+  //                               true)
+  //                           ? Colors
+  //                               .green
+  //                           : Colors.red,
+
+  //                   fontWeight:
+  //                       FontWeight
+  //                           .w600,
+  //                 ),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+
+  //         const SizedBox(
+  //           height: 20,
+  //         ),
+
+  //         Row(
+  //           children: [
+  //             Expanded(
+  //               child:
+  //                   buildInfoTile(
+  //                 title:
+  //                     "Students",
+
+  //                 value: students
+  //                     .length
+  //                     .toString(),
+  //               ),
+  //             ),
+
+  //             const SizedBox(
+  //               width: 14,
+  //             ),
+
+  //             Expanded(
+  //               child:
+  //                   buildInfoTile(
+  //                 title:
+  //                     "District",
+
+  //                 value:
+  //                     mentor[
+  //                             "district"] ??
+  //                         "-",
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+
+  //         const SizedBox(
+  //           height: 18,
+  //         ),
+
+  //         Container(
+  //           width:
+  //               double.infinity,
+
+  //           padding:
+  //               const EdgeInsets.all(
+  //             16,
+  //           ),
+
+  //           decoration:
+  //               BoxDecoration(
+  //             color: AppColors
+  //                 .primary
+  //                 .withValues(
+  //                   alpha: 0.04,
+  //                 ),
+
+  //             borderRadius:
+  //                 BorderRadius.circular(
+  //               18,
+  //             ),
+  //           ),
+
+  //           child: Column(
+  //             children: [
+  //               Row(
+  //                 children: [
+  //                   const Icon(
+  //                     Icons.phone,
+
+  //                     size: 18,
+
+  //                     color:
+  //                         AppColors
+  //                             .primary,
+  //                   ),
+
+  //                   const SizedBox(
+  //                     width: 10,
+  //                   ),
+
+  //                   Text(
+  //                     user["phone"] ??
+  //                         "-",
+  //                   ),
+  //                 ],
+  //               ),
+
+  //               const SizedBox(
+  //                 height: 12,
+  //               ),
+
+  //               Row(
+  //                 children: [
+  //                   const Icon(
+  //                     Icons
+  //                         .workspace_premium_rounded,
+
+  //                     size: 18,
+
+  //                     color:
+  //                         AppColors
+  //                             .primary,
+  //                   ),
+
+  //                   const SizedBox(
+  //                     width: 10,
+  //                   ),
+
+  //                   Expanded(
+  //                     child: Text(
+  //                       mentor["specialization"] ??
+  //                           "No Specialization",
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+
+  //         const SizedBox(
+  //           height: 20,
+  //         ),
+
+  //         Row(
+  //           children: [
+  //             Expanded(
+  //               child:
+  //                   ElevatedButton(
+  //                 onPressed: () {},
+
+  //                 style:
+  //                     ElevatedButton.styleFrom(
+  //                   backgroundColor:
+  //                       AppColors
+  //                           .primary,
+
+  //                   padding:
+  //                       const EdgeInsets.symmetric(
+  //                     vertical: 14,
+  //                   ),
+
+  //                   shape:
+  //                       RoundedRectangleBorder(
+  //                     borderRadius:
+  //                         BorderRadius.circular(
+  //                       16,
+  //                     ),
+  //                   ),
+  //                 ),
+
+  //                 child: const Text(
+  //                   "View Students",
+  //                 ),
+  //               ),
+  //             ),
+
+  //             const SizedBox(
+  //               width: 14,
+  //             ),
+
+  //             Expanded(
+  //               child:
+  //                   ElevatedButton(
+  //                 onPressed: () {
+  //                   removeMentor(
+  //                     mentor["id"],
+  //                   );
+  //                 },
+
+  //                 style:
+  //                     ElevatedButton.styleFrom(
+  //                   backgroundColor:
+  //                       Colors.red,
+
+  //                   padding:
+  //                       const EdgeInsets.symmetric(
+  //                     vertical: 14,
+  //                   ),
+
+  //                   shape:
+  //                       RoundedRectangleBorder(
+  //                     borderRadius:
+  //                         BorderRadius.circular(
+  //                       16,
+  //                     ),
+  //                   ),
+  //                 ),
+
+  //                 child: const Text(
+  //                   "Remove",
+  //                 ),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget buildInfoTile({
     required String title,

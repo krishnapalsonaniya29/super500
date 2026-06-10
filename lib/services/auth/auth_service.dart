@@ -270,6 +270,7 @@ class AuthService {
     required String name,
     required String phone,
     required String profession,
+    required String district,
   }) async {
     try {
       final response =
@@ -279,6 +280,7 @@ class AuthService {
           "name": name,
           "phone": phone,
           "profession": profession,
+          "district": district,
         },
       );
 

@@ -32,6 +32,10 @@ class _MentorRegisterScreenState
   professionController =
       TextEditingController();
 
+  final TextEditingController
+  districtController =
+      TextEditingController();
+
   final GlobalKey<FormState>
   _formKey =
       GlobalKey<FormState>();
@@ -45,6 +49,8 @@ class _MentorRegisterScreenState
     phoneController.dispose();
 
     professionController.dispose();
+
+    districtController.dispose();
 
     super.dispose();
   }
@@ -69,6 +75,10 @@ Future<void> applyMentor() async {
 
       profession:
           professionController.text
+              .trim(),
+
+      district:
+          districtController.text
               .trim(),
     );
 
@@ -218,6 +228,27 @@ Future<void> applyMentor() async {
                     if (value == null ||
                         value.isEmpty) {
                       return "Profession is required";
+                    }
+
+                    return null;
+                  },
+                ),
+
+                const SizedBox(
+                  height: 35,
+                ),
+
+                CustomTextField(
+                  hintText:
+                      'District',
+
+                  controller:
+                      districtController,
+
+                  validator: (value) {
+                    if (value == null ||
+                        value.isEmpty) {
+                      return "District is required";
                     }
 
                     return null;

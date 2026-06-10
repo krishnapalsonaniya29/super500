@@ -79,6 +79,12 @@ class _AssignMentorScreenState
   void applySearch() {
     filteredMentors =
         mentors.where((mentor) {
+      if (mentor[
+              "verificationStatus"] !=
+          "APPROVED") {
+        return false;
+      }
+
       final user = mentor["user"];
 
       final name =

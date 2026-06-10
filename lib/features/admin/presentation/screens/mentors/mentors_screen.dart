@@ -502,6 +502,15 @@ class _MentorsScreenState
                                   mentor["verificationStatus"] ??
                                       "PENDING";
 
+                              final fullName =
+                                  (user?["fullName"] as String?)?.trim() ??
+                                      "";
+
+                              final avatarLabel =
+                                  fullName.isNotEmpty
+                                      ? fullName[0].toUpperCase()
+                                      : "?";
+
                               return Container(
                                 margin:
                                     const EdgeInsets.only(
@@ -539,7 +548,7 @@ class _MentorsScreenState
 
                                           child:
                                               Text(
-                                            user["fullName"][0],
+                                            avatarLabel,
 
                                             style:
                                                 const TextStyle(
@@ -565,7 +574,9 @@ class _MentorsScreenState
 
                                             children: [
                                               Text(
-                                                user["fullName"],
+                                                fullName.isNotEmpty
+                                                    ? fullName
+                                                    : "Unknown Mentor",
 
                                                 style:
                                                     const TextStyle(

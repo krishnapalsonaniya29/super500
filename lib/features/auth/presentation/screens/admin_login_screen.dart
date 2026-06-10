@@ -432,6 +432,9 @@ class _AdminLoginScreenState
 
                                 fontWeight:
                                     FontWeight.bold,
+
+                                color:
+                                    Colors.white,
                               ),
                             ),
                 ),
