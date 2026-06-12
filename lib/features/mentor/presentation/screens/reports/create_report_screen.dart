@@ -165,7 +165,7 @@ class _CreateReportScreenState
 
                   DropdownButtonFormField<
                       String>(
-                    value:
+                    initialValue:
                         selectedStudentId,
 
                     decoration:
@@ -225,7 +225,7 @@ class _CreateReportScreenState
 
                   DropdownButtonFormField<
                       String>(
-                    value:
+                    initialValue:
                         selectedReportType,
 
                     decoration:

@@ -81,6 +81,20 @@ class AdminService {
     );
   }
 
+
+/// =====================================
+/// DEACTIVATE STUDENT
+/// =====================================
+
+static Future deactivateStudent(
+  String id,
+) async {
+  return await _dio.put(
+    "$baseUrl/deactivate-student/$id",
+  );
+}
+
+
   /// =====================================
   /// VERIFY MENTOR
   /// =====================================
@@ -122,29 +136,37 @@ class AdminService {
     );
   }
 
-  /// =====================================
-  /// APPROVE EXPENSE
-  /// =====================================
+/// =====================================
+/// APPROVE EXPENSE
+/// =====================================
 
-  static Future approveExpense(
-    String id,
-  ) async {
-    return await _dio.put(
-      "$baseUrl/approve-expense/$id",
-    );
-  }
+static Future approveExpense({
+  required String id,
+  String remarks = "",
+}) async {
+  return await _dio.put(
+    "$baseUrl/expenses/$id/approve",
+    data: {
+      "remarks": remarks,
+    },
+  );
+}
 
-  /// =====================================
-  /// REJECT EXPENSE
-  /// =====================================
+/// =====================================
+/// REJECT EXPENSE
+/// =====================================
 
-  static Future rejectExpense(
-    String id,
-  ) async {
-    return await _dio.put(
-      "$baseUrl/reject-expense/$id",
-    );
-  }
+static Future rejectExpense({
+  required String id,
+  required String remarks,
+}) async {
+  return await _dio.put(
+    "$baseUrl/expenses/$id/reject",
+    data: {
+      "remarks": remarks,
+    },
+  );
+}
 
   /// =====================================
   /// ASSIGN MENTOR
@@ -166,4 +188,17 @@ class AdminService {
       },
     );
   }
+  /// =====================================
+/// GET ALL EXPENSES
+/// =====================================
+
+static Future<Map<String, dynamic>>
+    getExpenses() async {
+  final response = await _dio.get(
+    "$baseUrl/expenses",
+  );
+
+  return response.data;
 }
+}
+

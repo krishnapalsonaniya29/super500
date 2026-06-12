@@ -5,7 +5,7 @@ class DioClient {
   static final Dio instance = Dio(
     BaseOptions(
       baseUrl:
-          "https://unspeedy-nickie-oratorically.ngrok-free.dev/api",
+          "http://localhost:5000/api/",
 
       connectTimeout:
           const Duration(

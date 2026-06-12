@@ -119,7 +119,43 @@ static Future<List<dynamic>>
 
     return response.data;
   }
+/// ====================================
+/// CREATE EXPENSE
+/// ====================================
 
+static Future<Map<String, dynamic>>
+    createExpense({
+  required String title,
+  required double amount,
+  required String category,
+  required String description,
+  MultipartFile? receipt,
+}) async {
+  final formData = FormData.fromMap({
+    "title": title,
+    "amount": amount,
+    "description": description,
+    "expenseCategory": category,
+    "receipt": ?receipt,
+  });
+
+  final response = await _dio.post(
+    "$baseUrl/expenses",
+    data: formData,
+    options: Options(
+      headers: {
+        "Authorization":
+            "Bearer ${await AuthService.getToken()}",
+        "Content-Type":
+            "multipart/form-data",
+      },
+    ),
+  );
+
+  return Map<String, dynamic>.from(
+    response.data,
+  );
+}
   /// ====================================
   /// GET PROFILE
   /// ====================================

@@ -268,7 +268,7 @@ class _CreateSessionScreenState
 
                   DropdownButtonFormField<
                       String>(
-                    value:
+                    initialValue:
                         selectedStudentId,
 
                     decoration:

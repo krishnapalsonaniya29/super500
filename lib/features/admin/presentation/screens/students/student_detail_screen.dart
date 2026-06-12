@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../theme/app_colors.dart';
-
+import 'student_expenses_screen.dart';
 class StudentDetailScreen
     extends StatelessWidget {
   final Map<String, dynamic>
@@ -248,21 +248,64 @@ class StudentDetailScreen
               "Expenses",
             ),
 
-            ...expenses.map(
-              (expense) =>
-                  buildCard(
-                title:
-                    expense["category"] ??
-                        "-",
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius:
+                    BorderRadius.circular(20),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.receipt_long,
+                        color: AppColors.primary,
+                      ),
 
-                subtitle:
-                    "₹ ${expense["amount"]}",
+                      const SizedBox(width: 12),
 
-                trailing:
-                    expense["approved"] ==
-                            true
-                        ? "Approved"
-                        : "Pending",
+                      Expanded(
+                        child: Text(
+                          "${expenses.length} Expenses Submitted",
+                          style:
+                              const TextStyle(
+                            fontSize: 16,
+                            fontWeight:
+                                FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(
+                        Icons.visibility,
+                      ),
+                      label: const Text(
+                        "View Expenses",
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                StudentExpensesScreen(
+                              student: student,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
 

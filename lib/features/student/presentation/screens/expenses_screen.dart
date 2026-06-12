@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../theme/app_colors.dart';
 import '../../../../services/student/student_service.dart';
-
+import 'add_expense_screen.dart';
 class ExpensesScreen
     extends StatefulWidget {
   final Function(int index)
@@ -93,6 +93,24 @@ class _ExpensesScreenState
                 FontWeight.bold,
           ),
         ),
+      ),
+      floatingActionButton:
+          FloatingActionButton(
+        onPressed: () async {
+          final result =
+              await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  const AddExpenseScreen(),
+            ),
+          );
+
+          if (result == true) {
+            loadExpenses();
+          }
+        },
+        child: const Icon(Icons.add),
       ),
 
       body: isLoading

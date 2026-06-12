@@ -232,7 +232,7 @@ class _CreateReportScreenState
               ),
 
               DropdownButtonFormField<String>(
-                value: reportType,
+                initialValue: reportType,
 
                 decoration:
                     InputDecoration(

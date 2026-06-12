@@ -84,6 +84,52 @@ class _StudentsScreenState
   }
 
   /// =====================================
+  /// DEACTIVATE STUDENT
+  /// =====================================
+void showDeactivateDialog(
+  String studentId,
+  String studentName,
+) {
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: const Text(
+        "Deactivate Student",
+      ),
+      content: Text(
+        "Deactivate $studentName?\n\nThe student will lose access until approved again.",
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text(
+            "Cancel",
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            Navigator.pop(context);
+
+            await deactivateStudent(
+              studentId,
+            );
+          },
+          style:
+              ElevatedButton.styleFrom(
+            backgroundColor:
+                Colors.red,
+          ),
+          child: const Text(
+            "Deactivate",
+          ),
+        ),
+      ],
+    ),
+  );
+}
+  /// =====================================
   /// SEARCH
   /// =====================================
 
@@ -198,6 +244,45 @@ class _StudentsScreenState
     }
   }
 
+
+/// =========
+/// Delete Student
+/// ===========================
+Future<void> deactivateStudent(
+  String id,
+) async {
+  try {
+    setState(() {
+      actionLoading = true;
+    });
+
+    await AdminService
+        .deactivateStudent(id);
+
+    await fetchStudents();
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(
+      const SnackBar(
+        backgroundColor:
+            Colors.orange,
+        content: Text(
+          "Student deactivated",
+        ),
+      ),
+    );
+  } catch (e) {
+    debugPrint(e.toString());
+  } finally {
+    if (mounted) {
+      setState(() {
+        actionLoading = false;
+      });
+    }
+  }
+}
   /// =====================================
   /// REJECTION DIALOG
   /// =====================================
@@ -271,6 +356,10 @@ class _StudentsScreenState
       ),
     );
   }
+
+
+
+
 
   Color getStatusColor(
     String status,
@@ -459,15 +548,20 @@ class _StudentsScreenState
                           20,
                         ),
 
-                        decoration:
-                            BoxDecoration(
-                          color:
-                              Colors.white,
-
+                        decoration: BoxDecoration(
+                          color: Colors.white,
                           borderRadius:
-                              BorderRadius.circular(
-                            24,
-                          ),
+                              BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color:
+                                  Colors.black.withValues(
+                                alpha: 0.05,
+                              ),
+                              blurRadius: 16,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
 
                         child: Column(
@@ -696,63 +790,128 @@ class _StudentsScreenState
                               height: 16,
                             ),
 
+                            if (status == "PENDING")
                             Row(
                               children: [
                                 Expanded(
-                                  child:
-                                      ElevatedButton(
-                                    onPressed:
-                                        actionLoading
-                                            ? null
-                                            : () {
-                                                verifyStudent(
-                                                  student["id"],
-                                                );
-                                              },
-
+                                  child: ElevatedButton.icon(
+                                    onPressed: actionLoading
+                                        ? null
+                                        : () => verifyStudent(
+                                              student["id"],
+                                            ),
+                                    icon: const Icon(
+                                      Icons.check_circle,
+                                    ),
+                                    label: const Text(
+                                      "Verify",
+                                    ),
                                     style:
                                         ElevatedButton.styleFrom(
                                       backgroundColor:
                                           Colors.green,
                                     ),
-
-                                    child:
-                                        const Text(
-                                      "Verify",
-                                    ),
                                   ),
                                 ),
 
-                                const SizedBox(
-                                  width: 14,
-                                ),
+                                const SizedBox(width: 14),
 
                                 Expanded(
-                                  child:
-                                      ElevatedButton(
-                                    onPressed:
-                                        actionLoading
-                                            ? null
-                                            : () {
-                                                showRejectDialog(
-                                                  student["id"],
-                                                );
-                                              },
-
+                                  child: ElevatedButton.icon(
+                                    onPressed: actionLoading
+                                        ? null
+                                        : () => showRejectDialog(
+                                              student["id"],
+                                            ),
+                                    icon: const Icon(
+                                      Icons.cancel,
+                                    ),
+                                    label: const Text(
+                                      "Reject",
+                                    ),
                                     style:
                                         ElevatedButton.styleFrom(
                                       backgroundColor:
                                           Colors.red,
                                     ),
-
-                                    child:
-                                        const Text(
-                                      "Reject",
-                                    ),
                                   ),
                                 ),
                               ],
-                            ),
+                            )
+
+                          else if (status == "APPROVED")
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                onPressed: actionLoading
+                                    ? null
+                                    : () => showDeactivateDialog(
+                                          student["id"],
+                                          user["fullName"],
+                                        ),
+                                icon: const Icon(
+                                  Icons.block,
+                                ),
+                                label: const Text(
+                                  "Deactivate Student",
+                                ),
+                                style:
+                                    ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Colors.red.shade700,
+                                ),
+                              ),
+                            )
+
+                          else if (status == "REJECTED")
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                onPressed: actionLoading
+                                    ? null
+                                    : () => verifyStudent(
+                                          student["id"],
+                                        ),
+                                icon: const Icon(
+                                  Icons.refresh,
+                                ),
+                                label: const Text(
+                                  "Reactivate Student",
+                                ),
+                                style:
+                                    ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Colors.green,
+                                ),
+                              ),
+                            )
+                            else
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton.icon(
+                                  onPressed: () {
+                                    showDeactivateDialog(
+                                      student["id"],
+                                      user["fullName"],
+                                    );
+                                  },
+
+                                  icon: const Icon(
+                                    Icons.block,
+                                  ),
+
+                                  label: const Text(
+                                    "Deactivate Student",
+                                  ),
+                                  
+                                  
+                                  style:
+                                      ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        Colors.red.shade700,
+                                  ),
+                                ),
+                              ),
                           ],
                         ),
                       );
