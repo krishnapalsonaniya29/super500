@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter_application_1/features/student/presentation/screens/student_dashboard_screen.dart';
 import 'package:flutter_application_1/services/student/student_service.dart';
-
+import '../../../student/presentation/screens/student_approval_status_screen.dart';
+import '../../../../services/auth/auth_service.dart';
 class StudentRegisterScreen
     extends StatefulWidget {
   const StudentRegisterScreen({
@@ -26,6 +26,8 @@ class _StudentRegisterScreenState
 
   final samagraController =
       TextEditingController();
+  final apaarController =
+    TextEditingController();
   final fullNameController =
       TextEditingController();
   final fatherNameController =
@@ -74,6 +76,7 @@ class _StudentRegisterScreenState
   @override
   void dispose() {
     samagraController.dispose();
+    apaarController.dispose();
     fullNameController.dispose();
     fatherNameController.dispose();
     districtController.dispose();
@@ -247,6 +250,9 @@ class _StudentRegisterScreenState
           "samagraId":
               samagraController.text
                   .trim(),
+          "apaarId":
+              apaarController.text.trim(),
+          
           "schoolName":
               schoolController.text
                   .trim(),
@@ -280,14 +286,26 @@ class _StudentRegisterScreenState
         ),
       );
 
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (_) =>
-              const StudentDashboardScreen(),
-        ),
-        (route) => false,
-      );
+      final user =
+            await AuthService.getCurrentUser();
+
+        if (!mounted) return;
+
+        final studentProfile =
+            Map<String, dynamic>.from(
+          user["studentProfile"],
+        );
+
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                StudentApprovalStatusScreen(
+              studentProfile: studentProfile,
+            ),
+          ),
+          (route) => false,
+        );
     } catch (e) {
       if (!mounted) return;
 
@@ -817,6 +835,34 @@ class _StudentRegisterScreenState
                     controller:
                         schoolController,
                   ),
+                  const SizedBox(height: 16),
+
+                  buildField(
+                    hint: "APAAR ID",
+                    controller: apaarController,
+                    keyboard: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter
+                          .digitsOnly,
+                      LengthLimitingTextInputFormatter(
+                        12,
+                      ),
+                    ],
+                    validator: (value) {
+                      final apaarId =
+                          value?.trim() ?? "";
+
+                      if (apaarId.isEmpty) {
+                        return "APAAR ID is required";
+                      }
+
+                      if (apaarId.length != 12) {
+                        return "APAAR ID must be 12 digits";
+                      }
+
+                      return null;
+                    },
+                  ),
                   buildClassDropdown(),
                   buildField(
                     hint: "Annual Income",
@@ -826,11 +872,23 @@ class _StudentRegisterScreenState
                         TextInputType.number,
                   ),
                   buildField(
-                    hint: "10th Marks",
-                    controller:
-                        marksController,
-                    keyboard:
-                        TextInputType.number,
+                    hint: "Total Marks Obtained in Class 10 (Out of 500)",
+                    controller: marksController,
+                    keyboard: TextInputType.number,
+                    validator: (value) {
+                      final marks =
+                          int.tryParse(value ?? "");
+
+                      if (marks == null) {
+                        return "Enter valid marks";
+                      }
+
+                      if (marks < 0 || marks > 500) {
+                        return "Marks must be between 0 and 500";
+                      }
+
+                      return null;
+                    },
                   ),
                   buildField(
                     hint: "Pincode",

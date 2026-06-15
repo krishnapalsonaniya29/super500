@@ -234,34 +234,35 @@ class AuthService {
   /// SEND OTP
   /// =========================
   static Future<Map<String, dynamic>>
-      sendOtp(
-    String phone,
-  ) async {
-    try {
-      final response =
-          await DioClient.instance.post(
-        "$baseUrl/send-otp",
-        data: {
-          "phone": phone,
-        },
-      );
+    sendOtp({
+  required String phone,
+  required String role,
+}) async {
+  try {
+    final response =
+        await DioClient.instance.post(
+      "$baseUrl/send-otp",
+      data: {
+        "phone": phone,
+        "role": role,
+      },
+    );
 
-      print(
-        "SEND OTP RESPONSE => ${response.data}",
-      );
+    print(
+      "SEND OTP RESPONSE => ${response.data}",
+    );
 
-      return Map<String, dynamic>.from(
-        response.data,
-      );
-    } catch (e) {
-      print("SEND OTP ERROR => $e");
+    return Map<String, dynamic>.from(
+      response.data,
+    );
+  } catch (e) {
+    print("SEND OTP ERROR => $e");
 
-      throw Exception(
-        _formatError(e),
-      );
-    }
+    throw Exception(
+      _formatError(e),
+    );
   }
-
+}
   /// =========================
   /// MENTOR REGISTER
   /// =========================

@@ -55,8 +55,11 @@ class _AdminLoginScreenState
 
       final response =
           await AuthService.sendOtp(
-        phoneController.text.trim(),
-      );
+            phone:
+                phoneController.text.trim(),
+            role: "ADMIN",
+          );
+      
 
       debugPrint(
         response.toString(),
@@ -128,193 +131,108 @@ class _AdminLoginScreenState
                     .start,
 
             children: [
-              const SizedBox(
-                height: 40,
-              ),
-
-              /// BACK BUTTON
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(
-                    context,
-                  );
-                },
-
-                child: Container(
-                  padding:
-                      const EdgeInsets.all(
-                    12,
-                  ),
-
-                  decoration:
-                      BoxDecoration(
-                    color:
-                        Colors.white,
-
-                    borderRadius:
-                        BorderRadius.circular(
-                      16,
-                    ),
-                  ),
-
-                  child: const Icon(
-                    Icons.arrow_back,
-                  ),
-                ),
-              ),
-
-              const SizedBox(
-                height: 40,
-              ),
-
-              /// HEADER
-              const Text(
-                "District Admin Login",
-
-                style: TextStyle(
-                  fontSize: 34,
-
-                  fontWeight:
-                      FontWeight.bold,
-
-                  fontFamily:
-                      'Poppins',
-
-                  color:
-                      AppColors.primary,
-                ),
-              ),
-
-              const SizedBox(
-                height: 14,
-              ),
-
-              const Text(
-                "Manage students, mentors, documents and district operations.",
-
-                style: TextStyle(
-                  fontSize: 16,
-
-                  color: AppColors
-                      .textSecondary,
-
-                  height: 1.5,
-                ),
-              ),
-
-              const SizedBox(
-                height: 40,
-              ),
-
-              /// HERO CARD
               Container(
-                width:
-                    double.infinity,
-
-                padding:
-                    const EdgeInsets.all(
-                  26,
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withOpacity(0.25),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
                 ),
-
-                decoration:
-                    BoxDecoration(
-                  borderRadius:
-                      BorderRadius.circular(
-                    30,
-                  ),
-
-                  gradient:
-                      const LinearGradient(
-                    colors: [
-                      Color(
-                        0xFF0A1931,
-                      ),
-                      Color(
-                        0xFF132D46,
-                      ),
-                    ],
-                  ),
-                ),
-
                 child: Column(
                   children: [
-                    Container(
-                      padding:
-                          const EdgeInsets.all(
-                        20,
-                      ),
-
-                      decoration:
-                          BoxDecoration(
-                        color: Colors.white
-                            .withValues(
-                          alpha: 0.12,
+                    Row(
+                      children: [
+                        Container(
+                          height: 70,
+                          width: 70,
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius:
+                                BorderRadius.circular(16),
+                          ),
+                          child: ClipRRect(
+                            borderRadius:
+                                BorderRadius.circular(12),
+                            child: Image.asset(
+                              "assets/images/app_logo2.png",
+                              fit: BoxFit.contain,
+                            ),
+                          ),
                         ),
 
-                        shape:
-                            BoxShape.circle,
-                      ),
+                        const SizedBox(width: 16),
 
-                      child: const Icon(
-                        Icons
-                            .admin_panel_settings_rounded,
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Admin Portal",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight:
+                                      FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
 
-                        color:
-                            Colors.white,
+                              SizedBox(height: 4),
 
-                        size: 54,
-                      ),
+                              Text(
+                                "Super 500 Administration",
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
 
-                    const SizedBox(
-                      height: 24,
+                    const SizedBox(height: 20),
+
+                    Image.asset(
+                      "assets/images/admin_role.png",
+                      height: 120,
                     ),
+
+                    const SizedBox(height: 12),
 
                     const Text(
-                      "District Administration Portal",
-
-                      textAlign:
-                          TextAlign.center,
-
-                      style:
-                          TextStyle(
-                        color:
-                            Colors.white,
-
-                        fontSize:
-                            24,
-
-                        fontWeight:
-                            FontWeight.bold,
+                      "Welcome Admin",
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
 
-                    const SizedBox(
-                      height: 12,
-                    ),
+                    const SizedBox(height: 8),
 
-                    const Text(
-                      "Secure access for district administrators to manage scholarship operations.",
-
-                      textAlign:
-                          TextAlign.center,
-
-                      style:
-                          TextStyle(
-                        color:
-                            Colors.white70,
-
-                        height:
-                            1.6,
+                    Text(
+                      "Manage students, mentors, documents and district operations.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.85),
+                        fontSize: 14,
                       ),
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(
-                height: 40,
-              ),
+              const SizedBox(height: 24),
 
               /// PHONE FIELD
               const Text(

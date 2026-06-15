@@ -172,78 +172,84 @@ class _AdminProfileScreenState
 
                         children: [
                           /// HEADER
-                          Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment
-                                    .spaceBetween,
-
-                            children: [
-                              const Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment
-                                        .start,
-
-                                children: [
-                                  Text(
-                                    "Profile",
-
-                                    style:
-                                        TextStyle(
-                                      fontSize:
-                                          30,
-
-                                      fontWeight:
-                                          FontWeight.bold,
-
-                                      fontFamily:
-                                          'Poppins',
+                         Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(20),
+                            margin: const EdgeInsets.only(
+                              bottom: 20,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius:
+                                  BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary
+                                      .withOpacity(0.25),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  height: 70,
+                                  width: 70,
+                                  padding:
+                                      const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius:
+                                        BorderRadius.circular(
+                                      16,
                                     ),
                                   ),
-
-                                  SizedBox(
-                                    height:
-                                        6,
-                                  ),
-
-                                  Text(
-                                    "District Admin Control Center",
-
-                                    style:
-                                        TextStyle(
-                                      color:
-                                          AppColors.textSecondary,
+                                  child: ClipRRect(
+                                    borderRadius:
+                                        BorderRadius.circular(
+                                      12,
+                                    ),
+                                    child: Image.asset(
+                                      "assets/images/app_logo2.png",
+                                      fit: BoxFit.contain,
                                     ),
                                   ),
-                                ],
-                              ),
-
-                              Container(
-                                padding:
-                                    const EdgeInsets.all(
-                                  14,
                                 ),
 
-                                decoration:
-                                    BoxDecoration(
-                                  color:
-                                      Colors.white,
+                                const SizedBox(width: 16),
 
-                                  borderRadius:
-                                      BorderRadius.circular(
-                                    18,
+                                const Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Profile",
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight:
+                                              FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+
+                                      SizedBox(height: 6),
+
+                                      Text(
+                                        "District Admin Control Center",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.white70,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-
-                                child:
-                                    const Icon(
-                                  Icons
-                                      .admin_panel_settings_rounded,
-
-                                  color:
-                                      AppColors.primary,
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
 
                           const SizedBox(
@@ -630,7 +636,7 @@ class _AdminProfileScreenState
                               style:
                                   ElevatedButton.styleFrom(
                                 backgroundColor:
-                                    Colors.red,
+                                    const Color.fromARGB(255, 250, 158, 151),
 
                                 shape:
                                     RoundedRectangleBorder(

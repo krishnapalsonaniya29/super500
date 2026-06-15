@@ -137,43 +137,84 @@ class _MentorsScreenState
 
                     children: [
                       /// HEADER
-                      const Text(
-                        "Mentor Management",
-
-                        style:
-                            TextStyle(
-                          fontSize: 30,
-
-                          fontWeight:
-                              FontWeight
-                                  .bold,
-
-                          fontFamily:
-                              'Poppins',
-
-                          color: AppColors
-                              .textPrimary,
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        margin: const EdgeInsets.only(
+                          bottom: 20,
                         ),
-                      ),
-
-                      const SizedBox(
-                        height: 8,
-                      ),
-
-                      const Text(
-                        "Manage all mentors and assigned students",
-
-                        style:
-                            TextStyle(
-                          color: AppColors
-                              .textSecondary,
-
-                          fontSize: 15,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius:
+                              BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary
+                                  .withOpacity(0.25),
+                              blurRadius: 12,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
                         ),
-                      ),
+                        child: Row(
+                          children: [
+                            Container(
+                              height: 70,
+                              width: 70,
+                              padding:
+                                  const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  16,
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  12,
+                                ),
+                                child: Image.asset(
+                                  "assets/images/app_logo2.png",
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
 
-                      const SizedBox(
-                        height: 28,
+                            const SizedBox(width: 16),
+
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Super Admin",
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight:
+                                          FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+
+                                  SizedBox(height: 6),
+
+                                  Text(
+                                    "Manage Mentors",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
 
                       /// TOP ANALYTICS

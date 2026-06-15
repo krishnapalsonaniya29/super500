@@ -28,10 +28,11 @@ class _StudentDetailScreenState
       student;
 
   @override
-  void initState() {
+  void initState() { 
     super.initState();
 
     student = widget.student;
+    print(student["expenses"]);
   }
 
   Future<void> verifyStudent()
@@ -202,6 +203,105 @@ class _StudentDetailScreenState
     );
   }
 
+  Future<void>
+    updateScholarshipAmount() async {
+  final controller =
+      TextEditingController(
+    text: student["allottedAmount"]
+        .toString(),
+  );
+
+  showDialog(
+    context: context,
+
+    builder: (_) {
+      return AlertDialog(
+        title: const Text(
+          "Update Scholarship Amount",
+        ),
+
+        content: TextField(
+          controller: controller,
+
+          keyboardType:
+              TextInputType.number,
+
+          decoration:
+              const InputDecoration(
+            hintText:
+                "Enter amount",
+          ),
+        ),
+
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(
+                context,
+              );
+            },
+
+            child:
+                const Text("Cancel"),
+          ),
+
+          ElevatedButton(
+            onPressed: () async {
+              try {
+                final amount =
+                    double.parse(
+                  controller.text,
+                );
+
+                await SuperAdminService
+                    .updateScholarshipAmount(
+                  studentId:
+                      student["id"],
+
+                  amount: amount,
+                );
+
+                setState(() {
+                  student[
+                          "allottedAmount"] =
+                      amount;
+                });
+
+                if (!mounted) {
+                  return;
+                }
+
+                Navigator.pop(
+                  context,
+                );
+
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      "Scholarship updated",
+                    ),
+                  ),
+                );
+              } catch (e) {
+                debugPrint(
+                  e.toString(),
+                );
+              }
+            },
+
+            child:
+                const Text(
+              "Save",
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
   @override
   Widget build(BuildContext context) {
     final user =
@@ -220,6 +320,45 @@ class _StudentDetailScreenState
         student["expenses"] ??
             [];
 
+    final reports =
+        student["reports"] ?? [];
+
+    final allottedAmount =
+        double.tryParse(
+          student["allottedAmount"]
+                  ?.toString() ??
+              "0",
+        ) ??
+        0;
+
+    final approvedExpenses =
+        expenses.where((expense) {
+      return expense["status"] ==
+          "APPROVED";
+    }).toList();
+
+    double usedAmount = 0;
+
+    for (final expense
+        in approvedExpenses) {
+      usedAmount +=
+          double.tryParse(
+                expense["amount"]
+                    .toString(),
+              ) ??
+              0;
+    }
+
+    final remainingAmount =
+        allottedAmount - usedAmount;
+
+    final utilizationPercentage =
+        allottedAmount > 0
+            ? (usedAmount /
+                    allottedAmount)
+                .clamp(0.0, 1.0)
+            : 0.0;
+
     return Scaffold(
       backgroundColor:
           AppColors.background,
@@ -227,8 +366,7 @@ class _StudentDetailScreenState
       appBar: AppBar(
         elevation: 0,
 
-        backgroundColor:
-            AppColors.background,
+        backgroundColor: AppColors.primary,
 
         title: const Text(
           "Student Details",
@@ -412,6 +550,104 @@ class _StudentDetailScreenState
                   buildSectionTitle(
                     "Personal Details",
                   ),
+                  const SizedBox(
+                    height: 28,
+                  ),
+
+                  buildSectionTitle(
+                    "Scholarship Analytics",
+                  ),
+
+                  const SizedBox(
+                    height: 16,
+                  ),
+
+                  Container(
+                    width: double.infinity,
+                    padding:
+                        const EdgeInsets.all(20),
+
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius:
+                          BorderRadius.circular(
+                        24,
+                      ),
+                    ),
+
+                    child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+
+                      children: [
+                        buildDetailTile(
+                          "Allotted Amount",
+                          "₹${allottedAmount.toStringAsFixed(0)}",
+                        ),
+
+                        buildDetailTile(
+                          "Used Amount",
+                          "₹${usedAmount.toStringAsFixed(0)}",
+                        ),
+
+                        buildDetailTile(
+                          "Remaining Amount",
+                          "₹${remainingAmount.toStringAsFixed(0)}",
+                        ),
+
+                        const SizedBox(
+                          height: 16,
+                        ),
+
+                        ClipRRect(
+                          borderRadius:
+                              BorderRadius.circular(
+                            10,
+                          ),
+                          child:
+                              LinearProgressIndicator(
+                            value:
+                                utilizationPercentage,
+                            minHeight: 12,
+                          ),
+                        ),
+
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const SizedBox(
+                          height: 16,
+                        ),
+
+                        SizedBox(
+                          width: double.infinity,
+
+                          child: ElevatedButton.icon(
+                            icon: const Icon(
+                              Icons.currency_rupee,
+                            ),
+
+                            label: const Text(
+                              "Update Scholarship Amount",
+                            ),
+
+                            onPressed:
+                                updateScholarshipAmount,
+                          ),
+                        ),
+
+                        Text(
+                          "${(utilizationPercentage * 100).toStringAsFixed(1)}% Utilized",
+
+                          style:
+                              const TextStyle(
+                            fontWeight:
+                                FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
                   const SizedBox(
                     height: 16,
@@ -471,6 +707,31 @@ class _StudentDetailScreenState
 
                   const SizedBox(
                     height: 28,
+                  ),
+
+                const SizedBox(
+                  height: 28,
+                ),
+
+                buildSectionTitle(
+                  "Student Reports",
+                ),
+
+                const SizedBox(
+                  height: 16,
+                ),
+
+                if (reports.isEmpty)
+                  buildEmptyCard(
+                    "No reports submitted yet",
+                  )
+                else
+                  ...reports.map(
+                    (report) {
+                      return buildReportCard(
+                        report,
+                      );
+                    },
                   ),
 
                   /// DOCUMENTS
@@ -542,19 +803,7 @@ class _StudentDetailScreenState
                     ...achievements.map(
                       (achievement) {
                         return buildAchievementTile(
-                          title:
-                              achievement[
-                                  "title"],
-
-                          description:
-                              achievement[
-                                      "description"] ??
-                                  "",
-
-                          verified:
-                              achievement[
-                                      "verified"] ??
-                                  false,
+                          achievement,
                         );
                       },
                     ),
@@ -578,48 +827,38 @@ class _StudentDetailScreenState
                       "No expenses found",
                     )
                   else
-                    ...expenses.map(
-                      (expense) {
-                        return buildExpenseTile(
-                          title:
-                              expense[
-                                  "title"],
-
-                          amount:
-                              expense[
-                                      "amount"]
-                                  .toString(),
-
-                          approved:
-                              expense[
-                                      "approved"] ??
-                                  false,
-                        );
-                      },
-                    ),
+                   ...expenses.map(
+                    (expense) {
+                      return buildExpenseTile(
+                        expense,
+                      );
+                    },
+                  ),
 
                   const SizedBox(
                     height: 34,
                   ),
 
                   /// ACTIONS
+                  if (student["verificationStatus"] !=
+                    "APPROVED")
                   Row(
                     children: [
                       Expanded(
-                        child:
-                            ElevatedButton(
-                          onPressed:
-                              verifyStudent,
+                        child: ElevatedButton(
+                          onPressed: verifyStudent,
 
                           style:
                               ElevatedButton.styleFrom(
                             backgroundColor:
                                 Colors.green,
 
+                            foregroundColor:
+                                Colors.white,
+
                             padding:
                                 const EdgeInsets.symmetric(
-                              vertical:
-                                  16,
+                              vertical: 16,
                             ),
 
                             shape:
@@ -631,8 +870,7 @@ class _StudentDetailScreenState
                             ),
                           ),
 
-                          child:
-                              const Text(
+                          child: const Text(
                             "Verify",
                           ),
                         ),
@@ -643,20 +881,20 @@ class _StudentDetailScreenState
                       ),
 
                       Expanded(
-                        child:
-                            ElevatedButton(
-                          onPressed:
-                              rejectStudent,
+                        child: ElevatedButton(
+                          onPressed: rejectStudent,
 
                           style:
                               ElevatedButton.styleFrom(
                             backgroundColor:
                                 Colors.orange,
 
+                            foregroundColor:
+                                Colors.white,
+
                             padding:
                                 const EdgeInsets.symmetric(
-                              vertical:
-                                  16,
+                              vertical: 16,
                             ),
 
                             shape:
@@ -668,8 +906,7 @@ class _StudentDetailScreenState
                             ),
                           ),
 
-                          child:
-                              const Text(
+                          child: const Text(
                             "Reject",
                           ),
                         ),
@@ -788,6 +1025,130 @@ class _StudentDetailScreenState
     );
   }
 
+Widget buildReportCard(
+  Map<String, dynamic> report,
+) {
+  return Container(
+    width: double.infinity,
+
+    margin:
+        const EdgeInsets.only(
+      bottom: 16,
+    ),
+
+    padding:
+        const EdgeInsets.all(
+      18,
+    ),
+
+    decoration: BoxDecoration(
+      color: Colors.white,
+
+      borderRadius:
+          BorderRadius.circular(
+        22,
+      ),
+    ),
+
+    child: Column(
+      crossAxisAlignment:
+          CrossAxisAlignment.start,
+
+      children: [
+        Row(
+          children: [
+            Container(
+              padding:
+                  const EdgeInsets.all(
+                10,
+              ),
+
+              decoration:
+                  BoxDecoration(
+                color: Colors.blue
+                    .withValues(
+                  alpha: 0.1,
+                ),
+
+                borderRadius:
+                    BorderRadius.circular(
+                  12,
+                ),
+              ),
+
+              child: const Icon(
+                Icons.description,
+                color: Colors.blue,
+              ),
+            ),
+
+            const SizedBox(
+              width: 12,
+            ),
+
+            Expanded(
+              child: Text(
+                report["reportType"] ??
+                    "Report",
+
+                style:
+                    const TextStyle(
+                  fontSize: 16,
+                  fontWeight:
+                      FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(
+          height: 16,
+        ),
+
+        if (report["quarter"] != null)
+          Text(
+            "Quarter ${report["quarter"]}",
+            style:
+                const TextStyle(
+              fontWeight:
+                  FontWeight.w600,
+            ),
+          ),
+
+        if (report["year"] != null)
+          Text(
+            "Year ${report["year"]}",
+          ),
+
+        const SizedBox(
+          height: 12,
+        ),
+
+        Text(
+          report["content"] ??
+              "",
+        ),
+
+        const SizedBox(
+          height: 12,
+        ),
+
+        Text(
+          "Submitted: ${report["createdAt"]?.toString().substring(0, 10) ?? "-"}",
+
+          style:
+              const TextStyle(
+            color: AppColors
+                .textSecondary,
+            fontSize: 12,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
   Widget buildDocumentTile({
     required String title,
     required bool verified,
@@ -848,26 +1209,484 @@ class _StudentDetailScreenState
     );
   }
 
-  Widget buildAchievementTile({
-    required String title,
-    required String description,
-    required bool verified,
-  }) {
-    return buildEmptyCard(
-      "$title\n$description",
+  Widget buildAchievementTile(
+    Map<String, dynamic> achievement,
+  ) {
+    final status =
+        achievement["status"] ??
+        "PENDING";
+
+    Color statusColor;
+
+    switch (status) {
+      case "APPROVED":
+        statusColor = Colors.green;
+        break;
+
+      case "REJECTED":
+        statusColor = Colors.red;
+        break;
+
+      default:
+        statusColor = Colors.orange;
+    }
+
+    return Container(
+      width: double.infinity,
+
+      margin:
+          const EdgeInsets.only(
+        bottom: 16,
+      ),
+
+      padding:
+          const EdgeInsets.all(
+        18,
+      ),
+
+      decoration: BoxDecoration(
+        color: Colors.white,
+
+        borderRadius:
+            BorderRadius.circular(
+          22,
+        ),
+      ),
+
+      child: Column(
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
+
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.emoji_events,
+                color: Colors.amber,
+              ),
+
+              const SizedBox(
+                width: 10,
+              ),
+
+              Expanded(
+                child: Text(
+                  achievement["title"] ??
+                      "-",
+
+                  style:
+                      const TextStyle(
+                    fontSize: 18,
+                    fontWeight:
+                        FontWeight.bold,
+                  ),
+                ),
+              ),
+
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+
+                decoration:
+                    BoxDecoration(
+                  color:
+                      statusColor
+                          .withValues(
+                    alpha: 0.1,
+                  ),
+
+                  borderRadius:
+                      BorderRadius.circular(
+                    20,
+                  ),
+                ),
+
+                child: Text(
+                  status,
+
+                  style:
+                      TextStyle(
+                    color:
+                        statusColor,
+
+                    fontWeight:
+                        FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(
+            height: 12,
+          ),
+
+          Text(
+            achievement[
+                    "description"] ??
+                "",
+          ),
+
+          const SizedBox(
+            height: 16,
+          ),
+
+          if (achievement[
+                  "proofImageUrl"] !=
+              null)
+            OutlinedButton.icon(
+              icon: const Icon(
+                Icons.image,
+              ),
+
+              label: const Text(
+                "View Proof",
+              ),
+
+              onPressed: () {
+                showDialog(
+                  context: context,
+
+                  builder: (_) {
+                    return Dialog(
+                      insetPadding:
+                          const EdgeInsets.all(
+                        16,
+                      ),
+
+                      child: Column(
+                        mainAxisSize:
+                            MainAxisSize.min,
+
+                        children: [
+                          AppBar(
+                            title:
+                                const Text(
+                              "Achievement Proof",
+                            ),
+
+                            automaticallyImplyLeading:
+                                false,
+
+                            actions: [
+                              IconButton(
+                                icon:
+                                    const Icon(
+                                  Icons.close,
+                                ),
+
+                                onPressed:
+                                    () {
+                                  Navigator.pop(
+                                    context,
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+
+                          Flexible(
+                            child:
+                                InteractiveViewer(
+                              child:
+                                  Image.network(
+                                achievement[
+                                    "proofImageUrl"],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+
+          const SizedBox(
+            height: 12,
+          ),
+
+          Text(
+            "Submitted: ${achievement["createdAt"]?.toString().substring(0, 10) ?? "-"}",
+
+            style:
+                const TextStyle(
+              color: AppColors
+                  .textSecondary,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget buildExpenseTile({
-    required String title,
-    required String amount,
-    required bool approved,
-  }) {
-    return buildEmptyCard(
-      "$title • ₹$amount",
-    );
+Widget buildExpenseTile(
+  Map<String, dynamic> expense,
+) {
+  final status =
+      expense["status"] ??
+      "PENDING";
+
+  Color statusColor;
+
+  switch (status) {
+    case "APPROVED":
+      statusColor = Colors.green;
+      break;
+
+    case "REJECTED":
+      statusColor = Colors.red;
+      break;
+
+    default:
+      statusColor = Colors.orange;
   }
 
+  return Container(
+    width: double.infinity,
+
+    margin:
+        const EdgeInsets.only(
+      bottom: 16,
+    ),
+
+    decoration: BoxDecoration(
+      color: Colors.white,
+
+      borderRadius:
+          BorderRadius.circular(
+        22,
+      ),
+    ),
+
+    child: Column(
+      crossAxisAlignment:
+          CrossAxisAlignment.start,
+
+      children: [
+        
+
+        Padding(
+          padding:
+              const EdgeInsets.all(
+            18,
+          ),
+
+          child: Column(
+            crossAxisAlignment:
+                CrossAxisAlignment
+                    .start,
+
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      expense["title"] ??
+                          "-",
+
+                      style:
+                          const TextStyle(
+                        fontSize: 18,
+
+                        fontWeight:
+                            FontWeight
+                                .bold,
+                      ),
+                    ),
+                  ),
+
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+
+                    decoration:
+                        BoxDecoration(
+                      color:
+                          statusColor
+                              .withValues(
+                        alpha: 0.1,
+                      ),
+
+                      borderRadius:
+                          BorderRadius.circular(
+                        20,
+                      ),
+                    ),
+
+                    child: Text(
+                      status,
+
+                      style:
+                          TextStyle(
+                        color:
+                            statusColor,
+
+                        fontWeight:
+                            FontWeight
+                                .bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(
+                height: 12,
+              ),
+
+              Text(
+                "₹ ${expense["amount"]}",
+                style:
+                    const TextStyle(
+                  fontSize: 22,
+                  fontWeight:
+                      FontWeight.bold,
+                ),
+              ),
+              const SizedBox(
+                height: 12,
+              ),
+
+              if (expense["receiptUrl"] != null)
+                OutlinedButton.icon(
+                  icon: const Icon(
+                    Icons.receipt_long,
+                  ),
+
+                  label: const Text(
+                    "View Receipt",
+                  ),
+
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+
+                      builder: (_) {
+                        return Dialog(
+                          insetPadding:
+                              const EdgeInsets.all(
+                            16,
+                          ),
+
+                          child: Column(
+                            mainAxisSize:
+                                MainAxisSize.min,
+
+                            children: [
+                              AppBar(
+                                title: const Text(
+                                  "Receipt",
+                                ),
+
+                                automaticallyImplyLeading:
+                                    false,
+
+                                actions: [
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.close,
+                                    ),
+
+                                    onPressed: () {
+                                      Navigator.pop(
+                                        context,
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+
+                              Flexible(
+                                child:
+                                    InteractiveViewer(
+                                  child:
+                                      Image.network(
+                                    expense[
+                                        "receiptUrl"],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+
+              const SizedBox(
+                height: 12,
+              ),
+
+              if (expense[
+                      "expenseCategory"] !=
+                  null)
+                Text(
+                  "Category: ${expense["expenseCategory"]}",
+                ),
+
+              if (expense[
+                      "description"] !=
+                  null)
+                Padding(
+                  padding:
+                      const EdgeInsets.only(
+                    top: 8,
+                  ),
+
+                  child: Text(
+                    expense[
+                        "description"],
+                  ),
+                ),
+
+              if (expense["remarks"] !=
+                  null)
+                Padding(
+                  padding:
+                      const EdgeInsets.only(
+                    top: 8,
+                  ),
+
+                  child: Text(
+                    "Remarks: ${expense["remarks"]}",
+                    style:
+                        const TextStyle(
+                      color:
+                          Colors.red,
+                    ),
+                  ),
+                ),
+
+              const SizedBox(
+                height: 12,
+              ),
+
+              Text(
+                "Submitted: ${expense["createdAt"]?.toString().substring(0, 10) ?? "-"}",
+
+                style:
+                    const TextStyle(
+                  color: AppColors
+                      .textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
   Widget buildEmptyCard(
     String text,
   ) {

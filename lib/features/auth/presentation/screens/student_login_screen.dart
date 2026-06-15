@@ -5,6 +5,8 @@ import 'package:flutter_application_1/services/auth/auth_service.dart';
 import '../../../../widgets/inputs/custom_textfield.dart';
 import '../../../student/presentation/screens/student_dashboard_screen.dart';
 import '../../../student/presentation/screens/student_document_upload_screen.dart';
+import '../../../student/presentation/screens/student_approval_status_screen.dart';
+import '../../../../theme/app_colors.dart';
 class StudentLoginScreen extends StatefulWidget {
   const StudentLoginScreen({super.key});
 
@@ -44,7 +46,9 @@ Future<void> sendOtp() async {
     });
 
     await AuthService.sendOtp(
-      phoneController.text.trim(),
+      phone:
+          phoneController.text.trim(),
+      role: "ADMIN",
     );
 
     if (!mounted) return;
@@ -77,9 +81,7 @@ Future<void> sendOtp() async {
 
 
 Future<void> verifyOtp() async {
-  if (otpController.text
-      .trim()
-      .length != 6) {
+  if (otpController.text.trim().length != 6) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text(
@@ -87,7 +89,6 @@ Future<void> verifyOtp() async {
         ),
       ),
     );
-
     return;
   }
 
@@ -103,71 +104,107 @@ Future<void> verifyOtp() async {
       role: "STUDENT",
     );
 
-    if (response["success"] == true) {
-      if (!mounted) return;
+    if (response["success"] != true) {
+      return;
+    }
 
-      final data =
-          Map<String, dynamic>.from(
-        response["data"] ?? {},
+    if (!mounted) return;
+
+    final data =
+        Map<String, dynamic>.from(
+      response["data"] ?? {},
+    );
+
+    final profileCompleted =
+        data["profileCompleted"] == true;
+
+    /// STEP 1
+    /// PROFILE NOT COMPLETED
+    if (!profileCompleted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              const StudentRegisterScreen(),
+        ),
+        (route) => false,
       );
-      final profileCompleted =
-          data["profileCompleted"] == true;
+      return;
+    }
 
-      if (!profileCompleted) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (_) =>
-                const StudentRegisterScreen(),
-          ),
-          (route) => false,
-        );
+    /// STEP 2
+    /// FETCH COMPLETE USER
+    Map<String, dynamic>? currentUser;
 
-        return;
-      }
+    try {
+      currentUser =
+          await AuthService.getCurrentUser();
+    } catch (e) {
+      debugPrint(
+        "STUDENT LOGIN GET CURRENT USER ERROR => $e",
+      );
+    }
 
-      Map<String, dynamic>? currentUser;
-      try {
-        currentUser =
-            await AuthService
-                .getCurrentUser();
-      } catch (e) {
-        debugPrint(
-          "STUDENT LOGIN GET CURRENT USER ERROR => $e",
-        );
-      }
+    if (!mounted) return;
 
-      if (!mounted) return;
+    final studentProfile =
+        currentUser?["studentProfile"];
 
-      final studentProfile =
-          currentUser?["studentProfile"];
+    if (studentProfile == null ||
+        studentProfile is! Map) {
+      throw Exception(
+        "Student profile not found",
+      );
+    }
 
-      if (studentProfile is Map) {
-        final documents =
-            (studentProfile["documents"]
-                    as List?)
-                ?.cast<dynamic>() ??
-            const [];
+    /// STEP 3
+    /// CHECK DOCUMENTS
+    final documents =
+        (studentProfile["documents"]
+                as List?)
+            ?.cast<dynamic>() ??
+        [];
 
-        if (documents.length < 5) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (_) =>
-                  const StudentDocumentUploadScreen(),
-            ),
-            (route) => false,
-          );
+    if (documents.length < 5) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              const StudentDocumentUploadScreen(),
+        ),
+        (route) => false,
+      );
+      return;
+    }
 
-          return;
-        }
-      }
+    /// STEP 4
+    /// CHECK APPROVAL STATUS
+    final verificationStatus =
+        studentProfile[
+                "verificationStatus"] ??
+            "PENDING";
 
+    if (verificationStatus ==
+        "APPROVED") {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
           builder: (_) =>
               const StudentDashboardScreen(),
+        ),
+        (route) => false,
+      );
+    } else {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              StudentApprovalStatusScreen(
+            studentProfile:
+                Map<String, dynamic>.from(
+              studentProfile,
+            ),
+          ),
         ),
         (route) => false,
       );
@@ -177,16 +214,19 @@ Future<void> verifyOtp() async {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(e.toString()),
+        content: Text(
+          e.toString(),
+        ),
       ),
     );
   } finally {
-  if (mounted) {
-    setState(() {
-      loading = false;
-    });
+    if (mounted) {
+      setState(() {
+        loading = false;
+      });
+    }
   }
-}
+
 }
   @override
   Widget build(BuildContext context) {
@@ -215,72 +255,108 @@ Future<void> verifyOtp() async {
         /// HEADER
         /// =====================================
 
-        Center(
-          child: Column(
-            children: [
-              Container(
-                height: 90,
-                width: 90,
-
-                decoration:
-                    BoxDecoration(
-                  color:
-                      Colors.blue
-                          .withOpacity(
-                    0.1,
-                  ),
-
-                  borderRadius:
-                      BorderRadius.circular(
-                    24,
-                  ),
-                ),
-
-                child: const Icon(
-                  Icons.school,
-
-                  size: 50,
-
-                  color: Colors.blue,
-                ),
+        Container(
+  width: double.infinity,
+  padding: const EdgeInsets.all(20),
+  decoration: BoxDecoration(
+    color: AppColors.primary,
+    borderRadius: BorderRadius.circular(24),
+    boxShadow: [
+      BoxShadow(
+        color: AppColors.primary.withOpacity(0.25),
+        blurRadius: 12,
+        offset: const Offset(0, 6),
+      ),
+    ],
+  ),
+  child: Column(
+    children: [
+      Row(
+        children: [
+          Container(
+            height: 70,
+            width: 70,
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius:
+                  BorderRadius.circular(16),
+            ),
+            child: ClipRRect(
+              borderRadius:
+                  BorderRadius.circular(12),
+              child: Image.asset(
+                "assets/images/app_logo2.png",
+                fit: BoxFit.contain,
               ),
-
-              const SizedBox(
-                height: 24,
-              ),
-
-              const Text(
-                "Student Login",
-
-                style: TextStyle(
-                  fontSize: 30,
-
-                  fontWeight:
-                      FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(
-                height: 10,
-              ),
-
-              Text(
-                "Login to continue your scholarship journey",
-
-                textAlign:
-                    TextAlign.center,
-
-                style: TextStyle(
-                  color:
-                      Colors.grey[700],
-
-                  height: 1.5,
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
 
+          const SizedBox(width: 16),
+
+          const Expanded(
+            child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Student Portal",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight:
+                        FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+
+                SizedBox(height: 4),
+
+                Text(
+                  "Super 500 Scholarship Program",
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+
+      const SizedBox(height: 20),
+
+      Image.asset(
+        "assets/images/student_role.png",
+        height: 120,
+      ),
+
+      const SizedBox(height: 12),
+
+      const Text(
+        "Welcome Student",
+        style: TextStyle(
+          fontSize: 26,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+
+      const SizedBox(height: 8),
+
+      Text(
+        "Login to continue your Super 500 journey",
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Colors.white.withOpacity(0.85),
+          fontSize: 14,
+        ),
+      ),
+    ],
+  ),
+),
+
+const SizedBox(height: 24),
         const SizedBox(
           height: 50,
         ),
@@ -402,7 +478,7 @@ Future<void> verifyOtp() async {
             style:
                 ElevatedButton.styleFrom(
               backgroundColor:
-                  Colors.blue,
+                  AppColors.primary,
 
               foregroundColor:
                   Colors.white,

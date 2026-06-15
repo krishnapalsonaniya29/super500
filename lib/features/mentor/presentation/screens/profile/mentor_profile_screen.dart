@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../services/storage/storage_service.dart';
+import '../../../../../services/mentor/mentor_service.dart';
 
+import '../../../../../services/storage/storage_service.dart';
 import '../../../../../theme/app_colors.dart';
 
 import '../../../../../widgets/loaders/app_loader.dart';
@@ -21,11 +22,17 @@ class MentorProfileScreen
 class _MentorProfileScreenState
     extends State<
         MentorProfileScreen> {
-  String name = "";
+String name = "";
+String phone = "";
+String role = "";
+String email = "";
+String district = "";
+String specialization = "";
+String verificationStatus = "";
 
-  String phone = "";
-
-  String role = "";
+int totalStudents = 0;
+int totalSessions = 0;
+int totalReports = 0;
 
   bool isLoading = true;
 
@@ -38,44 +45,67 @@ class _MentorProfileScreenState
     loadUserData();
   }
 
-  Future<void>
-      loadUserData() async {
-    try {
-      final user =
-          await StorageService
-              .getUser();
+  Future<void> loadUserData() async {
+  try {
+    final response =
+        await MentorService.getProfile();
 
-      if (!mounted) return;
+    final profile =
+        response["data"] ?? {};
 
-      setState(() {
-        name =
-            user?["name"] ?? "";
+    if (!mounted) return;
 
-        phone =
-            user?["phone"] ?? "";
+    setState(() {
+      name =
+          profile["fullName"] ?? "";
 
-        role =
-            user?["role"] ?? "";
+      phone =
+          profile["phone"] ?? "";
 
-        isLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
+      email =
+          profile["email"] ?? "";
 
-      setState(() {
-        isLoading = false;
-      });
+      role =
+          profile["role"] ?? "";
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        SnackBar(
-          content: Text(
-            e.toString(),
-          ),
+      district =
+          profile["district"] ?? "";
+
+      specialization =
+          profile["specialization"] ?? "";
+
+      verificationStatus =
+          profile["verificationStatus"] ??
+              "";
+
+      totalStudents =
+          profile["totalStudents"] ?? 0;
+
+      totalSessions =
+          profile["totalSessions"] ?? 0;
+
+      totalReports =
+          profile["totalReports"] ?? 0;
+
+      isLoading = false;
+    });
+  } catch (e) {
+    if (!mounted) return;
+
+    setState(() {
+      isLoading = false;
+    });
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(
+      SnackBar(
+        content: Text(
+          e.toString(),
         ),
-      );
-    }
+      ),
+    );
   }
+}
 
   Future<void> logout() async {
     setState(() {
@@ -113,42 +143,77 @@ class _MentorProfileScreenState
     }
   }
 
-  Widget buildTile({
-    required IconData icon,
-    required String title,
-    required String value,
-  }) {
-    return Card(
-      margin:
-          const EdgeInsets.only(
-        bottom: 14,
-      ),
-
-      shape:
-          RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.circular(
-          14,
+Widget buildTile({
+  required IconData icon,
+  required String title,
+  required String value,
+}) {
+  return Container(
+    margin:
+        const EdgeInsets.only(
+      bottom: 12,
+    ),
+    padding:
+        const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius:
+          BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color:
+              Colors.black.withOpacity(
+            0.03,
+          ),
+          blurRadius: 6,
         ),
-      ),
-
-      child: ListTile(
-        leading: Icon(
-          icon,
-          color: AppColors.primary,
+      ],
+    ),
+    child: Row(
+      children: [
+        CircleAvatar(
+          backgroundColor:
+              AppColors.primary
+                  .withOpacity(0.1),
+          child: Icon(
+            icon,
+            color:
+                AppColors.primary,
+          ),
         ),
 
-        title: Text(title),
+        const SizedBox(width: 16),
 
-        subtitle: Text(
-          value.isEmpty
-              ? "Not Available"
-              : value,
+        Expanded(
+          child: Column(
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style:
+                    const TextStyle(
+                  fontWeight:
+                      FontWeight.w600,
+                ),
+              ),
+
+              const SizedBox(
+                height: 4,
+              ),
+
+              Text(
+                value.isEmpty
+                    ? "Not Available"
+                    : value,
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
-
+      ],
+    ),
+  );
+}
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
@@ -161,16 +226,7 @@ class _MentorProfileScreenState
       backgroundColor:
           AppColors.background,
 
-      appBar: AppBar(
-        backgroundColor:
-            AppColors.primary,
-
-        elevation: 0,
-
-        title: const Text(
-          "Mentor Profile",
-        ),
-      ),
+      
 
       body: SingleChildScrollView(
         padding:
@@ -178,173 +234,282 @@ class _MentorProfileScreenState
 
         child: Column(
           children: [
-            /// =========================
-            /// PROFILE HEADER
-            /// =========================
+          Container(
+  width: double.infinity,
+  padding: const EdgeInsets.all(24),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius:
+        BorderRadius.circular(20),
+    boxShadow: [
+      BoxShadow(
+        color:
+            Colors.black.withOpacity(
+          0.05,
+        ),
+        blurRadius: 10,
+      ),
+    ],
+  ),
+  child: Column(
+    children: [
+      Container(
+  width: double.infinity,
+  padding: const EdgeInsets.all(20),
+  margin: const EdgeInsets.only(
+    bottom: 20,
+  ),
+  decoration: BoxDecoration(
+    color: AppColors.primary,
+    borderRadius:
+        BorderRadius.circular(20),
+  ),
+  child: Row(
+    children: [
+      Container(
+        height: 70,
+        width: 70,
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius:
+              BorderRadius.circular(16),
+        ),
+        child: ClipRRect(
+          borderRadius:
+              BorderRadius.circular(12),
+          child: Image.asset(
+            "assets/images/app_logo2.png",
+            fit: BoxFit.contain,
+          ),
+        ),
+      ),
 
-            Container(
-              width: double.infinity,
+      const SizedBox(width: 16),
 
-              padding:
-                  const EdgeInsets.all(
-                24,
-              ),
-
-              decoration:
-                  BoxDecoration(
-                color:
-                    AppColors.primary,
-
-                borderRadius:
-                    BorderRadius.circular(
-                  20,
-                ),
-              ),
-
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    radius: 45,
-
-                    backgroundColor:
-                        AppColors.gold,
-
-                    child: Text(
-                      name.isNotEmpty
-                          ? name[0]
-                              .toUpperCase()
-                          : "M",
-
-                      style:
-                          const TextStyle(
-                        fontSize: 30,
-
-                        fontWeight:
-                            FontWeight.bold,
-
-                        color:
-                            Colors.black,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(
-                    height: 14,
-                  ),
-
-                  Text(
-                    name.isEmpty
-                        ? "Mentor"
-                        : name,
-
-                    style:
-                        const TextStyle(
-                      fontSize: 22,
-
-                      fontWeight:
-                          FontWeight.bold,
-
-                      color:
-                          Colors.white,
-                    ),
-                  ),
-
-                  const SizedBox(
-                    height: 6,
-                  ),
-
-                  Text(
-                    role
-                        .toUpperCase(),
-
-                    style:
-                        const TextStyle(
-                      color:
-                          Colors.white70,
-
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
+      const Expanded(
+        child: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Mentor Profile",
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight:
+                    FontWeight.bold,
+                color: Colors.white,
               ),
             ),
-
-            const SizedBox(
-              height: 24,
-            ),
-
-            /// =========================
-            /// DETAILS
-            /// =========================
-
-            buildTile(
-              icon: Icons.phone,
-
-              title:
-                  "Phone Number",
-
-              value: phone,
-            ),
-
-            buildTile(
-              icon: Icons.badge,
-
-              title: "Role",
-
-              value: role,
-            ),
-
-            const SizedBox(
-              height: 30,
-            ),
-
-            /// =========================
-            /// LOGOUT BUTTON
-            /// =========================
-
-            SizedBox(
-              width: double.infinity,
-
-              child:
-                  ElevatedButton.icon(
-                style:
-                    ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Colors.red,
-
-                  padding:
-                      const EdgeInsets.symmetric(
-                    vertical: 14,
-                  ),
-                ),
-
-                onPressed:
-                    isLoggingOut
-                        ? null
-                        : logout,
-
-                icon: const Icon(
-                  Icons.logout,
-
-                  color:
-                      Colors.white,
-                ),
-
-                label: Text(
-                  isLoggingOut
-                      ? "Logging out..."
-                      : "Logout",
-
-                  style:
-                      const TextStyle(
-                    color:
-                        Colors.white,
-
-                    fontSize: 16,
-                  ),
-                ),
+            SizedBox(height: 4),
+            Text(
+              "Manage your profile and mentoring information.",
+              style: TextStyle(
+                color: Colors.white70,
               ),
             ),
+          ],
+        ),
+      ),
+    ],
+  ),
+),
+      CircleAvatar(
+        radius: 45,
+        backgroundColor:
+            AppColors.primary
+                .withOpacity(0.1),
+        child: Text(
+          name.isNotEmpty
+              ? name[0]
+                  .toUpperCase()
+              : "M",
+          style: const TextStyle(
+            fontSize: 30,
+            fontWeight:
+                FontWeight.bold,
+            color:
+                AppColors.primary,
+          ),
+        ),
+      ),
+
+      const SizedBox(height: 12),
+
+      Text(
+        name.isEmpty
+            ? "Mentor"
+            : name,
+        style: const TextStyle(
+          fontSize: 22,
+          fontWeight:
+              FontWeight.bold,
+        ),
+      ),
+
+      const SizedBox(height: 8),
+
+      Container(
+        padding:
+            const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 6,
+        ),
+        decoration: BoxDecoration(
+          color:
+              AppColors.primary
+                  .withOpacity(0.1),
+          borderRadius:
+              BorderRadius.circular(
+            20,
+          ),
+        ),
+        child: Text(
+          role.toUpperCase(),
+          style: const TextStyle(
+            color:
+                AppColors.primary,
+            fontWeight:
+                FontWeight.w600,
+          ),
+        ),
+      ),
+    ],
+  ),
+
+      ),
+      const SizedBox(height: 20),
+
+Container(
+  padding: const EdgeInsets.all(20),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius:
+        BorderRadius.circular(20),
+  ),
+  child: Row(
+    mainAxisAlignment:
+        MainAxisAlignment.spaceAround,
+    children: [
+      Column(
+        children: [
+          Text(
+            "$totalStudents",
+            style:
+                const TextStyle(
+              fontSize: 22,
+              fontWeight:
+                  FontWeight.bold,
+            ),
+          ),
+          const Text(
+            "Students",
+          ),
+        ],
+      ),
+      Column(
+        children: [
+          Text(
+            "$totalSessions",
+            style:
+                const TextStyle(
+              fontSize: 22,
+              fontWeight:
+                  FontWeight.bold,
+            ),
+          ),
+          const Text(
+            "Sessions",
+          ),
+        ],
+      ),
+      Column(
+        children: [
+          Text(
+            "$totalReports",
+            style:
+                const TextStyle(
+              fontSize: 22,
+              fontWeight:
+                  FontWeight.bold,
+            ),
+          ),
+          const Text(
+            "Reports",
+          ),
+        ],
+      ),
+    ],
+  ),
+),
+
+const SizedBox(height: 20),
+
+buildTile(
+  icon: Icons.phone,
+  title: "Phone Number",
+  value: phone,
+),
+
+buildTile(
+  icon: Icons.email,
+  title: "Email",
+  value: email,
+),
+
+buildTile(
+  icon: Icons.badge,
+  title: "Role",
+  value: role,
+),
+
+buildTile(
+  icon: Icons.location_city,
+  title: "District",
+  value: district,
+),
+
+buildTile(
+  icon: Icons.school,
+  title: "Specialization",
+  value: specialization,
+),
+
+buildTile(
+  icon: Icons.verified,
+  title: "Verification Status",
+  value: verificationStatus,
+),
+
+const SizedBox(height: 24),
+SizedBox(
+  width: double.infinity,
+  child: ElevatedButton.icon(
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.red,
+      padding: const EdgeInsets.symmetric(
+        vertical: 14,
+      ),
+    ),
+    onPressed:
+        isLoggingOut
+            ? null
+            : logout,
+    icon: const Icon(
+      Icons.logout,
+      color: Colors.white,
+    ),
+    label: Text(
+      isLoggingOut
+          ? "Logging out..."
+          : "Logout",
+      style: const TextStyle(
+        color: Colors.white,
+      ),
+    ),
+  ),
+),
+
           ],
         ),
       ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../services/super_admin/super_admin_service.dart';
 import '../../../../../theme/app_colors.dart';
-
+import 'student_ranking_screen.dart'; 
 import 'student_detail_screen.dart';
 
 class StudentsScreen extends StatefulWidget {
@@ -131,15 +131,83 @@ districts = ["All", ...districtList.toSet()];
 
                     children: [
                       /// HEADER
-                      const Text(
-                        "Students",
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        margin: const EdgeInsets.only(
+                          bottom: 20,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius:
+                              BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary
+                                  .withOpacity(0.25),
+                              blurRadius: 12,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              height: 70,
+                              width: 70,
+                              padding:
+                                  const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  16,
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  12,
+                                ),
+                                child: Image.asset(
+                                  "assets/images/app_logo2.png",
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
 
-                        style: TextStyle(
-                          fontSize: 30,
+                            const SizedBox(width: 16),
 
-                          fontWeight: FontWeight.bold,
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Super Admin",
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight:
+                                          FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
 
-                          fontFamily: 'Poppins',
+                                  SizedBox(height: 6),
+
+                                  Text(
+                                    "Manage Students",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
 
@@ -149,6 +217,43 @@ districts = ["All", ...districtList.toSet()];
                         "${filteredStudents.length} students found",
 
                         style: const TextStyle(color: AppColors.textSecondary),
+                      ),
+
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(
+                            Icons.leaderboard,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            "Super 500 Rankings",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 16,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                16,
+                              ),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    const StudentRankingScreen(),
+                              ),
+                            );
+                          },
+                        ),
                       ),
 
                       const SizedBox(height: 24),
@@ -450,7 +555,13 @@ districts = ["All", ...districtList.toSet()];
                                       ),
                                     ),
 
-                                    child: const Text("View Details"),
+                                    child: const Text(
+                                      "View Details",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],

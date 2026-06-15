@@ -3,6 +3,12 @@
   import '../../../../../theme/app_colors.dart';
   import '../../../../../services/auth/auth_service.dart';
 
+import 'dart:typed_data';
+
+import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
+
+import '../../../../../services/student/student_service.dart';
   class AchievementsScreen
       extends StatefulWidget {
     final Function(int index) onNavigate;
@@ -63,7 +69,9 @@
 
       final descriptionController =
           TextEditingController();
+      XFile? selectedImage;
 
+      Uint8List? imageBytes;
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -156,43 +164,93 @@
 
                   const SizedBox(height: 20),
 
-                  Container(
-                    padding:
-                        const EdgeInsets.all(
-                      16,
-                    ),
+                  StatefulBuilder(
+                    builder: (
+                      context,
+                      modalSetState,
+                    ) {
+                      return Container(
+                        width: double.infinity,
+                        padding:
+                            const EdgeInsets.all(16),
 
-                    decoration:
-                        BoxDecoration(
-                      color: AppColors
-                          .primary
-                          .withValues(
+                        decoration: BoxDecoration(
+                          color: AppColors.primary
+                              .withValues(
                             alpha: 0.05,
                           ),
 
-                      borderRadius:
-                          BorderRadius.circular(
-                        18,
-                      ),
-                    ),
-
-                    child: const Row(
-                      children: [
-                        Icon(
-                          Icons.info_outline,
-                          color:
-                              Color.fromARGB(255, 232, 234, 236),
-                        ),
-
-                        SizedBox(width: 12),
-
-                        Expanded(
-                          child: Text(
-                            "Proof upload will be added later.",
+                          borderRadius:
+                              BorderRadius.circular(
+                            18,
                           ),
                         ),
-                      ],
-                    ),
+
+                        child: Column(
+                          children: [
+                            if (imageBytes != null)
+                              ClipRRect(
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  14,
+                                ),
+                                child: Image.memory(
+                                  imageBytes!,
+                                  height: 180,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+
+                            if (imageBytes != null)
+                              const SizedBox(
+                                height: 14,
+                              ),
+
+                            OutlinedButton.icon(
+                              onPressed: () async {
+                                final picker = ImagePicker();
+                                final image =
+                                    await picker.pickImage(
+                                  source: ImageSource.gallery,
+                                  imageQuality: 80,
+                                );
+
+                                if (image == null) return;
+
+                                final bytes =
+                                    await image.readAsBytes();
+
+                                modalSetState(() {
+                                  selectedImage = image;
+                                  imageBytes = bytes;
+                                });
+                              },
+
+                              icon: const Icon(
+                                Icons.upload,
+                              ),
+
+                              label: Text(
+                                selectedImage == null
+                                    ? "Upload Proof Image"
+                                    : "Change Proof Image",
+                              ),
+                            ),
+
+                            const SizedBox(
+                              height: 10,
+                            ),
+
+                            const Text(
+                              "Upload certificate, medal photo, result screenshot or any supporting proof.",
+                              textAlign:
+                                  TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
 
                   const SizedBox(height: 28),
@@ -200,67 +258,92 @@
                   SizedBox(
                     width: double.infinity,
                     height: 55,
-
                     child: ElevatedButton(
-                      onPressed: () {
-                        if (titleController
-                            .text
-                            .trim()
-                            .isEmpty) {
-                          return;
+                    onPressed: () async {
+                    if (titleController.text
+                    .trim()
+                    .isEmpty) {
+                    return;
+                    }
+
+                    
+                      try {
+                       MultipartFile? proof;
+
+                        if (selectedImage != null) {
+                          proof = MultipartFile.fromBytes(
+                            imageBytes!,
+                            filename: selectedImage!.name,
+                          );
                         }
 
-                        setState(() {
-                          achievements.add({
-                            "title":
-                                titleController
-                                    .text
-                                    .trim(),
-
-                            "description":
-                                descriptionController
-                                    .text
-                                    .trim(),
-
-                            "verified":
-                                false,
-                          });
-                        });
-
-                        Navigator.pop(
-                          context,
+                        await StudentService
+                            .createAchievement(
+                          title: titleController.text
+                              .trim(),
+                          description:
+                              descriptionController.text
+                                  .trim(),
+                          proof: proof,
                         );
-                      },
 
-                      style:
-                          ElevatedButton.styleFrom(
-                        backgroundColor:
-                            AppColors
-                                .primary,
+                        if (!mounted) return;
 
-                        shape:
-                            RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(
-                            18,
+                        Navigator.pop(context);
+
+                        await fetchData();
+
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              "Achievement submitted successfully",
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      } catch (e) {
+                        debugPrint(
+                          "Achievement Error: $e",
+                        );
 
-                      child: const Text(
-                        "Add Achievement",
+                        if (!mounted) return;
 
-                        style: TextStyle(
-                          fontWeight:
-                              FontWeight.bold,
-                          fontSize: 16,
-
-                          color:
-                              Colors.white,
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Failed to submit achievement: $e",
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          AppColors.primary,
+                      shape:
+                          RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(
+                          18,
                         ),
                       ),
                     ),
-                  ),
+                    child: const Text(
+                      "Add Achievement",
+                      style: TextStyle(
+                        fontWeight:
+                            FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+
+                    ),
+                    ),
+
                 ],
               ),
             ),
@@ -273,6 +356,7 @@
       required String title,
       required String subtitle,
       required IconData icon,
+      String? proofImageUrl,
       bool verified = false,
     }) {
       return Container(
@@ -306,125 +390,151 @@
             ),
           ],
         ),
-
-        child: Row(
+       
+        child: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
           children: [
-            Container(
-              padding:
-                  const EdgeInsets.all(
-                16,
-              ),
 
-              decoration:
-                  BoxDecoration(
-                color: AppColors
-                    .primary
-                    .withValues(
-                      alpha: 0.1,
-                    ),
+            
 
-                borderRadius:
-                    BorderRadius.circular(
-                  18,
-                ),
-              ),
-
-              child: Icon(
-                icon,
-                size: 32,
-                color:
-                    const Color(
-                  0xFFD4AF37,
-                ),
-              ),
-            ),
-
-            const SizedBox(width: 18),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
-
-                children: [
-                  Text(
-                    title,
-
-                    style:
-                        const TextStyle(
-                      fontSize: 18,
-                      fontWeight:
-                          FontWeight.bold,
-
-                      fontFamily:
-                          'Poppins',
-
-                      color: AppColors
-                          .textPrimary,
-                    ),
+            Row(
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.all(
+                    16,
                   ),
-
-                  const SizedBox(
-                    height: 6,
-                  ),
-
-                  Text(
-                    subtitle,
-
-                    style:
-                        const TextStyle(
-                      fontSize: 14,
-                      fontFamily:
-                          'Poppins',
-
-                      color: AppColors
-                          .textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 6,
-              ),
-
-              decoration:
-                  BoxDecoration(
-                color: verified
-                    ? Colors.green
-                        .withValues(
-                          alpha: 0.1,
-                        )
-                    : Colors.orange
+                  decoration:
+                      BoxDecoration(
+                    color: AppColors
+                        .primary
                         .withValues(
                           alpha: 0.1,
                         ),
-
-                borderRadius:
-                    BorderRadius.circular(
-                  20,
+                    borderRadius:
+                        BorderRadius.circular(
+                      18,
+                    ),
+                  ),
+                  child: Icon(
+                    icon,
+                    size: 32,
+                    color:
+                        const Color(
+                      0xFFD4AF37,
+                    ),
+                  ),
                 ),
-              ),
 
-              child: Text(
-                verified
-                    ? "Verified"
-                    : "Pending",
-
-                style: TextStyle(
-                  color: verified
-                      ? Colors.green
-                      : Colors.orange,
-
-                  fontWeight:
-                      FontWeight.w600,
+                const SizedBox(
+                  width: 18,
                 ),
-              ),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment
+                            .start,
+                    children: [
+                      Text(
+                        title,
+                        style:
+                            const TextStyle(
+                          fontSize: 18,
+                          fontWeight:
+                              FontWeight.bold,
+                          fontFamily:
+                              'Poppins',
+                          color: AppColors
+                              .textPrimary,
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 6,
+                      ),
+
+                      Text(
+                        subtitle,
+                        style:
+                            const TextStyle(
+                          fontSize: 14,
+                          fontFamily:
+                              'Poppins',
+                          color: AppColors
+                              .textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration:
+                      BoxDecoration(
+                    color: verified
+                        ? Colors.green
+                            .withValues(
+                              alpha: 0.1,
+                            )
+                        : Colors.orange
+                            .withValues(
+                              alpha: 0.1,
+                            ),
+                    borderRadius:
+                        BorderRadius.circular(
+                      20,
+                    ),
+                  ),
+                  child: Text(
+                    verified
+                        ? "Verified"
+                        : "Pending",
+                    style: TextStyle(
+                      color: verified
+                          ? Colors.green
+                          : Colors.orange,
+                      fontWeight:
+                          FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
             ),
+            const SizedBox(height: 12),
+
+              if (proofImageUrl != null &&
+                  proofImageUrl.isNotEmpty)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.image),
+                    label: const Text("View Proof"),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => Dialog(
+                          child: ClipRRect(
+                            borderRadius:
+                                BorderRadius.circular(16),
+                            child: InteractiveViewer(
+                              child: Image.network(
+                                proofImageUrl,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
           ],
         ),
       );
@@ -457,6 +567,9 @@
 
           label: const Text(
             "Add Achievement",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
 
@@ -479,24 +592,74 @@
                             .start,
 
                     children: [
-                      const Text(
-                        'Achievements',
+                      
 
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontWeight:
-                              FontWeight
-                                  .bold,
-
-                          fontFamily:
-                              'Poppins',
-
-                          color: Color.fromARGB(255, 7, 110, 136),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        margin: const EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withOpacity(0.25),
+                              blurRadius: 12,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
                         ),
-                      ),
+                        child: Row(
+                          children: [
+                            Container(
+                              height: 70,
+                              width: 70,
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.asset(
+                                  "assets/images/app_logo2.png",
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
 
-                      const SizedBox(
-                        height: 28,
+                            const SizedBox(width: 16),
+
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Achievements",
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+
+                                  SizedBox(height: 6),
+
+                                  Text(
+                                    "Showcase your achievements and accomplishments.",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
 
                       /// 10TH MARKS
@@ -512,16 +675,12 @@
                         decoration:
                             BoxDecoration(
                           gradient:
-                              const LinearGradient(
-                            colors: [
-                              Color(
-                                0xFF0A1931,
+                              LinearGradient(
+                                colors: [
+                                  AppColors.primary,
+                                  AppColors.primary,
+                                ],
                               ),
-                              Color(
-                                0xFF132D46,
-                              ),
-                            ],
-                          ),
 
                           borderRadius:
                               BorderRadius.circular(
@@ -649,8 +808,7 @@
                               ),
 
                               const Text(
-                                "You have not uploaded any achievement yet.",
-
+                               "No achievements uploaded yet.\nTap 'Add Achievement' to showcase your accomplishments.",
                                 textAlign:
                                     TextAlign
                                         .center,
@@ -670,23 +828,29 @@
                           (achievement) {
                             return buildAchievementCard(
                               title:
-                                  achievement[
-                                          "title"] ??
-                                      "Achievement",
+                                  achievement["title"] ??
+                                  "Achievement",
 
                               subtitle:
+                                  achievement["description"] ??
+                                  "No description",
+                                  
+
+                              proofImageUrl:
                                   achievement[
-                                          "description"] ??
-                                      "No description",
+                                      "proofImageUrl"],
+
+                              
 
                               icon: Icons
                                   .emoji_events_rounded,
 
                               verified:
                                   achievement[
-                                          "verified"] ??
-                                      false,
+                                      "verified"] ??
+                                  false,
                             );
+                          
                           },
                         ),
                     ],

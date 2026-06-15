@@ -81,21 +81,13 @@ class _MentorStudentsScreenState
     return Scaffold(
       backgroundColor:
           AppColors.background,
-
-      appBar: AppBar(
-        title: const Text(
-          "Assigned Students",
-        ),
-
-        elevation: 0,
-
-        backgroundColor:
-            AppColors.primary,
-      ),
+      
+      
+      
 
       body: RefreshIndicator(
         onRefresh: loadStudents,
-
+  
         child: students.isEmpty
             ? ListView(
                 physics:
@@ -106,144 +98,230 @@ class _MentorStudentsScreenState
                     height: 250,
                   ),
 
-                  Center(
-                    child: Text(
-                      "No students assigned",
+                  Column(
+                      children: [
+                        Icon(
+                          Icons.school_outlined,
+                          size: 70,
+                          color: Colors.grey,
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        const Text(
+                          "No students assigned yet",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        const Text(
+                          "Assigned students will appear here.",
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    )
+                ],
+              )
+            :  ListView(
+    padding: const EdgeInsets.all(16),
+    children: [
+      /// HEADER
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        margin: const EdgeInsets.only(
+          bottom: 20,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.primary,
+          borderRadius:
+              BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary
+                  .withOpacity(0.25),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              height: 70,
+              width: 70,
+              padding:
+                  const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius:
+                    BorderRadius.circular(
+                  16,
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius:
+                    BorderRadius.circular(
+                  12,
+                ),
+                child: Image.asset(
+                  "assets/images/app_logo2.png",
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 16),
+
+            const Expanded(
+              child: Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Assigned Students",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight:
+                          FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    "View and monitor students assigned to you.",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white70,
                     ),
                   ),
                 ],
-              )
-            : ListView.builder(
-                padding:
-                    const EdgeInsets.all(
-                  16,
-                ),
-
-                itemCount:
-                    students.length,
-
-                itemBuilder:
-                    (context, index) {
-                  final student =
-                      students[index];
-
-                  final user =
-                      student["user"] ??
-                          {};
-
-                  final name =
-                      user["name"] ??
-                          "";
-
-                  final school =
-                      student["schoolName"] ??
-                          "";
-
-                  final stream =
-                      student["stream"] ??
-                          "";
-
-                  return Card(
-                    margin:
-                        const EdgeInsets.only(
-                      bottom: 14,
-                    ),
-
-                    elevation: 2,
-
-                    shape:
-                        RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(
-                        14,
-                      ),
-                    ),
-
-                    child: ListTile(
-                      contentPadding:
-                          const EdgeInsets.all(
-                        14,
-                      ),
-
-                      leading:
-                          CircleAvatar(
-                        backgroundColor:
-                            AppColors.gold,
-
-                        child: Text(
-                          name.isNotEmpty
-                              ? name[0]
-                                  .toUpperCase()
-                              : "S",
-
-                          style:
-                              const TextStyle(
-                            color:
-                                Colors.black,
-
-                            fontWeight:
-                                FontWeight.bold,
-                          ),
-                        ),
-                      ),
-
-                      title: Text(
-                        name,
-
-                        style:
-                            const TextStyle(
-                          fontWeight:
-                              FontWeight.bold,
-                        ),
-                      ),
-
-                      subtitle: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment
-                                .start,
-
-                        children: [
-                          const SizedBox(
-                            height: 6,
-                          ),
-
-                          if (school
-                              .isNotEmpty)
-                            Text(school),
-
-                          if (stream
-                              .isNotEmpty)
-                            Text(stream),
-                        ],
-                      ),
-
-                      trailing:
-                          const Icon(
-                        Icons
-                            .arrow_forward_ios,
-
-                        size: 18,
-                      ),
-
-                      onTap: () {
-                        Navigator.push(
-                          context,
-
-                          MaterialPageRoute(
-                            builder:
-                                (_) =>
-                                    MentorStudentDetailScreen(
-                              studentId:
-                                  student["id"],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                },
               ),
+            ),
+          ],
+        ),
+      ),
+
+      /// STUDENTS
+      ...students.map((student) {
+        final user =
+            student["user"] ?? {};
+
+        final name =
+            user["fullName"] ?? "";
+
+        final school =
+            student["schoolName"] ?? "";
+
+        final stream =
+            student["stream"] ?? "";
+
+        return _buildStudentCard(
+          student,
+          name,
+          school,
+          stream,
+        );
+      }),
+    ],
+  ),
       ),
     );
   }
+  Widget _buildStudentCard(
+  Map<String, dynamic> student,
+  String name,
+  String school,
+  String stream,
+) {
+  return Container(
+    margin: const EdgeInsets.only(
+      bottom: 16,
+    ),
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius:
+          BorderRadius.circular(20),
+      boxShadow: [
+        BoxShadow(
+          color:
+              Colors.black.withOpacity(
+            0.04,
+          ),
+          blurRadius: 8,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    ),
+    child: Row(
+      children: [
+        CircleAvatar(
+          radius: 28,
+          backgroundColor:
+              AppColors.primary
+                  .withOpacity(0.1),
+          child: Text(
+            name.isNotEmpty
+                ? name[0].toUpperCase()
+                : "S",
+            style: const TextStyle(
+              color: AppColors.primary,
+              fontWeight:
+                  FontWeight.bold,
+            ),
+          ),
+        ),
+
+        const SizedBox(width: 16),
+
+        Expanded(
+          child: Column(
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                style:
+                    const TextStyle(
+                  fontWeight:
+                      FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+
+              if (school.isNotEmpty)
+                Text(school),
+
+              if (stream.isNotEmpty)
+                Text(stream),
+            ],
+          ),
+        ),
+
+        IconButton(
+          icon: const Icon(
+            Icons.arrow_forward_ios,
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) =>
+                    MentorStudentDetailScreen(
+                  studentId:
+                      student["id"],
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    ),
+  );
+}
 }

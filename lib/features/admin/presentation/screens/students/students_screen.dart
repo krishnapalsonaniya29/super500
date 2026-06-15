@@ -50,6 +50,84 @@ class _StudentsScreenState
     fetchStudents();
   }
 
+
+/// =====================================
+/// VERIFY DIALOG
+///  =====================================
+void showVerifyDialog(
+  String studentId,
+) {
+  final amountController =
+      TextEditingController();
+  debugPrint("VERIFY DIALOG OPENED");
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: const Text(
+        "Verify Student",
+      ),
+      content: TextField(
+        controller: amountController,
+        keyboardType:
+            TextInputType.number,
+        decoration:
+            const InputDecoration(
+          labelText:
+              "Allotted Amount",
+          hintText:
+              "Enter amount",
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text(
+            "Cancel",
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            final amount =
+                double.tryParse(
+              amountController.text,
+            );
+
+            if (amount == null ||
+                amount <= 0) {
+              ScaffoldMessenger.of(
+                      context)
+                  .showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    "Enter valid amount",
+                  ),
+                ),
+              );
+              return;
+            }
+
+            Navigator.pop(context);
+
+            await verifyStudent(
+              studentId,
+              amount,
+            );
+          },
+          style:
+              ElevatedButton.styleFrom(
+            backgroundColor:
+                Colors.green,
+          ),
+          child: const Text(
+            "Verify",
+          ),
+        ),
+      ],
+    ),
+  );
+}
   /// =====================================
   /// FETCH STUDENTS
   /// =====================================
@@ -162,42 +240,43 @@ void showDeactivateDialog(
   /// VERIFY
   /// =====================================
 
-  Future<void> verifyStudent(
-    String id,
-  ) async {
-    try {
-      setState(() {
-        actionLoading = true;
-      });
+Future<void> verifyStudent(
+  String id,
+  double allottedAmount,
+) async {
+  try {
+    setState(() {
+      actionLoading = true;
+    });
 
-      await AdminService
-          .verifyStudent(id);
+    await AdminService.verifyStudent(
+      id,
+      allottedAmount,
+    );
 
-      await fetchStudents();
+    await fetchStudents();
 
-      if (!mounted) return;
+    if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-          backgroundColor:
-              Colors.green,
-
-          content: Text(
-            "Student verified successfully",
-          ),
+    ScaffoldMessenger.of(context)
+        .showSnackBar(
+      const SnackBar(
+        backgroundColor: Colors.green,
+        content: Text(
+          "Student verified successfully",
         ),
-      );
-    } catch (e) {
-      debugPrint(e.toString());
-    } finally {
-      if (mounted) {
-        setState(() {
-          actionLoading = false;
-        });
-      }
+      ),
+    );
+  } catch (e) {
+    debugPrint(e.toString());
+  } finally {
+    if (mounted) {
+      setState(() {
+        actionLoading = false;
+      });
     }
   }
+}
 
   /// =====================================
   /// REJECT
@@ -399,19 +478,72 @@ Future<void> deactivateStudent(
                 ),
 
                 children: [
-                  const Text(
-                    "District Students",
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.25),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          height: 70,
+                          width: 70,
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.asset(
+                              "assets/images/app_logo2.png",
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
 
-                    style: TextStyle(
-                      fontSize: 30,
+                        const SizedBox(width: 16),
 
-                      fontWeight:
-                          FontWeight.bold,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "District Students",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
 
-                      fontFamily:
-                          'Poppins',
+                              const SizedBox(height: 6),
+
+                              Text(
+                                "${filteredStudents.length} students available for management",
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                  
 
                   const SizedBox(
                     height: 8,
@@ -437,8 +569,7 @@ Future<void> deactivateStudent(
 
                       style:
                           ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Colors.orange,
+                        backgroundColor:AppColors.primary,
 
                         shape:
                             RoundedRectangleBorder(
@@ -461,6 +592,7 @@ Future<void> deactivateStudent(
 
                           fontWeight:
                               FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -483,41 +615,26 @@ Future<void> deactivateStudent(
 
                   /// SEARCH
                   TextField(
-                    controller:
-                        searchController,
-
-                    onChanged:
-                        (value) {
-                      searchQuery =
-                          value;
-
+                    controller: searchController,
+                    onChanged: (value) {
+                      searchQuery = value;
                       applySearch();
                     },
-
-                    decoration:
-                        InputDecoration(
-                      hintText:
-                          "Search students",
-
-                      prefixIcon:
-                          const Icon(
+                    decoration: InputDecoration(
+                      hintText: "Search by name or phone",
+                      prefixIcon: const Icon(
                         Icons.search,
+                        color: AppColors.primary,
                       ),
-
                       filled: true,
-
-                      fillColor:
-                          Colors.white,
-
-                      border:
-                          OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(
-                          20,
-                        ),
-
-                        borderSide:
-                            BorderSide.none,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(18),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding:
+                          const EdgeInsets.symmetric(
+                        vertical: 16,
                       ),
                     ),
                   ),
@@ -527,6 +644,7 @@ Future<void> deactivateStudent(
                   ),
 
                   /// STUDENTS
+                  
                   ...filteredStudents.map(
                     (student) {
                       final user =
@@ -547,7 +665,7 @@ Future<void> deactivateStudent(
                             const EdgeInsets.all(
                           20,
                         ),
-
+                      
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius:
@@ -721,7 +839,7 @@ Future<void> deactivateStudent(
                                       "Details",
 
                                   color:
-                                      Colors.orange,
+                                      const Color.fromARGB(255, 1, 230, 134),
 
                                   onTap: () {
                                     Navigator.push(
@@ -743,7 +861,7 @@ Future<void> deactivateStudent(
                                       "Documents",
 
                                   color:
-                                      Colors.orange,
+                                     const Color.fromARGB(255, 1, 230, 134),
 
                                   onTap: () {
                                     Navigator.push(
@@ -765,7 +883,7 @@ Future<void> deactivateStudent(
                                       "Assign Mentor",
 
                                   color:
-                                      Colors.orange,
+                                      const Color.fromARGB(255, 1, 230, 134),
 
                                   onTap: () async {
                                     await Navigator.push(
@@ -796,10 +914,10 @@ Future<void> deactivateStudent(
                                 Expanded(
                                   child: ElevatedButton.icon(
                                     onPressed: actionLoading
-                                        ? null
-                                        : () => verifyStudent(
-                                              student["id"],
-                                            ),
+                                      ? null
+                                      : () => showVerifyDialog(
+                                            student["id"],
+                                          ),
                                     icon: const Icon(
                                       Icons.check_circle,
                                     ),
@@ -854,11 +972,12 @@ Future<void> deactivateStudent(
                                 ),
                                 label: const Text(
                                   "Deactivate Student",
+                                  style : TextStyle(color: Colors.white),
                                 ),
                                 style:
                                     ElevatedButton.styleFrom(
                                   backgroundColor:
-                                      Colors.red.shade700,
+                                      const Color.fromARGB(255, 255, 82, 82),
                                 ),
                               ),
                             )
@@ -868,10 +987,10 @@ Future<void> deactivateStudent(
                               width: double.infinity,
                               child: ElevatedButton.icon(
                                 onPressed: actionLoading
-                                    ? null
-                                    : () => verifyStudent(
-                                          student["id"],
-                                        ),
+                                  ? null
+                                  : () => showVerifyDialog(
+                                        student["id"],
+                                      ),
                                 icon: const Icon(
                                   Icons.refresh,
                                 ),
@@ -927,22 +1046,26 @@ Future<void> deactivateStudent(
     );
   }
 
-  Widget actionButton({
-    required String title,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return ElevatedButton(
-      onPressed: onTap,
-
-      style:
-          ElevatedButton.styleFrom(
-        backgroundColor: color,
+Widget actionButton({
+  required String title,
+  required Color color,
+  required VoidCallback onTap,
+}) {
+  return ElevatedButton(
+    onPressed: onTap,
+    style: ElevatedButton.styleFrom(
+      backgroundColor: color,
+      foregroundColor: Colors.white,
+    ),
+    child: Text(
+      title,
+      style: const TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.w600,
       ),
-
-      child: Text(title),
-    );
-  }
+    ),
+  );
+}
 
   Widget buildInfoRow({
     required IconData icon,
@@ -967,8 +1090,10 @@ Future<void> deactivateStudent(
 
           style:
               const TextStyle(
+                
             fontWeight:
                 FontWeight.bold,
+
           ),
         ),
 

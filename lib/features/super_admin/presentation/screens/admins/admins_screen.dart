@@ -297,6 +297,9 @@ class _AdminsScreenState
 
         label: const Text(
           "Create Admin",
+          style : TextStyle(
+            color: Colors.white,
+          )
         ),
       ),
 
@@ -364,35 +367,84 @@ class _AdminsScreenState
 
                         children: [
                           /// HEADER
-                          const Text(
-                            "District Admins",
-                            style:
-                                TextStyle(
-                              fontSize:
-                                  30,
-                              fontWeight:
-                                  FontWeight
-                                      .bold,
-                              fontFamily:
-                                  'Poppins',
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(20),
+                            margin: const EdgeInsets.only(
+                              bottom: 20,
                             ),
-                          ),
-
-                          const SizedBox(
-                            height: 8,
-                          ),
-
-                          Text(
-                            "${filteredAdmins.length} admins found",
-                            style:
-                                const TextStyle(
-                              color: AppColors
-                                  .textSecondary,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius:
+                                  BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary
+                                      .withOpacity(0.25),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
                             ),
-                          ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  height: 70,
+                                  width: 70,
+                                  padding:
+                                      const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius:
+                                        BorderRadius.circular(
+                                      16,
+                                    ),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius:
+                                        BorderRadius.circular(
+                                      12,
+                                    ),
+                                    child: Image.asset(
+                                      "assets/images/app_logo2.png",
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                ),
 
-                          const SizedBox(
-                            height: 24,
+                                const SizedBox(width: 16),
+
+                                const Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Super Admin",
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight:
+                                              FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+
+                                      SizedBox(height: 6),
+
+                                      Text(
+                                        "District Wise Admin Management",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.white70,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
 
                           /// SEARCH
@@ -702,11 +754,14 @@ class _AdminsScreenState
                                         style:
                                             ElevatedButton.styleFrom(
                                           backgroundColor:
-                                              Colors.red,
+                                              const Color.fromARGB(255, 228, 46, 33),
                                         ),
                                         child:
                                             const Text(
                                           "Delete Admin",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          )
                                         ),
                                       ),
                                     ),

@@ -28,6 +28,26 @@ class MentorService {
     );
   }
 
+  /// =========================
+/// GET PROFILE
+/// =========================
+
+static Future<Map<String, dynamic>>
+    getProfile() async {
+  final options =
+      await _getOptions();
+
+  final response =
+      await _dio.get(
+    "$baseUrl/profile",
+    options: options,
+  );
+
+  return Map<String, dynamic>.from(
+    response.data,
+  );
+}
+
   /// ====================================
   /// DASHBOARD
   /// ====================================

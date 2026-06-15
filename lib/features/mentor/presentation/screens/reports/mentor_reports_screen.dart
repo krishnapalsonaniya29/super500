@@ -101,161 +101,299 @@ class _MentorReportsScreenState
       backgroundColor:
           AppColors.background,
 
-      appBar: AppBar(
-        backgroundColor:
-            AppColors.primary,
-
-        elevation: 0,
-
-        title: const Text(
-          "Mentor Reports",
-        ),
-      ),
+      
 
       body: RefreshIndicator(
         onRefresh: loadReports,
-
-        child: reports.isEmpty
-            ? ListView(
-                physics:
-                    const AlwaysScrollableScrollPhysics(),
-
-                children: const [
-                  SizedBox(
-                    height: 250,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            /// HEADER
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              margin: const EdgeInsets.only(
+                bottom: 20,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius:
+                    BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary
+                        .withOpacity(0.25),
+                    blurRadius: 12,
+                    offset:
+                        const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    height: 70,
+                    width: 70,
+                    padding:
+                        const EdgeInsets.all(8),
+                    decoration:
+                        BoxDecoration(
+                      color: Colors.white,
+                      borderRadius:
+                          BorderRadius.circular(
+                        16,
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius:
+                          BorderRadius.circular(
+                        12,
+                      ),
+                      child: Image.asset(
+                        "assets/images/app_logo2.png",
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                   ),
 
-                  Center(
-                    child: Text(
-                      "No reports found",
+                  const SizedBox(
+                    width: 16,
+                  ),
+
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment
+                              .start,
+                      children: [
+                        Text(
+                          "Mentor Reports",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight:
+                                FontWeight.bold,
+                            color:
+                                Colors.white,
+                          ),
+                        ),
+
+                        SizedBox(
+                          height: 4,
+                        ),
+
+                        Text(
+                          "Create and monitor student reports.",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color:
+                                Colors.white70,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
-              )
-            : ListView.builder(
-                padding:
-                    const EdgeInsets.all(
-                  16,
-                ),
+              ),
+            ),
 
-                itemCount:
-                    reports.length,
+            /// EMPTY STATE
+            if (reports.isEmpty)
+              Column(
+                children: [
+                  const SizedBox(
+                    height: 80,
+                  ),
 
-                itemBuilder:
-                    (context, index) {
-                  final report =
-                      reports[index];
+                  Icon(
+                    Icons.assignment_outlined,
+                    size: 70,
+                    color:
+                        Colors.grey.shade400,
+                  ),
 
-                  final student =
-                      report["student"] ??
-                          {};
+                  const SizedBox(
+                    height: 16,
+                  ),
 
-                  final user =
-                      student["user"] ??
-                          {};
-
-                  final studentName =
-                      user["fullName"] ??
-                          "";
-
-                  final reportType =
-                      report["reportType"] ??
-                          "";
-
-                  final content =
-                      report["content"] ??
-                          "";
-
-                  return Card(
-                    margin:
-                        const EdgeInsets.only(
-                      bottom: 14,
+                  const Text(
+                    "No reports found",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight:
+                          FontWeight.bold,
                     ),
+                  ),
 
-                    shape:
-                        RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(
-                        14,
+                  const SizedBox(
+                    height: 8,
+                  ),
+
+                  const Text(
+                    "Create a report using the + button.",
+                    textAlign:
+                        TextAlign.center,
+                  ),
+                ],
+              ),
+
+            /// REPORT CARDS
+            ...reports.map(
+              (report) {
+                final student =
+                    report["student"] ??
+                        {};
+
+                final user =
+                    student["user"] ??
+                        {};
+
+                final studentName =
+                    user["fullName"] ??
+                        "";
+
+                final reportType =
+                    report["reportType"] ??
+                        "";
+
+                final content =
+                    report["content"] ??
+                        "";
+
+                return Container(
+                  margin:
+                      const EdgeInsets.only(
+                    bottom: 16,
+                  ),
+                  padding:
+                      const EdgeInsets.all(
+                    16,
+                  ),
+                  decoration:
+                      BoxDecoration(
+                    color: Colors.white,
+                    borderRadius:
+                        BorderRadius
+                            .circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black
+                            .withOpacity(
+                          0.04,
+                        ),
+                        blurRadius: 8,
+                        offset:
+                            const Offset(
+                          0,
+                          4,
+                        ),
                       ),
-                    ),
-
-                    child: ListTile(
-                      contentPadding:
-                          const EdgeInsets.all(
-                        14,
-                      ),
-
-                      leading:
-                          CircleAvatar(
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 28,
                         backgroundColor:
                             getReportColor(
-                          reportType,
-                        ),
-
-                        child: const Icon(
-                          Icons.assignment,
-
-                          color:
-                              Colors.white,
-                        ),
-                      ),
-
-                      title: Text(
-                        studentName,
-
-                        style:
-                            const TextStyle(
-                          fontWeight:
-                              FontWeight.bold,
-                        ),
-                      ),
-
-                      subtitle: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment
-                                .start,
-
-                        children: [
-                          const SizedBox(
-                            height: 6,
-                          ),
-
-                          Text(
-                            reportType,
-
-                            style:
-                                TextStyle(
-                              color:
-                                  getReportColor(
-                                reportType,
-                              ),
-
-                              fontWeight:
-                                  FontWeight
-                                      .w600,
+                              reportType,
+                            ).withOpacity(
+                              0.15,
                             ),
+                        child: Icon(
+                          Icons.assignment,
+                          color:
+                              getReportColor(
+                            reportType,
                           ),
-
-                          const SizedBox(
-                            height: 6,
-                          ),
-
-                          Text(
-                            content,
-
-                            maxLines: 3,
-
-                            overflow:
-                                TextOverflow
-                                    .ellipsis,
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
+
+                      const SizedBox(
+                        width: 16,
+                      ),
+
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment:
+                              CrossAxisAlignment
+                                  .start,
+                          children: [
+                            Text(
+                              studentName,
+                              style:
+                                  const TextStyle(
+                                fontSize: 16,
+                                fontWeight:
+                                    FontWeight
+                                        .bold,
+                              ),
+                            ),
+
+                            const SizedBox(
+                              height: 8,
+                            ),
+
+                            Container(
+                              padding:
+                                  const EdgeInsets.symmetric(
+                                horizontal:
+                                    10,
+                                vertical: 4,
+                              ),
+                              decoration:
+                                  BoxDecoration(
+                                color:
+                                    getReportColor(
+                                  reportType,
+                                ).withOpacity(
+                                  0.12,
+                                ),
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  12,
+                                ),
+                              ),
+                              child: Text(
+                                reportType,
+                                style:
+                                    TextStyle(
+                                  color:
+                                      getReportColor(
+                                    reportType,
+                                  ),
+                                  fontWeight:
+                                      FontWeight
+                                          .w600,
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(
+                              height: 8,
+                            ),
+
+                            Text(
+                              content,
+                              maxLines: 3,
+                              overflow:
+                                  TextOverflow
+                                      .ellipsis,
+                              style:
+                                  const TextStyle(
+                                color: AppColors
+                                    .textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
 
       floatingActionButton:

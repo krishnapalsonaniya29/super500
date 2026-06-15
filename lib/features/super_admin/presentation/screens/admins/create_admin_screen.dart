@@ -446,8 +446,10 @@ class _CreateAdminScreenState
                       : const Text(
                           "Create Admin",
 
+
                           style: TextStyle(
                             fontSize: 17,
+                            color: Colors.white,
 
                             fontWeight:
                                 FontWeight

@@ -48,7 +48,9 @@ class _SuperAdminHomeScreenState
       final response =
           await SuperAdminService
               .getDashboardStats();
-
+print(
+  "DASHBOARD DATA => ${response["data"]}",
+);
       if (response["success"] !=
           true) {
         throw Exception(
@@ -190,80 +192,84 @@ class _SuperAdminHomeScreenState
 
                         children: [
                           /// HEADER
-                          Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment
-                                    .spaceBetween,
-
-                            children: [
-                              Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment
-                                        .start,
-
-                                children:
-                                    const [
-                                  Text(
-                                    "Super Admin",
-
-                                    style:
-                                        TextStyle(
-                                      fontSize:
-                                          30,
-
-                                      fontWeight:
-                                          FontWeight
-                                              .bold,
-
-                                      fontFamily:
-                                          'Poppins',
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(20),
+                            margin: const EdgeInsets.only(
+                              bottom: 20,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius:
+                                  BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary
+                                      .withOpacity(0.25),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  height: 70,
+                                  width: 70,
+                                  padding:
+                                      const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius:
+                                        BorderRadius.circular(
+                                      16,
                                     ),
                                   ),
-
-                                  SizedBox(
-                                    height:
-                                        6,
-                                  ),
-
-                                  Text(
-                                    "Scholarship Control Center",
-
-                                    style:
-                                        TextStyle(
-                                      color:
-                                          AppColors.textSecondary,
+                                  child: ClipRRect(
+                                    borderRadius:
+                                        BorderRadius.circular(
+                                      12,
+                                    ),
+                                    child: Image.asset(
+                                      "assets/images/app_logo2.png",
+                                      fit: BoxFit.contain,
                                     ),
                                   ),
-                                ],
-                              ),
-
-                              Container(
-                                padding:
-                                    const EdgeInsets.all(
-                                  14,
                                 ),
 
-                                decoration:
-                                    BoxDecoration(
-                                  color:
-                                      Colors.white,
+                                const SizedBox(width: 16),
 
-                                  borderRadius:
-                                      BorderRadius.circular(
-                                    18,
+                                const Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Super Admin",
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight:
+                                              FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+
+                                      SizedBox(height: 6),
+
+                                      Text(
+                                        "Scholarship Control Center",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.white70,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-
-                                child:
-                                    const Icon(
-                                  Icons
-                                      .admin_panel_settings_rounded,
-
-                                  color:
-                                      AppColors.primary,
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
 
                           const SizedBox(
@@ -308,15 +314,10 @@ class _SuperAdminHomeScreenState
 
                               children: [
                                 const Text(
-                                  "Total Scholarship Disbursed",
-
-                                  style:
-                                      TextStyle(
-                                    color:
-                                        Colors.white70,
-
-                                    fontSize:
-                                        15,
+                                  "Total Scholarship Allotted",
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 15,
                                   ),
                                 ),
 
@@ -326,18 +327,11 @@ class _SuperAdminHomeScreenState
                                 ),
 
                                 Text(
-                                  "₹ ${stats?["totalDisbursed"] ?? 0}",
-
-                                  style:
-                                      const TextStyle(
-                                    color:
-                                        Colors.white,
-
-                                    fontSize:
-                                        38,
-
-                                    fontWeight:
-                                        FontWeight.bold,
+                                  "₹ ${stats?["totalAllottedAmount"] ?? 0}",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 38,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
 
@@ -503,72 +497,57 @@ class _SuperAdminHomeScreenState
     );
   }
 }
-
-class DashboardStatCard
-    extends StatelessWidget {
+class DashboardStatCard extends StatelessWidget {
   final String title;
-
   final String value;
-
   final IconData icon;
+
+  final Color iconColor;
+  final Color backgroundColor;
 
   const DashboardStatCard({
     super.key,
     required this.title,
     required this.value,
     required this.icon,
+    this.iconColor = AppColors.primary,
+    this.backgroundColor = Colors.white,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding:
-          const EdgeInsets.all(
-        20,
-      ),
+      padding: const EdgeInsets.all(20),
 
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: backgroundColor,
 
-        borderRadius:
-            BorderRadius.circular(
-          24,
-        ),
+        borderRadius: BorderRadius.circular(24),
 
         boxShadow: [
           BoxShadow(
-            color: Colors.black
-                .withValues(
-                  alpha: 0.04,
-                ),
-
-            blurRadius: 8,
-
-            offset:
-                const Offset(0, 4),
+            color: Colors.black.withValues(
+              alpha: 0.05,
+            ),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
 
       child: Column(
         crossAxisAlignment:
-            CrossAxisAlignment
-                .start,
+            CrossAxisAlignment.start,
 
         children: [
           Container(
             padding:
-                const EdgeInsets.all(
-              14,
-            ),
+                const EdgeInsets.all(14),
 
-            decoration:
-                BoxDecoration(
-              color: AppColors
-                  .primary
-                  .withValues(
-                    alpha: 0.1,
-                  ),
+            decoration: BoxDecoration(
+              color: iconColor.withValues(
+                alpha: 0.12,
+              ),
 
               borderRadius:
                   BorderRadius.circular(
@@ -578,9 +557,8 @@ class DashboardStatCard
 
             child: Icon(
               icon,
-
-              color:
-                  AppColors.primary,
+              color: iconColor,
+              size: 26,
             ),
           ),
 
@@ -588,23 +566,29 @@ class DashboardStatCard
 
           Text(
             value,
+            maxLines: 1,
+            overflow:
+                TextOverflow.ellipsis,
 
             style: const TextStyle(
-              fontSize: 30,
-
+              fontSize: 28,
               fontWeight:
                   FontWeight.bold,
+              fontFamily: 'Poppins',
             ),
           ),
 
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
 
           Text(
             title,
 
             style: const TextStyle(
-              color: AppColors
-                  .textSecondary,
+              color:
+                  AppColors.textSecondary,
+              fontSize: 14,
+              fontWeight:
+                  FontWeight.w500,
             ),
           ),
         ],

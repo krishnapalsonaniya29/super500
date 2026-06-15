@@ -55,14 +55,18 @@ class AdminService {
   /// VERIFY STUDENT
   /// =====================================
 
-  static Future verifyStudent(
-    String id,
-  ) async {
-    return await _dio.put(
-      "$baseUrl/verify-student/$id",
-    );
-  }
-
+static Future verifyStudent(
+  String id,
+  double allottedAmount,
+) async {
+  return await _dio.put(
+    "$baseUrl/verify-student/$id",
+    data: {
+      "allottedAmount":
+          allottedAmount,
+    },
+  );
+}
   /// =====================================
   /// REJECT STUDENT
   /// =====================================
@@ -200,5 +204,33 @@ static Future<Map<String, dynamic>>
 
   return response.data;
 }
-}
 
+
+/// =====================================
+/// update achievement status
+/// =====================================
+static Future<void>
+    updateAchievementStatus({
+  required String achievementId,
+  required String status,
+}) async {
+
+  print(
+    "UPDATING ACHIEVEMENT => "
+    "$achievementId : $status",
+  );
+
+  final response =
+      await _dio.put(
+    "$baseUrl/achievements/$achievementId/status",
+    data: {
+      "status": status,
+    },
+  );
+
+  print(
+    "ACHIEVEMENT RESPONSE => "
+    "${response.data}",
+  );
+}
+}

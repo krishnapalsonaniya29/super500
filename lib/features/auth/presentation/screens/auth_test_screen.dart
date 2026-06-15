@@ -29,7 +29,10 @@ class _AuthTestScreenState
       });
 
       final data = await AuthService.sendOtp(
-        phoneController.text.trim(),
+  phone:
+      phoneController.text.trim(),
+  role: "ADMIN",
+
       );
 
       setState(() {

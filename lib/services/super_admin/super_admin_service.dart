@@ -176,4 +176,55 @@ class SuperAdminService {
       "$baseUrl/delete-mentor/$id",
     );
   }
+
+  /// =====================================
+/// Edit Alloted Amount
+/// ====================================
+static Future<Map<String, dynamic>>
+    updateScholarshipAmount({
+  required String studentId,
+  required double amount,
+}) async {
+  final response =
+      await _dio.patch(
+    "$baseUrl/students/$studentId/allotment",
+
+    data: {
+      "amount": amount,
+    },
+  );
+
+  return response.data;
 }
+
+/// ====================================
+/// GET STUDENT RANKINGS
+/// ====================================
+
+static Future<Map<String, dynamic>>
+    getStudentRanking() async {
+  final response =
+      await _dio.get(
+    "$baseUrl/students/ranking",
+  );
+
+  return response.data;
+}
+
+// /// ====================================
+// /// GET STUDENT DETAILS
+// /// ====================================
+
+// static Future<Map<String, dynamic>>
+//     getStudentDetails(
+//   String studentId,
+// ) async {
+//   final response =
+//       await _dio.get(
+//     "$baseUrl/students/$studentId",
+//   );
+
+//   return response.data;
+// }
+}
+

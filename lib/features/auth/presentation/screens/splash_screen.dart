@@ -1,87 +1,4 @@
-// import 'dart:async';
 
-// import 'package:flutter/material.dart';
-
-// import '../../../../theme/app_colors.dart';
-// import 'role_selection_screen.dart';
-
-// class SplashScreen extends StatefulWidget {
-//   const SplashScreen({super.key});
-
-//   @override
-//   State<SplashScreen> createState() => _SplashScreenState();
-// }
-
-// class _SplashScreenState extends State<SplashScreen> {
-//   @override
-//   void initState() {
-//     super.initState();
-
-//     Timer(const Duration(seconds: 3), () {
-//       if (!mounted) return;
-    
-//       Navigator.pushReplacement(
-//         context,
-//         MaterialPageRoute(
-//           builder: (_) => const RoleSelectionScreen(),
-//         ),
-//       );
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: AppColors.primary,
-
-//       body: Center(
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: [
-//             Container(
-//               height: 140,
-//               width: 140,
-//               padding: const EdgeInsets.all(16),
-
-//               decoration: BoxDecoration(
-//                 color: Colors.white,
-//                 borderRadius: BorderRadius.circular(32),
-//               ),
-
-//               child: Image.asset(
-//                 'assets/images/app_logo.png',
-//                 fit: BoxFit.contain,
-//               ),
-//             ),
-
-//             const SizedBox(height: 28),
-
-//             const Text(
-//               'Super 500',
-//               style: TextStyle(
-//                 color: Colors.white,
-//                 fontSize: 34,
-//                 fontWeight: FontWeight.bold,
-//                 letterSpacing: 1,
-//               ),
-//             ),
-
-//             const SizedBox(height: 10),
-
-//             const Text(
-//               'Scholarship & Mentorship Platform',
-//               style: TextStyle(
-//                 color: Colors.white70,
-//                 fontSize: 16,
-//                 fontWeight: FontWeight.w400,
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
 
 import 'dart:async';
 
@@ -94,6 +11,7 @@ import '../../../../theme/app_colors.dart';
 import '../../../student/presentation/screens/student_dashboard_screen.dart';
 
 import 'role_selection_screen.dart';
+import '../../../student/presentation/screens/student_approval_status_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -133,13 +51,46 @@ class _SplashScreenState
       if (!mounted) return;
 
       if (role == "STUDENT") {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) =>
-                const StudentDashboardScreen(),
-          ),
-        );
+        final user =
+            await AuthService.getCurrentUser();
+
+        final student =
+            user["studentProfile"];
+
+        if (student == null) {
+          navigateToRoleSelection();
+          return;
+        }
+
+        final verificationStatus =
+            student["verificationStatus"] ??
+            "PENDING";
+
+        if (!mounted) return;
+
+        if (verificationStatus ==
+            "APPROVED") {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  const StudentDashboardScreen(),
+            ),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  StudentApprovalStatusScreen(
+                studentProfile:
+                    Map<String, dynamic>.from(
+                  student,
+                ),
+              ),
+            ),
+          );
+        }
 
         return;
       }
@@ -186,7 +137,7 @@ class _SplashScreenState
               ),
 
               child: Image.asset(
-                'assets/images/app_logo.png',
+                'assets/images/app_logo2.png',
                 fit: BoxFit.contain,
               ),
             ),

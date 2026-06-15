@@ -285,4 +285,57 @@ static Future<Map<String, dynamic>>
       ),
     );
   }
+
+  /// ====================================
+  /// FINANCIAL SUMMARY 
+  /// ====================================
+static Future<Map<String, dynamic>>
+    getFinancialSummary() async {
+
+  final response =
+      await _dio.get(
+    "$baseUrl/financial-summary",
+    options:
+        await _getOptions(),
+  );
+
+  return response.data;
+}
+
+
+
+
+/// ====================================
+/// CREATE ACHIEVEMENT
+/// ====================================
+static Future<Map<String, dynamic>>
+    createAchievement({
+  required String title,
+  required String description,
+  MultipartFile? proof,
+}) async {
+  final formData = FormData.fromMap({
+    "title": title,
+    "description": description,
+    "proof": proof,
+  });
+
+  final response = await _dio.post(
+    "$baseUrl/achievements",
+    data: formData,
+    options: Options(
+      headers: {
+        "Authorization":
+            "Bearer ${await AuthService.getToken()}",
+        "Content-Type":
+            "multipart/form-data",
+      },
+    ),
+  );
+
+  return Map<String, dynamic>.from(
+    response.data,
+  );
+}
+
 }

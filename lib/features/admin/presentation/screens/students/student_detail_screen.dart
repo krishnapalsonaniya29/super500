@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../theme/app_colors.dart';
 import 'student_expenses_screen.dart';
+import '../../../../../services/admin/admin_service.dart';
 class StudentDetailScreen
     extends StatelessWidget {
   final Map<String, dynamic>
@@ -48,6 +49,42 @@ class StudentDetailScreen
         student[
                 "verificationStatus"] ??
             "PENDING";
+    
+    final allottedAmount =
+        double.tryParse(
+              student["allottedAmount"]
+                  ?.toString() ??
+                  "0",
+            ) ??
+            0;
+
+    final approvedExpenses =
+        expenses.where((expense) {
+      return expense["status"] ==
+          "APPROVED";
+    }).toList();
+
+    double usedAmount = 0;
+
+    for (final expense
+        in approvedExpenses) {
+      usedAmount +=
+          double.tryParse(
+                expense["amount"]
+                    .toString(),
+              ) ??
+              0;
+    }
+
+    final remainingAmount =
+        allottedAmount - usedAmount;
+
+    final utilizationPercentage =
+        allottedAmount > 0
+            ? (usedAmount /
+                    allottedAmount)
+                .clamp(0.0, 1.0)
+            : 0.0;
 
     return Scaffold(
       backgroundColor:
@@ -216,6 +253,64 @@ class StudentDetailScreen
               height: 28,
             ),
 
+            /// SCHOLARSHIP FUND
+            buildSectionTitle(
+              "Scholarship Fund",
+            ),
+
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius:
+                    BorderRadius.circular(20),
+              ),
+              child: Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
+                  buildInfoRow(
+                    "Allotted",
+                    "₹${allottedAmount.toStringAsFixed(0)}",
+                  ),
+
+                  buildInfoRow(
+                    "Used",
+                    "₹${usedAmount.toStringAsFixed(0)}",
+                  ),
+
+                  buildInfoRow(
+                    "Remaining",
+                    "₹${remainingAmount.toStringAsFixed(0)}",
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  ClipRRect(
+                    borderRadius:
+                        BorderRadius.circular(10),
+                    child:
+                        LinearProgressIndicator(
+                      value:
+                          utilizationPercentage,
+                      minHeight: 10,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Text(
+                    "${(utilizationPercentage * 100).toStringAsFixed(1)}% Fund Utilized",
+                    style: const TextStyle(
+                      fontWeight:
+                          FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
             /// DOCUMENTS
             buildSectionTitle(
               "Documents",
@@ -319,19 +414,12 @@ class StudentDetailScreen
             ),
 
             ...achievements.map(
-              (achievement) =>
-                  buildCard(
-                title:
-                    achievement[
-                            "title"] ??
-                        "-",
-
-                subtitle:
-                    achievement[
-                            "description"] ??
-                        "-",
-              ),
+            (achievement) =>
+                buildAchievementCard(
+              context,
+              achievement,
             ),
+          ),
 
             const SizedBox(
               height: 28,
@@ -501,6 +589,233 @@ class StudentDetailScreen
       ),
     );
   }
+
+
+  Widget buildAchievementCard(
+  BuildContext context,
+  Map<String, dynamic>
+      achievement,
+) {
+  final status =
+      achievement["status"] ??
+      "PENDING";
+
+  return Container(
+    margin:
+        const EdgeInsets.only(
+      bottom: 16,
+    ),
+
+    padding:
+        const EdgeInsets.all(
+      16,
+    ),
+
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius:
+          BorderRadius.circular(
+        20,
+      ),
+    ),
+
+    child: Column(
+      crossAxisAlignment:
+          CrossAxisAlignment.start,
+      children: [
+
+        if (achievement[
+                "proofImageUrl"] !=
+            null)
+          ClipRRect(
+            borderRadius:
+                BorderRadius.circular(
+              16,
+            ),
+            child: GestureDetector(
+  onTap: () {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return Dialog(
+          insetPadding:
+              const EdgeInsets.all(
+            12,
+          ),
+          child: InteractiveViewer(
+            child: Image.network(
+              achievement[
+                  "proofImageUrl"],
+              fit: BoxFit.contain,
+            ),
+          ),
+        );
+      },
+    );
+  },
+  child: Image.network(
+    achievement[
+        "proofImageUrl"],
+    height: 220,
+    width: double.infinity,
+    fit: BoxFit.cover,
+  ),
+),
+          ),
+
+        const SizedBox(
+          height: 12,
+        ),
+
+        Text(
+          achievement["title"] ??
+              "-",
+          style:
+              const TextStyle(
+            fontSize: 18,
+            fontWeight:
+                FontWeight.bold,
+          ),
+        ),
+
+        const SizedBox(
+          height: 6,
+        ),
+
+        Text(
+          achievement[
+                  "description"] ??
+              "-",
+        ),
+
+        const SizedBox(
+          height: 12,
+        ),
+
+        Row(
+          children: [
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 6,
+              ),
+              decoration:
+                  BoxDecoration(
+                color:
+                    getStatusColor(
+                  status,
+                ).withValues(
+                  alpha: 0.1,
+                ),
+                borderRadius:
+                    BorderRadius.circular(
+                  20,
+                ),
+              ),
+              child: Text(
+                status,
+                style: TextStyle(
+                  color:
+                      getStatusColor(
+                    status,
+                  ),
+                  fontWeight:
+                      FontWeight.bold,
+                ),
+              ),
+            ),
+
+            const Spacer(),
+
+            if (status == "PENDING") ...[
+              ElevatedButton(
+                onPressed: () async {
+                  try {
+                    await AdminService
+                        .updateAchievementStatus(
+                      achievementId:
+                          achievement["id"],
+                      status: "APPROVED",
+                    );
+
+                    achievement["status"] =
+                        "APPROVED";
+
+                    (context as Element)
+                        .markNeedsBuild();
+
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          "Achievement approved",
+                        ),
+                      ),
+                    );
+                  } catch (e) {
+                    debugPrint(
+                      "Approve Error: $e",
+                    );
+                  }
+                },
+                child: const Text(
+                  "Approve",
+                ),
+              ),
+
+              const SizedBox(
+                width: 8,
+              ),
+
+              ElevatedButton(
+                onPressed: () async {
+                  try {
+                    await AdminService
+                        .updateAchievementStatus(
+                      achievementId:
+                          achievement["id"],
+                      status: "REJECTED",
+                    );
+
+                    achievement["status"] =
+                        "REJECTED";
+
+                    (context as Element)
+                        .markNeedsBuild();
+
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          "Achievement rejected",
+                        ),
+                      ),
+                    );
+                  } catch (e) {
+                    debugPrint(
+                      "Reject Error: $e",
+                    );
+                  }
+                },
+                style:
+                    ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Colors.red,
+                ),
+                child: const Text(
+                  "Reject",
+                ),
+              ),
+            ]
+          ],
+        ),
+      ],
+    ),
+  );
+}
 
   Widget buildInfoRow(
     String title,

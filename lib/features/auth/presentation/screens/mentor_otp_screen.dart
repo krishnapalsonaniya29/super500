@@ -134,12 +134,7 @@ Future<void> verifyOtp() async {
       backgroundColor:
           AppColors.background,
 
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor:
-            Colors.transparent,
-      ),
-
+      
       body: SafeArea(
         child: SingleChildScrollView(
           padding:
@@ -153,31 +148,116 @@ Future<void> verifyOtp() async {
                   CrossAxisAlignment.start,
 
               children: [
-                const SizedBox(
-                  height: 40,
-                ),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius:
+                        BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary
+                            .withOpacity(0.25),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            height: 70,
+                            width: 70,
+                            padding:
+                                const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.circular(
+                                16,
+                              ),
+                            ),
+                            child: ClipRRect(
+                              borderRadius:
+                                  BorderRadius.circular(
+                                12,
+                              ),
+                              child: Image.asset(
+                                "assets/images/app_logo2.png",
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
 
-                const Text(
-                  "OTP Verification",
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight:
-                        FontWeight.bold,
+                          const SizedBox(width: 16),
+
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Mentor Portal",
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight:
+                                        FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  "Super 500 Mentorship System",
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      Image.asset(
+                        "assets/images/mentor_role.png",
+                        height: 120,
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      const Text(
+                        "Verify OTP",
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      Text(
+                        "Enter the OTP sent to\n${widget.phone}",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color:
+                              Colors.white.withOpacity(
+                            0.85,
+                          ),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
-                const SizedBox(
-                  height: 12,
-                ),
-
-                Text(
-                  "Enter the OTP sent to ${widget.phone}",
-                  style: TextStyle(
-                    color: Colors
-                        .grey.shade600,
-                    fontSize: 15,
-                  ),
-                ),
+                const SizedBox(height: 24),
 
                 const SizedBox(
                   height: 40,

@@ -34,6 +34,77 @@ class _PendingStudentsScreenState
     fetchPendingStudents();
   }
 
+
+void showVerifyDialog(
+  String studentId,
+) {
+  final amountController =
+      TextEditingController();
+
+  debugPrint("VERIFY DIALOG OPENED");
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: const Text(
+        "Approve Student",
+      ),
+      content: TextField(
+        controller: amountController,
+        keyboardType:
+            TextInputType.number,
+        decoration:
+            const InputDecoration(
+          labelText:
+              "Allotted Amount",
+          hintText:
+              "Enter amount",
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text(
+            "Cancel",
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            final amount =
+                double.tryParse(
+              amountController.text,
+            );
+
+            if (amount == null ||
+                amount <= 0) {
+              ScaffoldMessenger.of(
+                      context)
+                  .showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    "Enter valid amount",
+                  ),
+                ),
+              );
+              return;
+            }
+
+            Navigator.pop(context);
+
+            await verifyStudent(
+              studentId,
+              amount,
+            );
+          },
+          child: const Text(
+            "Approve",
+          ),
+        ),
+      ],
+    ),
+  );
+}
   /// =====================================
   /// FETCH PENDING
   /// =====================================
@@ -75,42 +146,44 @@ class _PendingStudentsScreenState
   /// VERIFY
   /// =====================================
 
-  Future<void> verifyStudent(
-    String id,
-  ) async {
-    try {
-      setState(() {
-        actionLoading = true;
-      });
 
-      await AdminService
-          .verifyStudent(id);
+Future<void> verifyStudent(
+  String id,
+  double allottedAmount,
+) async {
+  try {
+    setState(() {
+      actionLoading = true;
+    });
 
-      await fetchPendingStudents();
+    await AdminService.verifyStudent(
+      id,
+      allottedAmount,
+    );
 
-      if (!mounted) return;
+    await fetchPendingStudents();
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-          backgroundColor:
-              Colors.green,
+    if (!mounted) return;
 
-          content: Text(
-            "Student verified successfully",
-          ),
+    ScaffoldMessenger.of(context)
+        .showSnackBar(
+      const SnackBar(
+        backgroundColor: Colors.green,
+        content: Text(
+          "Student verified successfully",
         ),
-      );
-    } catch (e) {
-      debugPrint(e.toString());
-    } finally {
-      if (mounted) {
-        setState(() {
-          actionLoading = false;
-        });
-      }
+      ),
+    );
+  } catch (e) {
+    debugPrint(e.toString());
+  } finally {
+    if (mounted) {
+      setState(() {
+        actionLoading = false;
+      });
     }
   }
+}
 
   Color getStatusColor(
     String status,
@@ -363,7 +436,10 @@ class _PendingStudentsScreenState
                                       actionLoading
                                           ? null
                                           : () {
-                                              verifyStudent(
+                                            debugPrint(
+                                              "VERIFY BUTTON CLICKED",
+                                            );
+                                              showVerifyDialog(
                                                 student["id"],
                                               );
                                             },

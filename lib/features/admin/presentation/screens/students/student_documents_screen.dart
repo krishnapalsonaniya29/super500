@@ -453,7 +453,7 @@ class _StudentDocumentsScreenState
                                   Icons.link,
                                   size: 18,
                                   color:
-                                      AppColors.primary,
+                                      Color.fromARGB(255, 30, 95, 50),
                                 ),
 
                                 const SizedBox(

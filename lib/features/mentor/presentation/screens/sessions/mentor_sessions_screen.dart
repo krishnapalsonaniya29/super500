@@ -136,131 +136,242 @@ class _MentorSessionsScreenState
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(
-        child: AppLoader(),
-      );
-    }
+@override
+Widget build(BuildContext context) {
+  if (isLoading) {
+    return const Center(
+      child: AppLoader(),
+    );
+  }
 
-    return Scaffold(
-      backgroundColor:
-          AppColors.background,
+  return Scaffold(
+    backgroundColor: AppColors.background,
 
-      appBar: AppBar(
-        title: const Text(
-          "Mentor Sessions",
-        ),
-
-        elevation: 0,
-
-        backgroundColor:
-            AppColors.primary,
-      ),
-
-      body: RefreshIndicator(
-        onRefresh: loadSessions,
-
-        child: sessions.isEmpty
-            ? ListView(
-                physics:
-                    const AlwaysScrollableScrollPhysics(),
-
-                children: const [
-                  SizedBox(
-                    height: 250,
-                  ),
-
-                  Center(
-                    child: Text(
-                      "No sessions found",
+    body: RefreshIndicator(
+      onRefresh: loadSessions,
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          /// HEADER
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            margin: const EdgeInsets.only(
+              bottom: 20,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius:
+                  BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary
+                      .withOpacity(0.25),
+                  blurRadius: 12,
+                  offset:
+                      const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  height: 70,
+                  width: 70,
+                  padding:
+                      const EdgeInsets.all(8),
+                  decoration:
+                      BoxDecoration(
+                    color: Colors.white,
+                    borderRadius:
+                        BorderRadius
+                            .circular(
+                      16,
                     ),
                   ),
-                ],
-              )
-            : ListView.builder(
-                padding:
-                    const EdgeInsets.all(
-                  16,
+                  child: ClipRRect(
+                    borderRadius:
+                        BorderRadius
+                            .circular(
+                      12,
+                    ),
+                    child: Image.asset(
+                      "assets/images/app_logo2.png",
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
 
-                itemCount:
-                    sessions.length,
+                const SizedBox(
+                  width: 16,
+                ),
 
-                itemBuilder:
-                    (context, index) {
-                  final session =
-                      sessions[index];
-
-                  final student =
-                      session["student"] ??
-                          {};
-
-                  final user =
-                      student["user"] ??
-                          {};
-
-                  final studentName =
-                      user["fullName"] ??
-                          "";
-
-                  final status =
-                      session["status"] ??
-                          "SCHEDULED";
-
-                  return Card(
-                    margin:
-                        const EdgeInsets.only(
-                      bottom: 14,
-                    ),
-
-                    shape:
-                        RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(
-                        14,
-                      ),
-                    ),
-
-                    child: ListTile(
-                      contentPadding:
-                          const EdgeInsets.all(
-                        14,
-                      ),
-
-                      leading:
-                          CircleAvatar(
-                        backgroundColor:
-                            getStatusColor(
-                          status,
-                        ),
-
-                        child: const Icon(
-                          Icons.schedule,
-
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment
+                            .start,
+                    children: [
+                      Text(
+                        "Mentor Sessions",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight:
+                              FontWeight
+                                  .bold,
                           color:
                               Colors.white,
                         ),
                       ),
 
-                      title: Text(
-                        session["title"] ??
-                            "",
+                      SizedBox(
+                        height: 4,
                       ),
 
-                      subtitle: Column(
+                      Text(
+                        "Manage and track mentoring sessions.",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors
+                              .white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          /// EMPTY STATE
+          if (sessions.isEmpty)
+            Column(
+              children: [
+                const SizedBox(
+                  height: 80,
+                ),
+
+                Icon(
+                  Icons
+                      .schedule_outlined,
+                  size: 70,
+                  color: Colors
+                      .grey.shade400,
+                ),
+
+                const SizedBox(
+                  height: 16,
+                ),
+
+                const Text(
+                  "No sessions found",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight:
+                        FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(
+                  height: 8,
+                ),
+
+                const Text(
+                  "Create a mentoring session using the + button.",
+                  textAlign:
+                      TextAlign.center,
+                ),
+              ],
+            ),
+
+          /// SESSION CARDS
+          ...sessions.map(
+            (session) {
+              final student =
+                  session["student"] ??
+                      {};
+
+              final user =
+                  student["user"] ?? {};
+
+              final studentName =
+                  user["fullName"] ?? "";
+
+              final status =
+                  session["status"] ??
+                      "SCHEDULED";
+
+              return Container(
+                margin:
+                    const EdgeInsets.only(
+                  bottom: 16,
+                ),
+                padding:
+                    const EdgeInsets.all(
+                  16,
+                ),
+                decoration:
+                    BoxDecoration(
+                  color: Colors.white,
+                  borderRadius:
+                      BorderRadius
+                          .circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors
+                          .black
+                          .withOpacity(
+                        0.04,
+                      ),
+                      blurRadius: 8,
+                      offset:
+                          const Offset(
+                        0,
+                        4,
+                      ),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 28,
+                      backgroundColor:
+                          getStatusColor(
+                            status,
+                          ).withOpacity(
+                            0.15,
+                          ),
+                      child: Icon(
+                        Icons.schedule,
+                        color:
+                            getStatusColor(
+                          status,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(
+                      width: 16,
+                    ),
+
+                    Expanded(
+                      child: Column(
                         crossAxisAlignment:
                             CrossAxisAlignment
                                 .start,
-
                         children: [
-                          const SizedBox(
-                            height: 6,
-                          ),
-
                           Text(
-                            studentName,
+                            session["title"] ??
+                                "",
+                            style:
+                                const TextStyle(
+                              fontSize:
+                                  16,
+                              fontWeight:
+                                  FontWeight
+                                      .bold,
+                            ),
                           ),
 
                           const SizedBox(
@@ -268,80 +379,108 @@ class _MentorSessionsScreenState
                           ),
 
                           Text(
-                            status,
+                            studentName,
                             style:
-                                TextStyle(
+                                const TextStyle(
+                              color:
+                                  AppColors
+                                      .textSecondary,
+                            ),
+                          ),
+
+                          const SizedBox(
+                            height: 8,
+                          ),
+
+                          Container(
+                            padding:
+                                const EdgeInsets.symmetric(
+                              horizontal:
+                                  10,
+                              vertical: 4,
+                            ),
+                            decoration:
+                                BoxDecoration(
                               color:
                                   getStatusColor(
                                 status,
+                              ).withOpacity(
+                                0.12,
                               ),
-
-                              fontWeight:
-                                  FontWeight
-                                      .w600,
+                              borderRadius:
+                                  BorderRadius.circular(
+                                12,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-
-                      trailing:
-                          PopupMenuButton(
-                        enabled:
-                            !isUpdating,
-
-                        onSelected:
-                            (value) async {
-                          if (value ==
-                              "complete") {
-                            await markCompleted(
-                              session["id"],
-                            );
-                          }
-                        },
-
-                        itemBuilder:
-                            (_) => [
-                          const PopupMenuItem(
-                            value:
-                                "complete",
-
                             child: Text(
-                              "Mark Completed",
+                              status,
+                              style:
+                                  TextStyle(
+                                color:
+                                    getStatusColor(
+                                  status,
+                                ),
+                                fontWeight:
+                                    FontWeight
+                                        .w600,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                  );
-                },
-              ),
+
+                    PopupMenuButton(
+                      enabled:
+                          !isUpdating,
+                      onSelected:
+                          (value) async {
+                        if (value ==
+                            "complete") {
+                          await markCompleted(
+                            session["id"],
+                          );
+                        }
+                      },
+                      itemBuilder: (_) => [
+                        const PopupMenuItem(
+                          value:
+                              "complete",
+                          child: Text(
+                            "Mark Completed",
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
       ),
+    ),
 
-      floatingActionButton:
-          FloatingActionButton(
-        backgroundColor:
-            AppColors.gold,
+    floatingActionButton:
+        FloatingActionButton(
+      backgroundColor:
+          AppColors.primary,
+      onPressed: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const CreateSessionScreen(),
+          ),
+        );
 
-        onPressed: () async {
-          await Navigator.push(
-            context,
-
-            MaterialPageRoute(
-              builder:
-                  (_) =>
-                      const CreateSessionScreen(),
-            ),
-          );
-
-          await loadSessions();
-        },
-
-        child: const Icon(
-          Icons.add,
-
-          color: Colors.black,
-        ),
+        await loadSessions();
+      },
+      child: const Icon(
+        Icons.add,
+        color: Colors.white,
       ),
-    );
-  }
+    ),
+  );
+}
 }
