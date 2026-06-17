@@ -48,7 +48,7 @@ Future<void> sendOtp() async {
     await AuthService.sendOtp(
       phone:
           phoneController.text.trim(),
-      role: "ADMIN",
+      role: "STUDENT",
     );
 
     if (!mounted) return;
@@ -231,9 +231,7 @@ Future<void> verifyOtp() async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Student Login'),
-      ),
+      
 
       body: SafeArea(
   child: SingleChildScrollView(

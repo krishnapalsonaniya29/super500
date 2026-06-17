@@ -198,7 +198,7 @@ class _CreateReportScreenState
 
                           child: Text(
                             student["user"]
-                                    ["name"] ??
+                                    ["fullName"] ??
                                 "",
                           ),
                         );

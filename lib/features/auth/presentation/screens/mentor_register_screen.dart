@@ -116,14 +116,7 @@ Future<void> applyMentor() async {
       backgroundColor:
           AppColors.background,
 
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor:
-            Colors.transparent,
-        title: const Text(
-          'Mentor Registration',
-        ),
-      ),
+      
 
       body: SafeArea(
         child: SingleChildScrollView(
@@ -142,31 +135,131 @@ Future<void> applyMentor() async {
                   height: 20,
                 ),
 
-                const Text(
-                  "Become a Mentor",
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight:
-                        FontWeight.bold,
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius:
+                        BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary
+                            .withOpacity(0.25),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            height: 70,
+                            width: 70,
+                            padding:
+                                const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.circular(
+                                16,
+                              ),
+                            ),
+                            child: ClipRRect(
+                              borderRadius:
+                                  BorderRadius.circular(
+                                12,
+                              ),
+                              child: Image.asset(
+                                "assets/images/app_logo2.png",
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(width: 16),
+
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Mentor Registration",
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight:
+                                        FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+
+                                SizedBox(height: 4),
+
+                                Text(
+                                  "Super500 Mentorship Program",
+                                  style: TextStyle(
+                                    color:
+                                        Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      Image.asset(
+                        "assets/images/mentor_role.png",
+                        height: 120,
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      const Text(
+                        "Become a Mentor",
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight:
+                              FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      Text(
+                        "Guide, inspire and support talented Super500 students in their educational journey.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color:
+                              Colors.white.withOpacity(
+                            0.85,
+                          ),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 40),
+                
 
-                Text(
-                  "Guide and mentor Super500 students",
+                const SizedBox(height: 20),const Text(
+                  "Application Details",
                   style: TextStyle(
-                    color: Colors
-                        .grey.shade600,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
 
-                const SizedBox(
-                  height: 40,
-                ),
-
+                const SizedBox(height: 20),
                 CustomTextField(
                   hintText:
                       'Full Name',

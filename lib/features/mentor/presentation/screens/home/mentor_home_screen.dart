@@ -149,7 +149,7 @@ class _MentorHomeScreenState
 
                     const SizedBox(width: 16),
 
-                    const Expanded(
+                     Expanded(
                       child: Column(
                         crossAxisAlignment:
                             CrossAxisAlignment.start,
@@ -168,7 +168,9 @@ class _MentorHomeScreenState
 
                           Text(
                             "Manage students, sessions and mentoring activities.",
-                            style: TextStyle(
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
                               fontSize: 14,
                               color: Colors.white70,
                             ),
@@ -262,7 +264,7 @@ class _MentorHomeScreenState
 
                   padding:
                       const EdgeInsets.all(
-                    20,
+                    24,
                   ),
 
                   decoration:

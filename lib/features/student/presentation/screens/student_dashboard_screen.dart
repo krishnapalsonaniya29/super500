@@ -63,8 +63,8 @@ class _StudentDashboardScreenState
 
           gradient: const LinearGradient(
             colors: [
-              Color(0xFF0A1931),
-              Color(0xFF13294B),
+              Color(0xFF319699),
+              Color(0xFF319699),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -92,7 +92,7 @@ class _StudentDashboardScreenState
             backgroundColor: Colors.transparent,
             elevation: 0,
 
-            selectedItemColor: const Color(0xFFD4AF37),
+            selectedItemColor: const Color.fromARGB(255, 255, 196, 0),
             unselectedItemColor: Colors.white70,
 
             selectedLabelStyle: const TextStyle(

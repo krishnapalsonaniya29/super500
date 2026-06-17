@@ -225,7 +225,7 @@ class _SessionsScreenState
                     padding:
                         const EdgeInsets.fromLTRB(
                       16,
-                      16,
+                      36,
                       16,
                       50,
                     ),

@@ -32,15 +32,15 @@ class DashboardCard extends StatelessWidget {
           ),
         ],
       ),
-
+      
       child: Row(
         children: [
           CircleAvatar(
             radius: 24,
-
             backgroundColor:
-                AppColors.secondary.withValues(alpha: 0.15),
-
+                AppColors.secondary.withOpacity(
+              0.15,
+            ),
             child: Icon(
               icon,
               color: AppColors.secondary,
@@ -49,21 +49,33 @@ class DashboardCard extends StatelessWidget {
 
           const SizedBox(width: 16),
 
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: AppTextStyles.small,
-              ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow:
+                      TextOverflow.ellipsis,
+                  style:
+                      AppTextStyles.small,
+                ),
 
-              const SizedBox(height: 4),
+                const SizedBox(height: 4),
 
-              Text(
-                value,
-                style: AppTextStyles.heading2,
-              ),
-            ],
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow:
+                      TextOverflow.ellipsis,
+                  style:
+                      AppTextStyles.heading2,
+                ),
+              ],
+            ),
           ),
         ],
       ),

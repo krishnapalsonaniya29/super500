@@ -145,7 +145,7 @@ Widget build(BuildContext context) {
                 width: double.infinity,
                 margin: const EdgeInsets.fromLTRB(
                   16,
-                  16,
+                  36,
                   16,
                   20,
                 ),
