@@ -48,7 +48,7 @@ class _SuperAdminHomeScreenState
       final response =
           await SuperAdminService
               .getDashboardStats();
-print(
+debugPrint(
   "DASHBOARD DATA => ${response["data"]}",
 );
       if (response["success"] !=
@@ -205,7 +205,7 @@ print(
                               boxShadow: [
                                 BoxShadow(
                                   color: AppColors.primary
-                                      .withOpacity(0.25),
+                                      .withValues(alpha:0.25),
                                   blurRadius: 12,
                                   offset: const Offset(0, 6),
                                 ),

@@ -261,7 +261,7 @@ Future<void> verifyOtp() async {
     borderRadius: BorderRadius.circular(24),
     boxShadow: [
       BoxShadow(
-        color: AppColors.primary.withOpacity(0.25),
+        color: AppColors.primary.withValues(alpha: 0.25),
         blurRadius: 12,
         offset: const Offset(0, 6),
       ),
@@ -346,7 +346,7 @@ Future<void> verifyOtp() async {
         "Login to continue your Super 500 journey",
         textAlign: TextAlign.center,
         style: TextStyle(
-          color: Colors.white.withOpacity(0.85),
+          color: Colors.white.withValues(alpha:0.85),
           fontSize: 14,
         ),
       ),
@@ -573,7 +573,7 @@ const SizedBox(height: 24),
               BoxDecoration(
             color:
                 Colors.orange
-                    .withOpacity(
+                    .withValues(alpha:
               0.08,
             ),
 

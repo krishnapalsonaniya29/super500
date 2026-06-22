@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../services/super_admin/super_admin_service.dart';
 import '../../../../../theme/app_colors.dart';
-
+import 'mentor_students_screen.dart';
 class MentorsScreen extends StatefulWidget {
   final Function(int index) onNavigate;
 
@@ -150,7 +150,7 @@ class _MentorsScreenState
                           boxShadow: [
                             BoxShadow(
                               color: AppColors.primary
-                                  .withOpacity(0.25),
+                                  .withValues(alpha:0.25),
                               blurRadius: 12,
                               offset: const Offset(0, 6),
                             ),
@@ -733,11 +733,21 @@ class _MentorsScreenState
             Expanded(
               child:
                   ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          MentorStudentsScreen(
+                        mentor: mentor,
+                      ),
+                    ),
+                  );
+                },
                 child: const Text(
                   "View Students",
                 ),
-              ),
+              ), 
             ),
 
             const SizedBox(

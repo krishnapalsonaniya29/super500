@@ -338,4 +338,18 @@ static Future<Map<String, dynamic>>
   );
 }
 
+
+
+/// ====================================
+/// MY RANK
+/// ====================================
+
+static Future<int> getMyRank() async {
+  final response = await _dio.get(
+    "/v1/student/my-rank",
+    options: await _getOptions(),
+  );
+
+  return response.data["rank"];
+}
 }

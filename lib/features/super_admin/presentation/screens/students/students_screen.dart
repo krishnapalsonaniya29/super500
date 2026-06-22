@@ -144,7 +144,7 @@ districts = ["All", ...districtList.toSet()];
                           boxShadow: [
                             BoxShadow(
                               color: AppColors.primary
-                                  .withOpacity(0.25),
+                                  .withValues(alpha:0.25),
                               blurRadius: 12,
                               offset: const Offset(0, 6),
                             ),

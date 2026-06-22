@@ -135,11 +135,12 @@ int totalReports = 0;
         ),
       );
     } finally {
-      if (!mounted) return;
+      if (mounted) {
 
       setState(() {
         isLoggingOut = false;
       });
+      }
     }
   }
 
@@ -162,7 +163,7 @@ Widget buildTile({
       boxShadow: [
         BoxShadow(
           color:
-              Colors.black.withOpacity(
+              Colors.black.withValues(alpha:
             0.03,
           ),
           blurRadius: 6,
@@ -174,7 +175,7 @@ Widget buildTile({
         CircleAvatar(
           backgroundColor:
               AppColors.primary
-                  .withOpacity(0.1),
+                  .withValues(alpha:0.1),
           child: Icon(
             icon,
             color:
@@ -244,7 +245,7 @@ Widget buildTile({
     boxShadow: [
       BoxShadow(
         color:
-            Colors.black.withOpacity(
+            Colors.black.withValues(alpha:
           0.05,
         ),
         blurRadius: 10,
@@ -318,7 +319,7 @@ Widget buildTile({
         radius: 45,
         backgroundColor:
             AppColors.primary
-                .withOpacity(0.1),
+                .withValues(alpha:0.1),
         child: Text(
           name.isNotEmpty
               ? name[0]
@@ -358,7 +359,7 @@ Widget buildTile({
         decoration: BoxDecoration(
           color:
               AppColors.primary
-                  .withOpacity(0.1),
+                  .withValues(alpha:0.1),
           borderRadius:
               BorderRadius.circular(
             20,

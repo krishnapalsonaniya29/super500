@@ -32,7 +32,7 @@ class _StudentDetailScreenState
     super.initState();
 
     student = widget.student;
-    print(student["expenses"]);
+    
   }
 
   Future<void> verifyStudent()
@@ -363,15 +363,7 @@ class _StudentDetailScreenState
       backgroundColor:
           AppColors.background,
 
-      appBar: AppBar(
-        elevation: 0,
-
-        backgroundColor: AppColors.primary,
-
-        title: const Text(
-          "Student Details",
-        ),
-      ),
+      
 
       body: loading
           ? const Center(
@@ -390,6 +382,86 @@ class _StudentDetailScreenState
                         .start,
 
                 children: [
+                  //header:
+                  Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  margin: const EdgeInsets.only(
+                    bottom: 20,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius:
+                        BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary
+                            .withValues(alpha: 0.25),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 70,
+                        width: 70,
+                        padding:
+                            const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius:
+                              BorderRadius.circular(
+                            16,
+                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius:
+                              BorderRadius.circular(
+                            12,
+                          ),
+                          child: Image.asset(
+                            "assets/images/app_logo2.png",
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 16),
+
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Student Details",
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight:
+                                    FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+
+                            SizedBox(height: 6),
+
+                            Text(
+                              "Details of Student",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      
+                    ],
+                  ),
+                ),
                   /// PROFILE
                   Container(
                     width:
@@ -1393,9 +1465,8 @@ Widget buildReportCard(
                                 InteractiveViewer(
                               child:
                                   Image.network(
-                                achievement[
-                                    "proofImageUrl"],
-                              ),
+                                    achievement["proofImageUrl"]?.toString() ?? "",
+                                  ),
                             ),
                           ),
                         ],
@@ -1610,9 +1681,8 @@ Widget buildExpenseTile(
                                     InteractiveViewer(
                                   child:
                                       Image.network(
-                                    expense[
-                                        "receiptUrl"],
-                                  ),
+                                        expense["receiptUrl"]?.toString() ?? "",
+                                      ),
                                 ),
                               ),
                             ],

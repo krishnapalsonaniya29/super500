@@ -122,7 +122,7 @@ class _MentorReportsScreenState
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.primary
-                        .withOpacity(0.25),
+                        .withValues(alpha:0.25),
                     blurRadius: 12,
                     offset:
                         const Offset(0, 6),
@@ -277,7 +277,7 @@ class _MentorReportsScreenState
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black
-                            .withOpacity(
+                            .withValues(alpha:
                           0.04,
                         ),
                         blurRadius: 8,
@@ -296,7 +296,7 @@ class _MentorReportsScreenState
                         backgroundColor:
                             getReportColor(
                               reportType,
-                            ).withOpacity(
+                            ).withValues(alpha:
                               0.15,
                             ),
                         child: Icon(
@@ -345,7 +345,7 @@ class _MentorReportsScreenState
                                 color:
                                     getReportColor(
                                   reportType,
-                                ).withOpacity(
+                                ).withValues(alpha:
                                   0.12,
                                 ),
                                 borderRadius:

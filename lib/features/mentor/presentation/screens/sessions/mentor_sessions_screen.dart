@@ -113,11 +113,12 @@ class _MentorSessionsScreenState
         ),
       );
     } finally {
-      if (!mounted) return;
+      if (mounted) {
 
       setState(() {
         isUpdating = false;
       });
+      }
     }
   }
 
@@ -166,7 +167,7 @@ Widget build(BuildContext context) {
               boxShadow: [
                 BoxShadow(
                   color: AppColors.primary
-                      .withOpacity(0.25),
+                      .withValues(alpha:0.25),
                   blurRadius: 12,
                   offset:
                       const Offset(0, 6),
@@ -320,7 +321,7 @@ Widget build(BuildContext context) {
                     BoxShadow(
                       color: Colors
                           .black
-                          .withOpacity(
+                          .withValues(alpha:
                         0.04,
                       ),
                       blurRadius: 8,
@@ -339,7 +340,7 @@ Widget build(BuildContext context) {
                       backgroundColor:
                           getStatusColor(
                             status,
-                          ).withOpacity(
+                          ).withValues(alpha:
                             0.15,
                           ),
                       child: Icon(
@@ -404,7 +405,7 @@ Widget build(BuildContext context) {
                               color:
                                   getStatusColor(
                                 status,
-                              ).withOpacity(
+                              ).withValues(alpha:
                                 0.12,
                               ),
                               borderRadius:

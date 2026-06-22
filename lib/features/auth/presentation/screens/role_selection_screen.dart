@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../theme/app_colors.dart';
-import '../widgets/role_card.dart';
+
 
 import 'admin_login_screen.dart';
 import 'mentor_login_screen.dart';
@@ -149,7 +149,7 @@ class RoleSelectionScreen extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white
-                          .withOpacity(0.15),
+                          .withValues(alpha: 0.15),
                       borderRadius:
                           BorderRadius.circular(
                         30,
@@ -344,7 +344,7 @@ class RoleCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color:
-                  Colors.black.withOpacity(0.05),
+                  Colors.black.withValues(alpha:0.05),
               blurRadius: 15,
               offset: const Offset(0, 6),
             ),

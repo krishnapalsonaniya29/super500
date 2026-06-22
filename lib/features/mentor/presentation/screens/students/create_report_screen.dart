@@ -103,11 +103,13 @@ class _CreateReportScreenState
 
     } finally {
 
-      if (!mounted) return;
-
-      setState(() {
+      if (mounted) {
+          setState(() {
         isLoading = false;
       });
+      }
+
+      
     }
   }
 

@@ -693,125 +693,121 @@ class StudentDetailScreen
         ),
 
         Row(
-          children: [
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 6,
-              ),
-              decoration:
-                  BoxDecoration(
-                color:
-                    getStatusColor(
-                  status,
-                ).withValues(
-                  alpha: 0.1,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
                 ),
-                borderRadius:
-                    BorderRadius.circular(
-                  20,
-                ),
-              ),
-              child: Text(
-                status,
-                style: TextStyle(
-                  color:
-                      getStatusColor(
+                decoration: BoxDecoration(
+                  color: getStatusColor(
                     status,
+                  ).withValues(
+                    alpha: 0.1,
                   ),
-                  fontWeight:
-                      FontWeight.bold,
+                  borderRadius:
+                      BorderRadius.circular(20),
+                ),
+                child: Text(
+                  status,
+                  style: TextStyle(
+                    color: getStatusColor(
+                      status,
+                    ),
+                    fontWeight:
+                        FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
 
-            const Spacer(),
+              const Spacer(),
 
-            if (status == "PENDING") ...[
-              ElevatedButton(
-                onPressed: () async {
-                  try {
-                    await AdminService
-                        .updateAchievementStatus(
-                      achievementId:
-                          achievement["id"],
-                      status: "APPROVED",
-                    );
+              if (status == "PENDING") ...[
+                ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      await AdminService
+                          .updateAchievementStatus(
+                        achievementId:
+                            achievement["id"],
+                        status: "APPROVED",
+                      );
 
-                    achievement["status"] =
-                        "APPROVED";
+                      achievement["status"] =
+                          "APPROVED";
 
-                    (context as Element)
-                        .markNeedsBuild();
+                      if (!context.mounted) return;
 
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          "Achievement approved",
+                      (context as Element)
+                          .markNeedsBuild();
+
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            "Achievement approved",
+                          ),
                         ),
-                      ),
-                    );
-                  } catch (e) {
-                    debugPrint(
-                      "Approve Error: $e",
-                    );
-                  }
-                },
-                child: const Text(
-                  "Approve",
+                      );
+                    } catch (e) {
+                      debugPrint(
+                        "Approve Error: $e",
+                      );
+                    }
+                  },
+                  child: const Text(
+                    "Approve",
+                  ),
                 ),
-              ),
 
-              const SizedBox(
-                width: 8,
-              ),
+                const SizedBox(width: 8),
 
-              ElevatedButton(
-                onPressed: () async {
-                  try {
-                    await AdminService
-                        .updateAchievementStatus(
-                      achievementId:
-                          achievement["id"],
-                      status: "REJECTED",
-                    );
+                ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      await AdminService
+                          .updateAchievementStatus(
+                        achievementId:
+                            achievement["id"],
+                        status: "REJECTED",
+                      );
 
-                    achievement["status"] =
-                        "REJECTED";
+                      achievement["status"] =
+                          "REJECTED";
 
-                    (context as Element)
-                        .markNeedsBuild();
+                      if (!context.mounted) return;
 
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          "Achievement rejected",
+                      (context as Element)
+                          .markNeedsBuild();
+
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            "Achievement rejected",
+                          ),
                         ),
-                      ),
-                    );
-                  } catch (e) {
-                    debugPrint(
-                      "Reject Error: $e",
-                    );
-                  }
-                },
-                style:
-                    ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Colors.red,
+                      );
+                    } catch (e) {
+                      debugPrint(
+                        "Reject Error: $e",
+                      );
+                    }
+                  },
+                  style:
+                      ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Colors.red,
+                  ),
+                  child: const Text(
+                    "Reject",
+                  ),
                 ),
-                child: const Text(
-                  "Reject",
-                ),
-              ),
-            ]
-          ],
-        ),
+              ],
+            ],
+          )
       ],
     ),
   );

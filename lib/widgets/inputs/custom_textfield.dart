@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/app_colors.dart';
-
+import 'package:flutter/services.dart';
 class CustomTextField
     extends StatelessWidget {
   final String hintText;
@@ -18,7 +18,12 @@ class CustomTextField
       validator;
 
   final int maxLines;
+  final List<TextInputFormatter>?
+    inputFormatters;
 
+final TextCapitalization
+    textCapitalization;
+  
   const CustomTextField({
     super.key,
 
@@ -33,21 +38,32 @@ class CustomTextField
 
     this.validator,
 
-    this.maxLines = 1,
+this.maxLines = 1,
+
+this.inputFormatters,
+
+this.textCapitalization =
+    TextCapitalization.none,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: controller,
+  controller: controller,
 
-      keyboardType: keyboardType,
+  keyboardType: keyboardType,
 
-      obscureText: obscureText,
+  obscureText: obscureText,
 
-      validator: validator,
+  validator: validator,
 
-      maxLines: maxLines,
+  maxLines: maxLines,
+
+  inputFormatters:
+      inputFormatters,
+
+  textCapitalization:
+      textCapitalization,
 
       decoration: InputDecoration(
         hintText: hintText,

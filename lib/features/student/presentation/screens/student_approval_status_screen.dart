@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../services/auth/auth_service.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:http_parser/http_parser.dart';
+
 import 'package:dio/dio.dart';
 import '../../../../services/student/student_service.dart';
 class StudentApprovalStatusScreen extends StatefulWidget {
@@ -175,7 +175,7 @@ if (file.bytes != null) {
 void initState() {
   super.initState();
 
-  print(widget.studentProfile);
+debugPrint(widget.studentProfile.toString());
 }
   @override
   Widget build(BuildContext context) {
@@ -455,7 +455,7 @@ void initState() {
                   onPressed: () async {
                     await AuthService.logout();
 
-                    if (!mounted) return;
+                    if (!context.mounted) return;
 
                     Navigator.pushNamedAndRemoveUntil(
                       context,

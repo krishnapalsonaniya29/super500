@@ -1,167 +1,8 @@
-// import 'package:dio/dio.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-
-// import '../../core/network/dio_client.dart';
-
-// class AuthService {
-//   static const String baseUrl =
-//       "/v1/auth";
-
-//   /// SEND OTP
-//   static Future<Map<String, dynamic>> sendOtp(
-//     String phone,
-//   ) async {
-//     try {
-//       final response =
-//           await DioClient.instance.post(
-//         "$baseUrl/send-otp",
-//         data: {
-//           "phone": phone,
-//         },
-//       );
-
-     
-     
-
-//       return response.data;
-//     } catch (e) {
-    
-
-//       throw Exception(e.toString());
-//     }
-//   }
-
-// /// MENTOR REGISTER
-// static Future<Map<String, dynamic>>
-//     mentorRegister({
-//   required String name,
-//   required String phone,
-//   required String profession,
-// }) async {
-//   try {
-//     final response =
-//         await DioClient.instance.post(
-//       "/v1/public/mentor/register",
-
-//       data: {
-//         "name": name,
-//         "phone": phone,
-//         "profession": profession,
-//       },
-//     );
-
-//     return response.data;
-//   } catch (e) {
-//     throw Exception(
-//       e.toString(),
-//     );
-//   }
-// }
-
-//   /// VERIFY OTP
-//   static Future<Map<String, dynamic>> verifyOtp({
-//     required String phone,
-//     required String otp,
-    
-//   }) async {
-//     try {
-//       final response =
-//           await DioClient.instance.post(
-//         "$baseUrl/verify-otp",
-//         data: {
-//           "phone": phone,
-//           "otp": otp,
-//         },
-//       );
-
-     
-//       print("VERIFY OTP RESPONSE => ${response.data}");
-
-//       final accessToken =
-//           response.data["data"]?["accessToken"];
-
-//       print("EXTRACTED TOKEN => $accessToken");
-//       // final accessToken =
-//       //     response.data["data"]?["accessToken"];
-
-//       if (accessToken == null) {
-//         throw Exception(
-//           "Access token not found",
-//         );
-//       }
-
-//       final prefs =
-//           await SharedPreferences.getInstance();
-
-//       await prefs.setString(
-//         "accessToken",
-//         accessToken,
-//       );
-//       final saved =
-//     prefs.getString("accessToken");
-
-//     print("SAVED TOKEN => $saved");
-
-     
-//       return response.data;
-//     } catch (e) {
-     
-
-//       throw Exception(e.toString());
-//     }
-//   }
-
-//   /// GET TOKEN
-//   static Future<String?> getToken() async {
-//     final prefs =
-//         await SharedPreferences.getInstance();
-
-//     return prefs.getString(
-//       "accessToken",
-//     );
-//   }
-
-//   /// GET CURRENT USER
-//   static Future<Map<String, dynamic>> getMe() async {
-//     try {
-//       final prefs =
-//           await SharedPreferences.getInstance();
-
-//       final token =
-//           prefs.getString("accessToken");
-
-   
-
-//       if (token == null) {
-//         throw Exception(
-//           "Token is null",
-//         );
-//       }
-
-//       final response =
-//           await DioClient.instance.get(
-//         "$baseUrl/me",
-//         options: Options(
-//           headers: {
-//             "Authorization":
-//                 "Bearer $token",
-//           },
-//         ),
-//       );
-
-   
-//       return response.data;
-//     } catch (e) {
-    
-//       throw Exception(e.toString());
-//     }
-//   }
-// }
 
 
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:flutter/foundation.dart';
 import '../../core/network/dio_client.dart';
 
 class AuthService {
@@ -248,7 +89,7 @@ class AuthService {
       },
     );
 
-    print(
+    debugPrint(
       "SEND OTP RESPONSE => ${response.data}",
     );
 
@@ -256,7 +97,7 @@ class AuthService {
       response.data,
     );
   } catch (e) {
-    print("SEND OTP ERROR => $e");
+    debugPrint("SEND OTP ERROR => $e");
 
     throw Exception(
       _formatError(e),
@@ -266,42 +107,48 @@ class AuthService {
   /// =========================
   /// MENTOR REGISTER
   /// =========================
-  static Future<Map<String, dynamic>>
-      mentorRegister({
-    required String name,
-    required String phone,
-    required String profession,
-    required String district,
-  }) async {
-    try {
-      final response =
-          await DioClient.instance.post(
-        "/v1/public/mentor/register",
-        data: {
-          "name": name,
-          "phone": phone,
-          "profession": profession,
-          "district": district,
-        },
-      );
+ static Future<Map<String, dynamic>>
+    mentorRegister({
+  required String name,
+  required String phone,
+  required String profession,
+  required String district,
+  MultipartFile? avatar,
+}) async {
+  try {
+    final formData = FormData.fromMap({
+      "name": name,
+      "phone": phone,
+      "profession": profession,
+      "district": district,
 
-      print(
-        "MENTOR REGISTER RESPONSE => ${response.data}",
-      );
+      if (avatar != null)
+        "avatar": avatar,
+    });
 
-      return Map<String, dynamic>.from(
-        response.data,
-      );
-    } catch (e) {
-      print(
-        "MENTOR REGISTER ERROR => $e",
-      );
+    final response =
+        await DioClient.instance.post(
+      "/v1/public/mentor/register",
+      data: formData,
+    );
 
-      throw Exception(
-        _formatError(e),
-      );
-    }
+    debugPrint(
+      "MENTOR REGISTER RESPONSE => ${response.data}",
+    );
+
+    return Map<String, dynamic>.from(
+      response.data,
+    );
+  } catch (e) {
+    debugPrint(
+      "MENTOR REGISTER ERROR => $e",
+    );
+
+    throw Exception(
+      _formatError(e),
+    );
   }
+}
 
   /// =========================
   /// VERIFY OTP
@@ -326,7 +173,7 @@ class AuthService {
         },
       );
 
-      print(
+      debugPrint(
         "VERIFY OTP RESPONSE => ${response.data}",
       );
 
@@ -340,7 +187,7 @@ class AuthService {
               response.data["data"]
                   ?["refreshToken"];
 
-      print(
+      debugPrint(
         "EXTRACTED TOKEN => $accessToken",
       );
 
@@ -381,7 +228,7 @@ class AuthService {
         "accessToken",
       );
 
-      print(
+      debugPrint(
         "SAVED TOKEN => $saved",
       );
 
@@ -389,7 +236,7 @@ class AuthService {
         response.data,
       );
     } catch (e) {
-      print(
+      debugPrint(
         "VERIFY OTP ERROR => $e",
       );
 
@@ -411,7 +258,7 @@ class AuthService {
       "accessToken",
     );
 
-    print("GET TOKEN => $token");
+    debugPrint("GET TOKEN => $token");
 
     return token;
   }
@@ -430,7 +277,7 @@ class AuthService {
         "accessToken",
       );
 
-      print(
+      debugPrint(
         "GET ME TOKEN => $token",
       );
 
@@ -452,7 +299,7 @@ class AuthService {
         ),
       );
 
-      print(
+      debugPrint(
         "GET ME RESPONSE => ${response.data}",
       );
 
@@ -460,7 +307,7 @@ class AuthService {
         response.data,
       );
     } catch (e) {
-      print("GET ME ERROR => $e");
+      debugPrint("GET ME ERROR => $e");
 
       throw Exception(
         _formatError(e),
@@ -517,6 +364,8 @@ class AuthService {
       "refreshToken",
     );
 
-    print("TOKEN REMOVED");
+    debugPrint("TOKEN REMOVED");
   }
+
+  
 }

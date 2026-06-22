@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../../core/network/dio_client.dart';
-
+import 'package:flutter/foundation.dart';
 class AdminService {
   static final Dio _dio =
       DioClient.instance;
@@ -215,7 +215,7 @@ static Future<void>
   required String status,
 }) async {
 
-  print(
+  debugPrint(
     "UPDATING ACHIEVEMENT => "
     "$achievementId : $status",
   );
@@ -228,7 +228,7 @@ static Future<void>
     },
   );
 
-  print(
+  debugPrint(
     "ACHIEVEMENT RESPONSE => "
     "${response.data}",
   );

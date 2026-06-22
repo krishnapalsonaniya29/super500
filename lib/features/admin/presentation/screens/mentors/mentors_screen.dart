@@ -313,7 +313,7 @@ Container(
     borderRadius: BorderRadius.circular(20),
     boxShadow: [
       BoxShadow(
-        color: AppColors.primary.withOpacity(0.25),
+        color: AppColors.primary.withValues(alpha: 0.25),
         blurRadius: 12,
         offset: const Offset(0, 6),
       ),
@@ -509,8 +509,8 @@ const SizedBox(height: 24),
                                 boxShadow: [
                                   BoxShadow(
                                     color:
-                                        Colors.black.withOpacity(
-                                      0.04,
+                                        Colors.black.withValues(
+                                      alpha: 0.04,
                                     ),
                                     blurRadius: 10,
                                     offset: const Offset(0, 4),
@@ -773,7 +773,7 @@ const SizedBox(height: 24),
                                         Expanded(
                                           child: OutlinedButton.icon(
                                             onPressed: () {
-                                              print(mentor);
+                                              debugPrint(mentor);
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(

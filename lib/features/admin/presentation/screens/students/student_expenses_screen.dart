@@ -162,20 +162,23 @@ class _StudentExpensesScreenState
               reason;
         }
       });
-    } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        SnackBar(
-          content: Text(
-            e.toString(),
+    }catch (e) {
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              e.toString(),
+            ),
           ),
-        ),
-      );
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
+        );
+      } finally {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
+      }
   }
 
   Color getStatusColor(

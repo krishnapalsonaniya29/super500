@@ -70,12 +70,12 @@ class _SessionsScreenState
         ),
       );
     } finally {
-      if (!mounted) return;
-
-      setState(() {
-        isLoading = false;
-      });
-    }
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
+      }
   }
 
   /// =====================================
@@ -240,7 +240,7 @@ class _SessionsScreenState
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primary.withOpacity(0.25),
+                                color: AppColors.primary.withValues(alpha:0.25),
                                 blurRadius: 12,
                                 offset: const Offset(0, 6),
                               ),
@@ -416,7 +416,7 @@ class _SessionsScreenState
           colors: [
             AppColors.primary,
             AppColors.primary
-                .withOpacity(0.8),
+                .withValues(alpha:0.8),
           ],
         ),
 
@@ -572,7 +572,7 @@ class _SessionsScreenState
         boxShadow: [
           BoxShadow(
             color: Colors.black
-                .withOpacity(0.04),
+                .withValues(alpha:0.04),
 
             blurRadius: 10,
 
@@ -621,7 +621,7 @@ class _SessionsScreenState
                   color:
                       getStatusColor(
                     status,
-                  ).withOpacity(
+                  ).withValues(alpha:
                     0.12,
                   ),
 
@@ -709,7 +709,7 @@ class _SessionsScreenState
                   BoxDecoration(
                 color:
                     Colors.blue
-                        .withOpacity(
+                        .withValues(alpha:
                   0.05,
                 ),
 

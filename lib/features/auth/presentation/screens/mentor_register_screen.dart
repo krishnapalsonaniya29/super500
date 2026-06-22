@@ -5,6 +5,11 @@ import '../../../../theme/app_colors.dart';
 import '../../../../widgets/buttons/custom_button.dart';
 import '../../../../widgets/inputs/custom_textfield.dart';
 import '../../../../services/auth/auth_service.dart';
+import 'dart:typed_data';
+import 'package:flutter/services.dart';
+
+import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
 class MentorRegisterScreen
     extends StatefulWidget {
   const MentorRegisterScreen({
@@ -23,7 +28,9 @@ class _MentorRegisterScreenState
   final TextEditingController
   nameController =
       TextEditingController();
-
+  
+  XFile? selectedImage;
+  Uint8List? imageBytes;
   final TextEditingController
   phoneController =
       TextEditingController();
@@ -66,6 +73,14 @@ Future<void> applyMentor() async {
   });
 
   try {
+    MultipartFile? avatarFile;
+
+    if (selectedImage != null) {
+      avatarFile = MultipartFile.fromBytes(
+        imageBytes!,
+        filename: selectedImage!.name,
+      );
+    }
     await AuthService.mentorRegister(
       name:
           nameController.text.trim(),
@@ -80,6 +95,7 @@ Future<void> applyMentor() async {
       district:
           districtController.text
               .trim(),
+      avatar: avatarFile,
     );
 
     if (!mounted) return;
@@ -145,7 +161,7 @@ Future<void> applyMentor() async {
                     boxShadow: [
                       BoxShadow(
                         color: AppColors.primary
-                            .withOpacity(0.25),
+                            .withValues(alpha: 0.25),
                         blurRadius: 12,
                         offset: const Offset(0, 6),
                       ),
@@ -238,7 +254,7 @@ Future<void> applyMentor() async {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color:
-                              Colors.white.withOpacity(
+                              Colors.white.withValues(alpha: 
                             0.85,
                           ),
                           fontSize: 14,
@@ -249,7 +265,103 @@ Future<void> applyMentor() async {
                 ),
 
                 const SizedBox(height: 40),
-                
+                Center(
+                  child: Column(
+                    children: [
+                      Stack(
+                        children: [
+                          CircleAvatar(
+                            radius: 55,
+                            backgroundColor:
+                                Colors.grey.shade200,
+
+                            backgroundImage:
+                                imageBytes != null
+                                    ? MemoryImage(
+                                        imageBytes!,
+                                      )
+                                    : null,
+
+                            child: imageBytes == null
+                                ? const Icon(
+                                    Icons.person,
+                                    size: 55,
+                                    color: Colors.grey,
+                                  )
+                                : null,
+                          ),
+
+                          Positioned(
+                            right: 0,
+                            bottom: 0,
+
+                            child: InkWell(
+                              onTap: () async {
+                                final picker =
+                                    ImagePicker();
+
+                                final image =
+                                    await picker.pickImage(
+                                  source:
+                                      ImageSource.gallery,
+
+                                  imageQuality: 80,
+                                );
+
+                                if (image == null) {
+                                  return;
+                                }
+
+                                final bytes =
+                                    await image.readAsBytes();
+
+                                setState(() {
+                                  selectedImage =
+                                      image;
+
+                                  imageBytes =
+                                      bytes;
+                                });
+                              },
+
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.all(
+                                  8,
+                                ),
+
+                                decoration:
+                                    BoxDecoration(
+                                  color:
+                                      AppColors.primary,
+
+                                  shape:
+                                      BoxShape.circle,
+                                ),
+
+                                child: const Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      const Text(
+                        "Upload Profile Picture",
+                        style: TextStyle(
+                          fontWeight:
+                              FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
                 const SizedBox(height: 20),const Text(
                   "Application Details",
@@ -282,14 +394,14 @@ Future<void> applyMentor() async {
                 ),
 
                 CustomTextField(
-                  hintText:
-                      'Mobile Number',
+                  hintText: 'Mobile Number',
+                  controller: phoneController,
+                  keyboardType: TextInputType.phone,
 
-                  controller:
-                      phoneController,
-
-                  keyboardType:
-                      TextInputType.phone,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(10),
+                  ],
 
                   validator: (value) {
                     if (value == null ||
@@ -297,9 +409,8 @@ Future<void> applyMentor() async {
                       return "Phone number is required";
                     }
 
-                    if (value.length <
-                        10) {
-                      return "Enter valid mobile number";
+                    if (value.length != 10) {
+                      return "Mobile number must be exactly 10 digits";
                     }
 
                     return null;
@@ -332,11 +443,13 @@ Future<void> applyMentor() async {
                 ),
 
                 CustomTextField(
-                  hintText:
-                      'District',
+                  hintText: 'District',
 
                   controller:
                       districtController,
+
+                  textCapitalization:
+                      TextCapitalization.characters,
 
                   validator: (value) {
                     if (value == null ||

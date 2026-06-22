@@ -212,7 +212,7 @@ Future<void> verifyOtp() async {
             boxShadow: [
               BoxShadow(
                 color: AppColors.primary
-                    .withOpacity(0.25),
+                    .withValues(alpha: 0.25),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
               ),
@@ -305,7 +305,7 @@ Future<void> verifyOtp() async {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color:
-                      Colors.white.withOpacity(
+                      Colors.white.withValues(alpha: 
                     0.85,
                   ),
                   fontSize: 14,

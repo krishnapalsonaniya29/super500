@@ -49,66 +49,56 @@ class _CreateSessionScreenState
     loadStudents();
   }
 
-  Future<void>
-      loadStudents() async {
-    try {
-      final response =
-          await MentorService
-              .getStudents();
+Future<void> loadStudents() async {
+  try {
+    final response =
+        await MentorService.getStudents();
 
-      setState(() {
-        students =
-            response["students"];
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        SnackBar(
-          content: Text(
-            e.toString(),
-          ),
-        ),
-      );
-    }
-  }
-
-  Future<void>
-      pickDateTime() async {
-    final date =
-        await showDatePicker(
-      context: context,
-
-      firstDate: DateTime.now(),
-
-      lastDate: DateTime(2030),
-
-      initialDate: DateTime.now(),
-    );
-
-    if (date == null) return;
-
-    final time =
-        await showTimePicker(
-      context: context,
-
-      initialTime:
-          TimeOfDay.now(),
-    );
-
-    if (time == null) return;
+    if (!mounted) return;
 
     setState(() {
-      selectedDateTime =
-          DateTime(
-        date.year,
-        date.month,
-        date.day,
-        time.hour,
-        time.minute,
-      );
+      students =
+          response["students"];
     });
-  }
+  } catch (e) {
+    if (!mounted) return;
 
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          e.toString(),
+        ),
+      ),
+    );
+  }
+}
+Future<void> pickDateTime() async {
+  final date = await showDatePicker(
+    context: context,
+    firstDate: DateTime.now(),
+    lastDate: DateTime(2030),
+    initialDate: DateTime.now(),
+  );
+
+  if (!mounted || date == null) return;
+
+  final time = await showTimePicker(
+    context: context,
+    initialTime: TimeOfDay.now(),
+  );
+
+  if (!mounted || time == null) return;
+
+  setState(() {
+    selectedDateTime = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+  });
+}
   Future<void>
       createSession() async {
     if (titleController.text

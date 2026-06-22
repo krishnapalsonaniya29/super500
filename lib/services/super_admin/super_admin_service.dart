@@ -211,20 +211,16 @@ static Future<Map<String, dynamic>>
   return response.data;
 }
 
-// /// ====================================
-// /// GET STUDENT DETAILS
-// /// ====================================
 
-// static Future<Map<String, dynamic>>
-//     getStudentDetails(
-//   String studentId,
-// ) async {
-//   final response =
-//       await _dio.get(
-//     "$baseUrl/students/$studentId",
-//   );
+/// ===============================
+/// Recalculate student ranking
+/// ==============================
+static Future<void>
+    recalculateRankings() async {
+  await _dio.post(
+    "$baseUrl/students/ranking/recalculate",
+  );
+}
 
-//   return response.data;
-// }
 }
 

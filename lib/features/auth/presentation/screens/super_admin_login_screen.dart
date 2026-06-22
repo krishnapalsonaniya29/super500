@@ -36,67 +36,58 @@ class _SuperAdminLoginScreenState
   /// ======================================
   /// SEND OTP
   /// ======================================
+Future<void> sendOtp() async {
+  try {
+    if (phoneController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Enter phone number"),
+        ),
+      );
+      return;
+    }
 
-  Future<void> sendOtp() async {
-    try {
-      if (phoneController.text
-          .trim()
-          .isEmpty) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
-          const SnackBar(
-            content: Text(
-              "Enter phone number",
-            ),
-          ),
-        );
+    setState(() {
+      loading = true;
+    });
 
-        return;
-      }
+    final response =
+        await AuthService.sendOtp(
+      phone: phoneController.text.trim(),
+      role: "SUPER_ADMIN",
+    );
 
+    if (!mounted) return;
+
+    if (response["success"] == true) {
       setState(() {
-        loading = true;
+        otpSent = true;
       });
 
-      final response =
-          await AuthService.sendOtp(
-        phone :phoneController.text.trim(),
-        role : "SUPER_ADMIN"
-      );
-
-      if (response["success"] ==
-          true) {
-        setState(() {
-          otpSent = true;
-        });
-
-        if (!mounted) return;
-
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
-          const SnackBar(
-            content: Text(
-              "OTP sent successfully",
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
           content: Text(
-            e.toString(),
+            "OTP sent successfully",
           ),
         ),
       );
-    } finally {
+    }
+  } catch (e) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(e.toString()),
+      ),
+    );
+  } finally {
+    if (mounted) {
       setState(() {
         loading = false;
       });
     }
   }
-
+}
   /// ======================================
   /// LOGIN
   /// ======================================
@@ -214,7 +205,7 @@ class _SuperAdminLoginScreenState
                   boxShadow: [
                     BoxShadow(
                       color: AppColors.primary
-                          .withOpacity(0.25),
+                          .withValues(alpha:0.25),
                       blurRadius: 12,
                       offset: const Offset(0, 6),
                     ),
@@ -306,7 +297,7 @@ class _SuperAdminLoginScreenState
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color:
-                            Colors.white.withOpacity(
+                            Colors.white.withValues(alpha:
                           0.85,
                         ),
                         fontSize: 14,
@@ -327,7 +318,7 @@ class _SuperAdminLoginScreenState
                   boxShadow: [
                     BoxShadow(
                       color:
-                          Colors.black.withOpacity(
+                          Colors.black.withValues(alpha:
                         0.05,
                       ),
                       blurRadius: 10,
@@ -394,10 +385,10 @@ class _SuperAdminLoginScreenState
               Container(
   padding: const EdgeInsets.all(16),
   decoration: BoxDecoration(
-    color: Colors.red.withOpacity(0.08),
+    color: Colors.red.withValues(alpha:0.08),
     borderRadius: BorderRadius.circular(16),
     border: Border.all(
-      color: Colors.red.withOpacity(0.15),
+      color: Colors.red.withValues(alpha:0.15),
     ),
   ),
   child: const Row(

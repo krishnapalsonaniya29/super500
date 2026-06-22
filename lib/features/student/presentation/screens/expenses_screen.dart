@@ -60,7 +60,7 @@ double utilizationPercentage = 0;
             .getFinancialSummary();
 
 
-print(
+debugPrint(
   "SUMMARY => $summaryResponse",
 );
     expenses =
@@ -155,7 +155,7 @@ Widget build(BuildContext context) {
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(0.25),
+                      color: AppColors.primary.withValues(alpha:0.25),
                       blurRadius: 12,
                       offset: const Offset(0, 6),
                     ),

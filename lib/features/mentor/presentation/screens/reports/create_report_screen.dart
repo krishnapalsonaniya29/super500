@@ -44,28 +44,28 @@ class _CreateReportScreenState
     loadStudents();
   }
 
-  Future<void>
-      loadStudents() async {
-    try {
-      final response =
-          await MentorService
-              .getStudents();
+ Future<void> loadStudents() async {
+  try {
+    final response =
+        await MentorService.getStudents();
 
-      setState(() {
-        students =
-            response["students"];
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        SnackBar(
-          content: Text(
-            e.toString(),
-          ),
+    if (!mounted) return;
+
+    setState(() {
+      students = response["students"];
+    });
+  } catch (e) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          e.toString(),
         ),
-      );
-    }
+      ),
+    );
   }
+}
 
   Future<void>
       createReport() async {

@@ -55,16 +55,7 @@ class MentorDetailScreen
         mentor["state"] ??
             "N/A";
 
-    final studentsCount =
-        mentor["studentsCount"]
-                ?.toString() ??
-            "0";
-
-    final sessionsCount =
-        mentor["sessionsCount"]
-                ?.toString() ??
-            "0";
-
+   
     return Scaffold(
       backgroundColor:
           const Color(
@@ -73,195 +64,257 @@ class MentorDetailScreen
 
       body: CustomScrollView(
         slivers: [
-          /// =====================================
-          /// APP BAR
-          /// =====================================
+          
+SliverAppBar(
+  automaticallyImplyLeading: false,
+  expandedHeight: 480,
+  pinned: true,
+  backgroundColor: AppColors.primary,
 
-          SliverAppBar(
-            expandedHeight: 320,
+  flexibleSpace: FlexibleSpaceBar(
+    background: Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white,
+            Colors.white,
+          ],
+        ),
+      ),
 
-            pinned: true,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
 
-            backgroundColor:
-                AppColors.primary,
+          child: Column(
+            children: [
+              /// =========================
+              /// HEADER CARD
+              /// =========================
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
 
-            flexibleSpace:
-                FlexibleSpaceBar(
-              background: Container(
-                decoration:
-                    BoxDecoration(
-                  gradient:
-                      LinearGradient(
-                    begin:
-                        Alignment
-                            .topLeft,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
 
-                    end:
-                        Alignment
-                            .bottomRight,
+                  borderRadius:
+                      BorderRadius.circular(20),
 
-                    colors: [
-                      AppColors
-                          .primary,
-
-                      AppColors
-                          .primary
-                          .withOpacity(
-                        0.75,
-                      ),
-                    ],
+                  border: Border.all(
+                    color: Colors.white.withValues(
+                      alpha: 0.15,
+                    ),
                   ),
+
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(
+                        alpha: 0.08,
+                      ),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
 
-                child: SafeArea(
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.all(
-                      24,
+                child: Row(
+                  children: [
+                    Container(
+                      height: 70,
+                      width: 70,
+                      padding:
+                          const EdgeInsets.all(8),
+
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            BorderRadius.circular(
+                          16,
+                        ),
+                      ),
+
+                      child: ClipRRect(
+                        borderRadius:
+                            BorderRadius.circular(
+                          12,
+                        ),
+
+                        child: Image.asset(
+                          "assets/images/app_logo2.png",
+                          fit: BoxFit.contain,
+                        ),
+                      ),
                     ),
 
-                    child: Column(
-                      mainAxisAlignment:
-                          MainAxisAlignment
-                              .center,
+                    const SizedBox(width: 16),
 
-                      children: [
-                        CircleAvatar(
-                          radius: 52,
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start,
 
-                          backgroundColor:
-                              Colors.white,
+                        mainAxisSize:
+                            MainAxisSize.min,
 
-                          backgroundImage:
-                              avatar != null
-                                  ? NetworkImage(
-                                      avatar,
-                                    )
-                                  : null,
-
-                          child: avatar ==
-                                  null
-                              ? Text(
-                                  fullName[0]
-                                      .toUpperCase(),
-
-                                  style:
-                                      TextStyle(
-                                    color:
-                                        AppColors
-                                            .primary,
-
-                                    fontWeight:
-                                        FontWeight
-                                            .bold,
-
-                                    fontSize:
-                                        34,
-                                  ),
-                                )
-                              : null,
-                        ),
-
-                        const SizedBox(
-                          height: 18,
-                        ),
-
-                        Text(
-                          fullName,
-
-                          style:
-                              const TextStyle(
-                            color:
-                                Colors
-                                    .white,
-
-                            fontSize: 26,
-
-                            fontWeight:
-                                FontWeight
-                                    .bold,
-                          ),
-                        ),
-
-                        const SizedBox(
-                          height: 8,
-                        ),
-
-                        Container(
-                          padding:
-                              const EdgeInsets.symmetric(
-                            horizontal:
-                                14,
-
-                            vertical:
-                                8,
-                          ),
-
-                          decoration:
-                              BoxDecoration(
-                            color: Colors
-                                .white
-                                .withOpacity(
-                              0.15,
-                            ),
-
-                            borderRadius:
-                                BorderRadius.circular(
-                              20,
-                            ),
-                          ),
-
-                          child: Text(
-                            specialization,
-
-                            style:
-                                const TextStyle(
-                              color:
-                                  Colors
-                                      .white,
-
+                        children: [
+                          Text(
+                            "Mentor Details",
+                            style: TextStyle(
+                              fontSize: 22,
                               fontWeight:
-                                  FontWeight
-                                      .w600,
+                                  FontWeight.bold,
+                              color: Colors.white,
                             ),
                           ),
-                        ),
 
-                        const SizedBox(
-                          height: 20,
-                        ),
+                          SizedBox(height: 4),
 
-                        Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment
-                                  .spaceEvenly,
-
-                          children: [
-                            _buildStatCard(
-                              "Students",
-                              studentsCount,
+                          Text(
+                            "Details of Mentor",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color:
+                                  Colors.white70,
                             ),
-
-                            _buildStatCard(
-                              "Sessions",
-                              sessionsCount,
-                            ),
-
-                            _buildStatCard(
-                              "Experience",
-                              experience
-                                  .toString(),
-                            ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-            ),
-          ),
 
+              const SizedBox(height: 40),
+
+              /// =========================
+              /// PROFILE CARD
+              /// =========================
+              Container(
+                width: double.infinity,
+                padding:
+                    const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 28,
+                ),
+
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+
+                  borderRadius:
+                      BorderRadius.circular(24),
+
+                  border: Border.all(
+                    color: Colors.white.withValues(
+                      alpha: 0.15,
+                    ),
+                  ),
+                ),
+
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 52,
+                      backgroundColor:
+                          Colors.white,
+
+                      backgroundImage:
+                          avatar != null
+                              ? NetworkImage(
+                                  avatar,
+                                )
+                              : null,
+
+                      child: avatar == null
+                          ? Text(
+                              fullName[0]
+                                  .toUpperCase(),
+
+                              style:
+                                  const TextStyle(
+                                color:
+                                    Colors.blueGrey,
+
+                                fontWeight:
+                                    FontWeight.bold,
+
+                                fontSize: 34,
+                              ),
+                            )
+                          : null,
+                    ),
+
+                    const SizedBox(
+                      height: 16,
+                    ),
+
+                    Text(
+                      fullName,
+                      textAlign:
+                          TextAlign.center,
+
+                      style:
+                          const TextStyle(
+                        color: Colors.white,
+
+                        fontSize: 26,
+
+                        fontWeight:
+                            FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(
+                      height: 10,
+                    ),
+
+                    Container(
+                      padding:
+                          const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+
+                      decoration:
+                          BoxDecoration(
+                        color: Colors.white
+                            .withValues(
+                          alpha: 0.15,
+                        ),
+
+                        borderRadius:
+                            BorderRadius.circular(
+                          20,
+                        ),
+                      ),
+
+                      child: Text(
+                        specialization,
+                        textAlign:
+                            TextAlign.center,
+
+                        style:
+                            const TextStyle(
+                          color:
+                              Colors.white,
+
+                          fontWeight:
+                              FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  ),
+),
           /// =====================================
           /// BODY
           /// =====================================
@@ -509,7 +562,7 @@ class MentorDetailScreen
                 BoxDecoration(
               color:
                   AppColors.primary
-                      .withOpacity(
+                      .withValues(alpha:
                 0.1,
               ),
 
@@ -591,7 +644,7 @@ class MentorDetailScreen
 
       decoration: BoxDecoration(
         color:
-            Colors.white.withOpacity(
+            Colors.white.withValues(alpha:
           0.15,
         ),
 

@@ -106,9 +106,9 @@ class _MentorStudentsScreenState
                           color: Colors.grey,
                         ),
 
-                        const SizedBox(height: 16),
+                         SizedBox(height: 16),
 
-                        const Text(
+                         Text(
                           "No students assigned yet",
                           style: TextStyle(
                             fontSize: 18,
@@ -116,9 +116,9 @@ class _MentorStudentsScreenState
                           ),
                         ),
 
-                        const SizedBox(height: 8),
+                         SizedBox(height: 8),
 
-                        const Text(
+                         Text(
                           "Assigned students will appear here.",
                           textAlign: TextAlign.center,
                         ),
@@ -143,7 +143,7 @@ class _MentorStudentsScreenState
           boxShadow: [
             BoxShadow(
               color: AppColors.primary
-                  .withOpacity(0.25),
+                  .withValues(alpha:0.25),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
@@ -250,7 +250,7 @@ class _MentorStudentsScreenState
       boxShadow: [
         BoxShadow(
           color:
-              Colors.black.withOpacity(
+              Colors.black.withValues(alpha:
             0.04,
           ),
           blurRadius: 8,
@@ -264,7 +264,7 @@ class _MentorStudentsScreenState
           radius: 28,
           backgroundColor:
               AppColors.primary
-                  .withOpacity(0.1),
+                  .withValues(alpha:0.1),
           child: Text(
             name.isNotEmpty
                 ? name[0].toUpperCase()

@@ -28,7 +28,7 @@ import '../../../../../services/student/student_service.dart';
       extends State<
           AchievementsScreen> {
     Map<String, dynamic>? userData;
-
+    int? currentRank;
     List achievements = [];
 
     bool loading = true;
@@ -45,10 +45,13 @@ import '../../../../../services/student/student_service.dart';
             await AuthService.getMe();
 
         final data = response["data"];
-
+       final rank =
+        await StudentService.getMyRank();
+        
         setState(() {
+          currentRank = rank;
           userData = data;
-
+          debugPrint(data.toString());
           achievements =
               data["studentProfile"]
                       ?["achievements"] ??
@@ -277,13 +280,9 @@ import '../../../../../services/student/student_service.dart';
                           );
                         }
 
-                        await StudentService
-                            .createAchievement(
-                          title: titleController.text
-                              .trim(),
-                          description:
-                              descriptionController.text
-                                  .trim(),
+                        await StudentService.createAchievement(
+                          title: titleController.text.trim(),
+                          description: descriptionController.text.trim(),
                           proof: proof,
                         );
 
@@ -293,9 +292,9 @@ import '../../../../../services/student/student_service.dart';
 
                         await fetchData();
 
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(
+                        if (!mounted) return;
+
+                        ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text(
                               "Achievement submitted successfully",
@@ -547,7 +546,7 @@ import '../../../../../services/student/student_service.dart';
 
       final marks10th =
           profile?["marks10th"];
-
+    
       return Scaffold(
         backgroundColor:
             AppColors.background,
@@ -603,7 +602,7 @@ import '../../../../../services/student/student_service.dart';
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withOpacity(0.25),
+                              color: AppColors.primary.withValues(alpha:0.25),
                               blurRadius: 12,
                               offset: const Offset(0, 6),
                             ),
@@ -661,6 +660,63 @@ import '../../../../../services/student/student_service.dart';
                           ],
                         ),
                       ),
+
+                      Container(
+  width: double.infinity,
+  padding: const EdgeInsets.all(24),
+  margin: const EdgeInsets.only(
+    bottom: 20,
+  ),
+  decoration: BoxDecoration(
+    gradient: const LinearGradient(
+      colors: [
+        Color(0xFFFFD700),
+        Color(0xFFFFA000),
+      ],
+    ),
+    borderRadius:
+        BorderRadius.circular(28),
+  ),
+  child: Row(
+    children: [
+      const Icon(
+        Icons.emoji_events,
+        color: Colors.white,
+        size: 42,
+      ),
+
+      const SizedBox(width: 16),
+
+      Expanded(
+        child: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Current Rank",
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 16,
+              ),
+            ),
+
+            const SizedBox(height: 6),
+
+            Text(
+              "#${currentRank ?? '-'}",
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 38,
+                fontWeight:
+                    FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
+  ),
+),
 
                       /// 10TH MARKS
                       Container(
@@ -733,6 +789,8 @@ import '../../../../../services/student/student_service.dart';
                       const SizedBox(
                         height: 32,
                       ),
+
+                     
 
                       const Text(
                         "Other Achievements",
@@ -826,10 +884,12 @@ import '../../../../../services/student/student_service.dart';
                       else
                         ...achievements.map(
                           (achievement) {
+                            
                             return buildAchievementCard(
                               title:
                                   achievement["title"] ??
                                   "Achievement",
+                                  
 
                               subtitle:
                                   achievement["description"] ??
@@ -846,9 +906,10 @@ import '../../../../../services/student/student_service.dart';
                                   .emoji_events_rounded,
 
                               verified:
-                                  achievement[
-                                      "verified"] ??
-                                  false,
+                                  achievement["status"]
+                                          ?.toString()
+                                          .toUpperCase() ==
+                                      "APPROVED",
                             );
                           
                           },

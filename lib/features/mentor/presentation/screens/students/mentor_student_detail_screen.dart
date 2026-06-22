@@ -46,7 +46,7 @@ class _MentorStudentDetailScreenState
       );
 
       if (!mounted) return;
-
+     
       setState(() {
         student =
             response["student"];
@@ -131,6 +131,25 @@ class _MentorStudentDetailScreenState
     );
   }
 
+
+  String? getProfileImage(
+  List<Map<String, dynamic>>
+      documents,
+) {
+  try {
+    final photo =
+        documents.firstWhere(
+      (doc) =>
+          doc["documentType"] ==
+          "PHOTO",
+    );
+
+    return photo["documentUrl"];
+  } catch (_) {
+    return null;
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
@@ -148,6 +167,11 @@ class _MentorStudentDetailScreenState
         List<Map<String, dynamic>>.from(
       student?["sessions"] ?? [],
     );
+    
+    final documents =
+        List<Map<String, dynamic>>.from(
+      student?["documents"] ?? [],
+    );
 
     final achievements =
         List<Map<String, dynamic>>.from(
@@ -163,6 +187,11 @@ class _MentorStudentDetailScreenState
     final fullName =
         user["fullName"] ?? "";
 
+    final profileImage =
+    getProfileImage(
+      documents,
+    );
+  
     return Scaffold(
       backgroundColor:
           AppColors.background,
@@ -208,29 +237,40 @@ class _MentorStudentDetailScreenState
 
                 child: Row(
                   children: [
+                    
                     CircleAvatar(
                       radius: 38,
 
                       backgroundColor:
                           AppColors.gold,
 
-                      child: Text(
-                        fullName.isNotEmpty
-                            ? fullName[0]
-                                .toUpperCase()
-                            : "S",
+                      backgroundImage:
+                          profileImage != null
+                              ? NetworkImage(
+                                  profileImage,
+                                )
+                              : null,
 
-                        style:
-                            const TextStyle(
-                          fontSize: 28,
-                          fontWeight:
-                              FontWeight.bold,
+                      child:
+                          profileImage == null
+                              ? Text(
+                                  fullName.isNotEmpty
+                                      ? fullName[0]
+                                          .toUpperCase()
+                                      : "S",
 
-                          color:
-                              Colors.black,
-                        ),
-                      ),
+                                  style:
+                                      const TextStyle(
+                                    fontSize: 28,
+                                    fontWeight:
+                                        FontWeight.bold,
+                                    color:
+                                        Colors.black,
+                                  ),
+                                )
+                              : null,
                     ),
+
 
                     const SizedBox(
                       width: 16,
