@@ -1,32 +1,24 @@
 class AppRoutes {
   static const splash = '/';
 
-  static const roleSelection =
-      '/role-selection';
+  static const roleSelection = '/role-selection';
 
   /// AUTH
-  static const otpVerification =
-      '/otp-verification';
+  static const otpVerification = '/otp-verification';
 
   /// STUDENT
-  static const studentLogin =
-      '/student-login';
+  static const studentLogin = '/student-login';
 
-  static const studentRegister =
-      '/student-register';
+  static const studentRegister = '/student-register';
 
   /// MENTOR
-  static const mentorLogin =
-      '/mentor-login';
+  static const mentorLogin = '/mentor-login';
 
-  static const mentorRegister =
-      '/mentor-register';
+  static const mentorRegister = '/mentor-register';
 
   /// ADMIN
-  static const adminLogin =
-      '/admin-login';
+  static const adminLogin = '/admin-login';
 
   /// SUPER ADMIN
-  static const superAdminLogin =
-      '/super-admin-login';
+  static const superAdminLogin = '/super-admin-login';
 }

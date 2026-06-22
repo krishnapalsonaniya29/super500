@@ -5,61 +5,41 @@ import '../../core/network/dio_client.dart';
 import '../auth/auth_service.dart';
 
 class MentorService {
-  static final Dio _dio =
-      DioClient.instance;
+  static final Dio _dio = DioClient.instance;
 
-  static const String baseUrl =
-      "/v1/mentor";
+  static const String baseUrl = "/v1/mentor";
 
   /// ====================================
   /// AUTH OPTIONS
   /// ====================================
 
-  static Future<Options>
-      _getOptions() async {
-    final token =
-        await AuthService.getToken();
+  static Future<Options> _getOptions() async {
+    final token = await AuthService.getToken();
 
-    return Options(
-      headers: {
-        "Authorization":
-            "Bearer $token",
-      },
-    );
+    return Options(headers: {"Authorization": "Bearer $token"});
   }
 
   /// =========================
-/// GET PROFILE
-/// =========================
+  /// GET PROFILE
+  /// =========================
 
-static Future<Map<String, dynamic>>
-    getProfile() async {
-  final options =
-      await _getOptions();
+  static Future<Map<String, dynamic>> getProfile() async {
+    final options = await _getOptions();
 
-  final response =
-      await _dio.get(
-    "$baseUrl/profile",
-    options: options,
-  );
+    final response = await _dio.get("$baseUrl/profile", options: options);
 
-  return Map<String, dynamic>.from(
-    response.data,
-  );
-}
+    return Map<String, dynamic>.from(response.data);
+  }
 
   /// ====================================
   /// DASHBOARD
   /// ====================================
 
-  static Future<Map<String, dynamic>>
-      getDashboard() async {
-    final response =
-        await _dio.get(
+  static Future<Map<String, dynamic>> getDashboard() async {
+    final response = await _dio.get(
       "$baseUrl/dashboard",
 
-      options:
-          await _getOptions(),
+      options: await _getOptions(),
     );
 
     return response.data;
@@ -69,14 +49,11 @@ static Future<Map<String, dynamic>>
   /// GET STUDENTS
   /// ====================================
 
-  static Future<Map<String, dynamic>>
-      getStudents() async {
-    final response =
-        await _dio.get(
+  static Future<Map<String, dynamic>> getStudents() async {
+    final response = await _dio.get(
       "$baseUrl/students",
 
-      options:
-          await _getOptions(),
+      options: await _getOptions(),
     );
 
     return response.data;
@@ -86,16 +63,13 @@ static Future<Map<String, dynamic>>
   /// GET STUDENT DETAILS
   /// ====================================
 
-  static Future<Map<String, dynamic>>
-      getStudentDetails(
+  static Future<Map<String, dynamic>> getStudentDetails(
     String studentId,
   ) async {
-    final response =
-        await _dio.get(
+    final response = await _dio.get(
       "$baseUrl/students/$studentId",
 
-      options:
-          await _getOptions(),
+      options: await _getOptions(),
     );
 
     return response.data;
@@ -105,14 +79,11 @@ static Future<Map<String, dynamic>>
   /// GET SESSIONS
   /// ====================================
 
-  static Future<Map<String, dynamic>>
-      getSessions() async {
-    final response =
-        await _dio.get(
+  static Future<Map<String, dynamic>> getSessions() async {
+    final response = await _dio.get(
       "$baseUrl/sessions",
 
-      options:
-          await _getOptions(),
+      options: await _getOptions(),
     );
 
     return response.data;
@@ -122,8 +93,7 @@ static Future<Map<String, dynamic>>
   /// CREATE SESSION
   /// ====================================
 
-  static Future<Map<String, dynamic>>
-      createSession({
+  static Future<Map<String, dynamic>> createSession({
     required String title,
 
     required String studentId,
@@ -134,26 +104,21 @@ static Future<Map<String, dynamic>>
 
     String? meetingLink,
   }) async {
-    final response =
-        await _dio.post(
+    final response = await _dio.post(
       "$baseUrl/sessions",
 
-      options:
-          await _getOptions(),
+      options: await _getOptions(),
 
       data: {
         "title": title,
 
         "studentId": studentId,
 
-        "scheduledAt":
-            scheduledAt,
+        "scheduledAt": scheduledAt,
 
-        "description":
-            description,
+        "description": description,
 
-        "meetingLink":
-            meetingLink,
+        "meetingLink": meetingLink,
       },
     );
 
@@ -164,26 +129,19 @@ static Future<Map<String, dynamic>>
   /// UPDATE SESSION
   /// ====================================
 
-  static Future<Map<String, dynamic>>
-      updateSession({
+  static Future<Map<String, dynamic>> updateSession({
     required String sessionId,
 
     required String status,
 
     String? notes,
   }) async {
-    final response =
-        await _dio.put(
+    final response = await _dio.put(
       "$baseUrl/sessions/$sessionId",
 
-      options:
-          await _getOptions(),
+      options: await _getOptions(),
 
-      data: {
-        "status": status,
-
-        "notes": notes,
-      },
+      data: {"status": status, "notes": notes},
     );
 
     return response.data;
@@ -193,14 +151,11 @@ static Future<Map<String, dynamic>>
   /// GET REPORTS
   /// ====================================
 
-  static Future<Map<String, dynamic>>
-      getReports() async {
-    final response =
-        await _dio.get(
+  static Future<Map<String, dynamic>> getReports() async {
+    final response = await _dio.get(
       "$baseUrl/reports",
 
-      options:
-          await _getOptions(),
+      options: await _getOptions(),
     );
 
     return response.data;
@@ -210,30 +165,24 @@ static Future<Map<String, dynamic>>
   /// CREATE REPORT
   /// ====================================
 
-  static Future<Map<String, dynamic>>
-      createReport({
+  static Future<Map<String, dynamic>> createReport({
     required String studentId,
 
     required String content,
 
     required String reportType,
   }) async {
-    final response =
-        await _dio.post(
+    final response = await _dio.post(
       "$baseUrl/reports",
 
-      options:
-          await _getOptions(),
+      options: await _getOptions(),
 
       data: {
-        "studentId":
-            studentId,
+        "studentId": studentId,
 
-        "content":
-            content,
+        "content": content,
 
-        "reportType":
-            reportType,
+        "reportType": reportType,
       },
     );
 

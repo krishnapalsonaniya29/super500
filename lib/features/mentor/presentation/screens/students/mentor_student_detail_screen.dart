@@ -6,28 +6,21 @@ import '../../../../../theme/app_colors.dart';
 
 import '../../../../../widgets/loaders/app_loader.dart';
 import './create_report_screen.dart';
-class MentorStudentDetailScreen
-    extends StatefulWidget {
+
+class MentorStudentDetailScreen extends StatefulWidget {
   final String studentId;
 
-  const MentorStudentDetailScreen({
-    super.key,
-    required this.studentId,
-  });
+  const MentorStudentDetailScreen({super.key, required this.studentId});
 
   @override
-  State<MentorStudentDetailScreen>
-      createState() =>
-          _MentorStudentDetailScreenState();
+  State<MentorStudentDetailScreen> createState() =>
+      _MentorStudentDetailScreenState();
 }
 
-class _MentorStudentDetailScreenState
-    extends State<
-        MentorStudentDetailScreen> {
+class _MentorStudentDetailScreenState extends State<MentorStudentDetailScreen> {
   bool isLoading = true;
 
-  Map<String, dynamic>?
-      student;
+  Map<String, dynamic>? student;
 
   @override
   void initState() {
@@ -36,20 +29,14 @@ class _MentorStudentDetailScreenState
     loadStudent();
   }
 
-  Future<void>
-      loadStudent() async {
+  Future<void> loadStudent() async {
     try {
-      final response =
-          await MentorService
-              .getStudentDetails(
-        widget.studentId,
-      );
+      final response = await MentorService.getStudentDetails(widget.studentId);
 
       if (!mounted) return;
-     
+
       setState(() {
-        student =
-            response["student"];
+        student = response["student"];
 
         isLoading = false;
       });
@@ -60,48 +47,27 @@ class _MentorStudentDetailScreenState
         isLoading = false;
       });
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        SnackBar(
-          content: Text(
-            e.toString(),
-          ),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
-  Widget buildSectionTitle(
-    String title,
-  ) {
+  Widget buildSectionTitle(String title) {
     return Padding(
-      padding:
-          const EdgeInsets.only(
-        top: 22,
-        bottom: 12,
-      ),
+      padding: const EdgeInsets.only(top: 22, bottom: 12),
 
       child: Text(
         title,
 
-        style: const TextStyle(
-          fontSize: 19,
-          fontWeight:
-              FontWeight.bold,
-        ),
+        style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
       ),
     );
   }
 
-  Widget buildInfoTile({
-    required String label,
-    required String value,
-  }) {
+  Widget buildInfoTile({required String label, required String value}) {
     return Padding(
-      padding:
-          const EdgeInsets.only(
-        bottom: 10,
-      ),
+      padding: const EdgeInsets.only(bottom: 10),
 
       child: Row(
         children: [
@@ -111,205 +77,131 @@ class _MentorStudentDetailScreenState
             child: Text(
               label,
 
-              style:
-                  const TextStyle(
-                fontWeight:
-                    FontWeight.w600,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.w600),
             ),
           ),
 
-          Expanded(
-            child: Text(
-              value.isEmpty
-                  ? "N/A"
-                  : value,
-            ),
-          ),
+          Expanded(child: Text(value.isEmpty ? "N/A" : value)),
         ],
       ),
     );
   }
 
+  String? getProfileImage(List<Map<String, dynamic>> documents) {
+    try {
+      final photo = documents.firstWhere(
+        (doc) => doc["documentType"] == "PHOTO",
+      );
 
-  String? getProfileImage(
-  List<Map<String, dynamic>>
-      documents,
-) {
-  try {
-    final photo =
-        documents.firstWhere(
-      (doc) =>
-          doc["documentType"] ==
-          "PHOTO",
-    );
-
-    return photo["documentUrl"];
-  } catch (_) {
-    return null;
+      return photo["documentUrl"];
+    } catch (_) {
+      return null;
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Scaffold(
-        body: Center(
-          child: AppLoader(),
-        ),
-      );
+      return const Scaffold(body: Center(child: AppLoader()));
     }
 
-    final user =
-        student?["user"] ?? {};
+    final user = student?["user"] ?? {};
 
-    final sessions =
-        List<Map<String, dynamic>>.from(
+    final sessions = List<Map<String, dynamic>>.from(
       student?["sessions"] ?? [],
     );
-    
-    final documents =
-        List<Map<String, dynamic>>.from(
+
+    final documents = List<Map<String, dynamic>>.from(
       student?["documents"] ?? [],
     );
 
-    final achievements =
-        List<Map<String, dynamic>>.from(
-      student?["achievements"] ??
-          [],
+    final achievements = List<Map<String, dynamic>>.from(
+      student?["achievements"] ?? [],
     );
 
-    final expenses =
-        List<Map<String, dynamic>>.from(
+    final expenses = List<Map<String, dynamic>>.from(
       student?["expenses"] ?? [],
     );
 
-    final fullName =
-        user["fullName"] ?? "";
+    final fullName = user["fullName"] ?? "";
 
-    final profileImage =
-    getProfileImage(
-      documents,
-    );
-  
+    final profileImage = getProfileImage(documents);
+
     return Scaffold(
-      backgroundColor:
-          AppColors.background,
+      backgroundColor: AppColors.background,
 
       appBar: AppBar(
-        backgroundColor:
-            AppColors.primary,
+        backgroundColor: AppColors.primary,
 
-        title: Text(
-          fullName.isEmpty
-              ? "Student"
-              : fullName,
-        ),
+        title: Text(fullName.isEmpty ? "Student" : fullName),
       ),
 
       body: SingleChildScrollView(
-        padding:
-            const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
 
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
 
           children: [
             /// ============================
             /// PROFILE CARD
             /// ============================
-
             Card(
-              shape:
-                  RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.circular(
-                  18,
-                ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
               ),
 
               child: Padding(
-                padding:
-                    const EdgeInsets.all(
-                  18,
-                ),
+                padding: const EdgeInsets.all(18),
 
                 child: Row(
                   children: [
-                    
                     CircleAvatar(
                       radius: 38,
 
-                      backgroundColor:
-                          AppColors.gold,
+                      backgroundColor: AppColors.gold,
 
-                      backgroundImage:
-                          profileImage != null
-                              ? NetworkImage(
-                                  profileImage,
-                                )
-                              : null,
+                      backgroundImage: profileImage != null
+                          ? NetworkImage(profileImage)
+                          : null,
 
-                      child:
-                          profileImage == null
-                              ? Text(
-                                  fullName.isNotEmpty
-                                      ? fullName[0]
-                                          .toUpperCase()
-                                      : "S",
+                      child: profileImage == null
+                          ? Text(
+                              fullName.isNotEmpty
+                                  ? fullName[0].toUpperCase()
+                                  : "S",
 
-                                  style:
-                                      const TextStyle(
-                                    fontSize: 28,
-                                    fontWeight:
-                                        FontWeight.bold,
-                                    color:
-                                        Colors.black,
-                                  ),
-                                )
-                              : null,
+                              style: const TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            )
+                          : null,
                     ),
 
-
-                    const SizedBox(
-                      width: 16,
-                    ),
+                    const SizedBox(width: 16),
 
                     Expanded(
                       child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment
-                                .start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
 
                         children: [
                           Text(
                             fullName,
 
-                            style:
-                                const TextStyle(
-                              fontSize:
-                                  21,
+                            style: const TextStyle(
+                              fontSize: 21,
 
-                              fontWeight:
-                                  FontWeight
-                                      .bold,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
 
-                          const SizedBox(
-                            height: 6,
-                          ),
+                          const SizedBox(height: 6),
 
-                          Text(
-                            student?["schoolName"] ??
-                                "",
-                          ),
+                          Text(student?["schoolName"] ?? ""),
 
-                          Text(
-                            student?["stream"] ??
-                                "",
-                          ),
+                          Text(student?["stream"] ?? ""),
                         ],
                       ),
                     ),
@@ -321,73 +213,40 @@ class _MentorStudentDetailScreenState
             /// ============================
             /// STUDENT DETAILS
             /// ============================
-
-            buildSectionTitle(
-              "Student Details",
-            ),
+            buildSectionTitle("Student Details"),
 
             Card(
               child: Padding(
-                padding:
-                    const EdgeInsets.all(
-                  16,
-                ),
+                padding: const EdgeInsets.all(16),
 
                 child: Column(
                   children: [
-                    buildInfoTile(
-                      label:
-                          "Phone",
+                    buildInfoTile(label: "Phone", value: user["phone"] ?? ""),
 
-                      value:
-                          user["phone"] ??
-                              "",
+                    buildInfoTile(label: "Email", value: user["email"] ?? ""),
+
+                    buildInfoTile(
+                      label: "School",
+
+                      value: student?["schoolName"] ?? "",
                     ),
 
                     buildInfoTile(
-                      label:
-                          "Email",
+                      label: "Stream",
 
-                      value:
-                          user["email"] ??
-                              "",
+                      value: student?["stream"] ?? "",
                     ),
 
                     buildInfoTile(
-                      label:
-                          "School",
+                      label: "Scholarship",
 
-                      value:
-                          student?["schoolName"] ??
-                              "",
+                      value: student?["scholarshipStatus"] ?? "N/A",
                     ),
 
                     buildInfoTile(
-                      label:
-                          "Stream",
+                      label: "Address",
 
-                      value:
-                          student?["stream"] ??
-                              "",
-                    ),
-
-                    buildInfoTile(
-                      label:
-                          "Scholarship",
-
-                      value:
-                          student?[
-                                  "scholarshipStatus"] ??
-                              "N/A",
-                    ),
-
-                    buildInfoTile(
-                      label:
-                          "Address",
-
-                      value:
-                          student?["address"] ??
-                              "",
+                      value: student?["address"] ?? "",
                     ),
                   ],
                 ),
@@ -397,164 +256,92 @@ class _MentorStudentDetailScreenState
             /// ============================
             /// SESSIONS
             /// ============================
+            buildSectionTitle("Sessions"),
 
-            buildSectionTitle(
-              "Sessions",
-            ),
+            if (sessions.isEmpty) const Text("No sessions available"),
 
-            if (sessions.isEmpty)
-              const Text(
-                "No sessions available",
-              ),
+            ...sessions.map((session) {
+              return Card(
+                child: ListTile(
+                  leading: const Icon(Icons.schedule),
 
-            ...sessions.map(
-              (session) {
-                return Card(
-                  child: ListTile(
-                    leading:
-                        const Icon(
-                      Icons.schedule,
-                    ),
+                  title: Text(session["title"] ?? ""),
 
-                    title: Text(
-                      session["title"] ??
-                          "",
-                    ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
 
-                    subtitle: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment
-                              .start,
+                    children: [
+                      Text(session["status"] ?? ""),
 
-                      children: [
-                        Text(
-                          session["status"] ??
-                              "",
-                        ),
-
-                        if (session[
-                                "notes"] !=
-                            null)
-                          Text(
-                            session["notes"],
-                          ),
-                      ],
-                    ),
+                      if (session["notes"] != null) Text(session["notes"]),
+                    ],
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            }),
 
             /// ============================
             /// ACHIEVEMENTS
             /// ============================
+            buildSectionTitle("Achievements"),
 
-            buildSectionTitle(
-              "Achievements",
-            ),
+            if (achievements.isEmpty) const Text("No achievements available"),
 
-            if (achievements.isEmpty)
-              const Text(
-                "No achievements available",
-              ),
+            ...achievements.map((achievement) {
+              return Card(
+                child: ListTile(
+                  leading: const Icon(Icons.emoji_events),
 
-            ...achievements.map(
-              (achievement) {
-                return Card(
-                  child: ListTile(
-                    leading:
-                        const Icon(
-                      Icons.emoji_events,
-                    ),
+                  title: Text(achievement["title"] ?? ""),
 
-                    title: Text(
-                      achievement["title"] ??
-                          "",
-                    ),
-
-                    subtitle: Text(
-                      achievement[
-                              "description"] ??
-                          "",
-                    ),
-                  ),
-                );
-              },
-            ),
+                  subtitle: Text(achievement["description"] ?? ""),
+                ),
+              );
+            }),
 
             /// ============================
             /// EXPENSES
             /// ============================
+            buildSectionTitle("Expenses"),
 
-            buildSectionTitle(
-              "Expenses",
-            ),
+            if (expenses.isEmpty) const Text("No expenses available"),
 
-            if (expenses.isEmpty)
-              const Text(
-                "No expenses available",
-              ),
+            ...expenses.map((expense) {
+              return Card(
+                child: ListTile(
+                  leading: const Icon(Icons.currency_rupee),
 
-            ...expenses.map(
-              (expense) {
-                return Card(
-                  child: ListTile(
-                    leading:
-                        const Icon(
-                      Icons.currency_rupee,
-                    ),
+                  title: Text(expense["title"] ?? ""),
 
-                    title: Text(
-                      expense["title"] ??
-                          "",
-                    ),
+                  subtitle: Text("₹ ${expense["amount"] ?? 0}"),
+                ),
+              );
+            }),
 
-                    subtitle: Text(
-                      "₹ ${expense["amount"] ?? 0}",
-                    ),
-                  ),
-                );
-              },
-            ),
-
-            const SizedBox(
-              height: 80,
-            ),
+            const SizedBox(height: 80),
           ],
         ),
       ),
 
-floatingActionButton:
-    FloatingActionButton(
-  backgroundColor:
-      AppColors.gold,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.gold,
 
-  child: const Icon(
-    Icons.assignment,
-    color: Colors.black,
-  ),
+        child: const Icon(Icons.assignment, color: Colors.black),
 
-  onPressed: () {
+        onPressed: () {
+          Navigator.push(
+            context,
 
-    Navigator.push(
-      context,
+            MaterialPageRoute(
+              builder: (context) => CreateReportScreen(
+                studentId: widget.studentId,
 
-      MaterialPageRoute(
-        builder:
-            (context) =>
-                CreateReportScreen(
-          studentId:
-              widget.studentId,
-
-          studentName:
-              fullName.isEmpty
-                  ? "Student"
-                  : fullName,
-        ),
+                studentName: fullName.isEmpty ? "Student" : fullName,
+              ),
+            ),
+          );
+        },
       ),
-    );
-  },
-),
     );
   }
 }

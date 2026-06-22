@@ -3,106 +3,79 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 
 class DioClient {
-  static final Dio instance = Dio(
-    BaseOptions(
-      baseUrl:
-          "https://super500-backend.onrender.com",
-         // "http://localhost:5000/api/",
-         // "http://10.135.83.149:5000/api/",
-         
+  static final Dio instance =
+      Dio(
+          BaseOptions(
+            baseUrl: "https://super500-backend.onrender.com/api/",
 
-      connectTimeout:
-          const Duration(
-        seconds: 30,
-      ),
+            // "http://localhost:5000/api/",
+            // "http://10.135.83.149:5000/api/",
+            connectTimeout: const Duration(seconds: 30),
 
-      receiveTimeout:
-          const Duration(
-        seconds: 30,
-      ),
+            receiveTimeout: const Duration(seconds: 30),
 
-      headers: {
-        "Content-Type":
-            "application/json",
-        "Accept":
-            "application/json",
-        "ngrok-skip-browser-warning":
-            "true",
-      },
-    ),
-  )
-    // ..interceptors.add(
-    //   InterceptorsWrapper(
-    //     onRequest:
-    //         (
-    //           options,
-    //           handler,
-    //         ) async {
-    //       final prefs =
-    //           await SharedPreferences.getInstance();
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json",
+              "ngrok-skip-browser-warning": "true",
+            },
+          ),
+        )
+        // ..interceptors.add(
+        //   InterceptorsWrapper(
+        //     onRequest:
+        //         (
+        //           options,
+        //           handler,
+        //         ) async {
+        //       final prefs =
+        //           await SharedPreferences.getInstance();
+        //       final token =
+        //           prefs.getString(
+        //         "accessToken",
+        //       );
+        //       print("INTERCEPTOR TOKEN => $token",);
+        //       if (token != null &&
+        //         token.isNotEmpty &&
+        //         token != "null") {
+        //         options.headers[
+        //                 "Authorization"] =
+        //             "Bearer $token";
+        //       }
+        //       return handler.next(
+        //         options,
+        //       );
+        //     },
+        //   ),
+        // )
+        ..interceptors.add(
+          InterceptorsWrapper(
+            onRequest: (options, handler) async {
+              final prefs = await SharedPreferences.getInstance();
 
-    //       final token =
-    //           prefs.getString(
-    //         "accessToken",
-    //       );
-    //       print("INTERCEPTOR TOKEN => $token",);
-    //       if (token != null &&
-    //         token.isNotEmpty &&
-    //         token != "null") {
-    //         options.headers[
-    //                 "Authorization"] =
-    //             "Bearer $token";
-    //       }
+              final token = prefs.getString("accessToken");
 
-    //       return handler.next(
-    //         options,
-    //       );
-    //     },
-    //   ),
-    // )
-    ..interceptors.add(
-  InterceptorsWrapper(
-    onRequest: (
-      options,
-      handler,
-    ) async {
-      final prefs =
-          await SharedPreferences.getInstance();
+              debugPrint("INTERCEPTOR TOKEN => $token");
 
-      final token =
-          prefs.getString(
-        "accessToken",
-      );
+              if (token != null && token.isNotEmpty && token != "null") {
+                options.headers["Authorization"] = "Bearer $token";
+              }
 
-      debugPrint(
-        "INTERCEPTOR TOKEN => $token",
-      );
+              options.headers.putIfAbsent(
+                "ngrok-skip-browser-warning",
+                () => "true",
+              );
 
-      if (token != null &&
-          token.isNotEmpty &&
-          token != "null") {
-        options.headers[
-                "Authorization"] =
-            "Bearer $token";
-      }
-
-      options.headers.putIfAbsent(
-        "ngrok-skip-browser-warning",
-        () => "true",
-      );
-
-      return handler.next(
-        options,
-      );
-    },
-  ),
-)
-    ..interceptors.add(
-      LogInterceptor(
-        request: true,
-        requestBody: true,
-        responseBody: true,
-        responseHeader: false,
-      ),
-    );
+              return handler.next(options);
+            },
+          ),
+        )
+        ..interceptors.add(
+          LogInterceptor(
+            request: true,
+            requestBody: true,
+            responseBody: true,
+            responseHeader: false,
+          ),
+        );
 }

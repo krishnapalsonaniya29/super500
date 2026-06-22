@@ -35,19 +35,13 @@ void main() {
   runApp(const Super500App());
 }
 
-class Super500App
-    extends StatelessWidget {
-  const Super500App({
-    super.key,
-  });
+class Super500App extends StatelessWidget {
+  const Super500App({super.key});
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize:
-          const Size(390, 844),
+      designSize: const Size(390, 844),
 
       minTextAdapt: true,
 
@@ -55,77 +49,52 @@ class Super500App
 
       builder: (_, child) {
         return MaterialApp(
-          debugShowCheckedModeBanner:
-              false,
+          debugShowCheckedModeBanner: false,
 
           title: 'Super 500',
 
-          theme:
-              AppTheme.lightTheme,
+          theme: AppTheme.lightTheme,
 
           initialRoute: '/',
 
           routes: {
             /// SPLASH
-            '/': (_) =>
-                const SplashScreen(),
+            '/': (_) => const SplashScreen(),
 
             /// ROLE SELECTION
-            '/role-selection': (_) =>
-                const RoleSelectionScreen(),
+            '/role-selection': (_) => const RoleSelectionScreen(),
 
             /// STUDENT
-            '/student-login': (_) =>
-                const StudentLoginScreen(),
+            '/student-login': (_) => const StudentLoginScreen(),
 
-            '/student-register': (_) =>
-                const StudentRegisterScreen(),
+            '/student-register': (_) => const StudentRegisterScreen(),
 
-            '/student-dashboard': (_) =>
-                const StudentDashboardScreen(),
+            '/student-dashboard': (_) => const StudentDashboardScreen(),
 
             /// MENTOR
-            '/mentor-login': (_) =>
-                const MentorLoginScreen(),
+            '/mentor-login': (_) => const MentorLoginScreen(),
 
-            '/mentor-register': (_) =>
-                const MentorRegisterScreen(),
+            '/mentor-register': (_) => const MentorRegisterScreen(),
 
-            '/mentor-dashboard': (_) =>
-                const MentorMainScreen(),
+            '/mentor-dashboard': (_) => const MentorMainScreen(),
 
             /// ADMIN
-            '/admin-login': (_) =>
-                const AdminLoginScreen(),
+            '/admin-login': (_) => const AdminLoginScreen(),
 
-            '/admin-dashboard': (_) =>
-                const AdminMainScreen(),
+            '/admin-dashboard': (_) => const AdminMainScreen(),
 
             /// SUPER ADMIN
-            '/super-admin-login': (_) =>
-                const SuperAdminLoginScreen(),
+            '/super-admin-login': (_) => const SuperAdminLoginScreen(),
 
-            '/super-admin-dashboard':
-                (_) =>
-                    const SuperAdminDashboardScreen(),
+            '/super-admin-dashboard': (_) => const SuperAdminDashboardScreen(),
 
             /// OTP SCREEN
-            '/otp-verification':
-                (context) {
-              final args =
-                  ModalRoute.of(
-                    context,
-                  )!
-                      .settings
-                      .arguments
-                  as Map;
+            '/otp-verification': (context) {
+              final args = ModalRoute.of(context)!.settings.arguments as Map;
 
               return OtpVerificationScreen(
-                phoneNumber:
-                    args["phone"],
-                role:
-                    (args["role"] ?? "STUDENT")
-                        .toString(),
+                phoneNumber: args["phone"],
+                role: (args["role"] ?? "STUDENT").toString(),
               );
             },
           },

@@ -1,12 +1,9 @@
-
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/services/auth/auth_service.dart';
 
 import '../../../../theme/app_colors.dart';
-
 
 import '../../../student/presentation/screens/student_dashboard_screen.dart';
 
@@ -17,12 +14,10 @@ class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() =>
-      _SplashScreenState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState
-    extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
@@ -31,62 +26,45 @@ class _SplashScreenState
   }
 
   Future<void> checkLogin() async {
-    await Future.delayed(
-      const Duration(seconds: 2),
-    );
+    await Future.delayed(const Duration(seconds: 2));
 
     try {
-      final token =
-          await AuthService.getToken();
+      final token = await AuthService.getToken();
 
       if (token == null) {
         navigateToRoleSelection();
         return;
       }
 
-      final role =
-          await AuthService
-              .getCurrentUserRole();
+      final role = await AuthService.getCurrentUserRole();
 
       if (!mounted) return;
 
       if (role == "STUDENT") {
-        final user =
-            await AuthService.getCurrentUser();
+        final user = await AuthService.getCurrentUser();
 
-        final student =
-            user["studentProfile"];
+        final student = user["studentProfile"];
 
         if (student == null) {
           navigateToRoleSelection();
           return;
         }
 
-        final verificationStatus =
-            student["verificationStatus"] ??
-            "PENDING";
+        final verificationStatus = student["verificationStatus"] ?? "PENDING";
 
         if (!mounted) return;
 
-        if (verificationStatus ==
-            "APPROVED") {
+        if (verificationStatus == "APPROVED") {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (_) =>
-                  const StudentDashboardScreen(),
-            ),
+            MaterialPageRoute(builder: (_) => const StudentDashboardScreen()),
           );
         } else {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (_) =>
-                  StudentApprovalStatusScreen(
-                studentProfile:
-                    Map<String, dynamic>.from(
-                  student,
-                ),
+              builder: (_) => StudentApprovalStatusScreen(
+                studentProfile: Map<String, dynamic>.from(student),
               ),
             ),
           );
@@ -106,10 +84,7 @@ class _SplashScreenState
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (_) =>
-            const RoleSelectionScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
     );
   }
 
@@ -120,20 +95,17 @@ class _SplashScreenState
 
       body: Center(
         child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
 
           children: [
             Container(
               height: 140,
               width: 140,
-              padding:
-                  const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
 
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius:
-                    BorderRadius.circular(32),
+                borderRadius: BorderRadius.circular(32),
               ),
 
               child: Image.asset(
@@ -167,9 +139,7 @@ class _SplashScreenState
 
             const SizedBox(height: 40),
 
-            const CircularProgressIndicator(
-              color: Colors.white,
-            ),
+            const CircularProgressIndicator(color: Colors.white),
           ],
         ),
       ),

@@ -3,22 +3,16 @@ import 'package:dio/dio.dart';
 import '../../core/network/dio_client.dart';
 
 class SuperAdminService {
-  static final Dio _dio =
-      DioClient.instance;
+  static final Dio _dio = DioClient.instance;
 
-  static const String baseUrl =
-      "/v1/super-admin";
+  static const String baseUrl = "/v1/super-admin";
 
   /// =====================================
   /// DASHBOARD STATS
   /// =====================================
 
-  static Future<Map<String, dynamic>>
-      getDashboardStats() async {
-    final response =
-        await _dio.get(
-      "$baseUrl/dashboard-stats",
-    );
+  static Future<Map<String, dynamic>> getDashboardStats() async {
+    final response = await _dio.get("$baseUrl/dashboard-stats");
 
     return response.data;
   }
@@ -27,12 +21,8 @@ class SuperAdminService {
   /// GET ALL STUDENTS
   /// =====================================
 
-  static Future<Map<String, dynamic>>
-      getStudents() async {
-    final response =
-        await _dio.get(
-      "$baseUrl/students",
-    );
+  static Future<Map<String, dynamic>> getStudents() async {
+    final response = await _dio.get("$baseUrl/students");
 
     return response.data;
   }
@@ -41,12 +31,8 @@ class SuperAdminService {
   /// GET ALL ADMINS
   /// =====================================
 
-  static Future<Map<String, dynamic>>
-      getAdmins() async {
-    final response =
-        await _dio.get(
-      "$baseUrl/admins",
-    );
+  static Future<Map<String, dynamic>> getAdmins() async {
+    final response = await _dio.get("$baseUrl/admins");
 
     return response.data;
   }
@@ -55,12 +41,8 @@ class SuperAdminService {
   /// GET ALL MENTORS
   /// =====================================
 
-  static Future<Map<String, dynamic>>
-      getMentors() async {
-    final response =
-        await _dio.get(
-      "$baseUrl/mentors",
-    );
+  static Future<Map<String, dynamic>> getMentors() async {
+    final response = await _dio.get("$baseUrl/mentors");
 
     return response.data;
   }
@@ -69,29 +51,19 @@ class SuperAdminService {
   /// VERIFY STUDENT
   /// =====================================
 
-  static Future verifyStudent(
-    String id,
-  ) async {
-    return await _dio.put(
-      "$baseUrl/verify-student/$id",
-    );
+  static Future verifyStudent(String id) async {
+    return await _dio.put("$baseUrl/verify-student/$id");
   }
 
   /// =====================================
   /// REJECT STUDENT
   /// =====================================
 
-  static Future rejectStudent(
-    String id,
-    String reason,
-  ) async {
+  static Future rejectStudent(String id, String reason) async {
     return await _dio.put(
       "$baseUrl/reject-student/$id",
 
-      data: {
-        "rejectionReason":
-            reason,
-      },
+      data: {"rejectionReason": reason},
     );
   }
 
@@ -99,36 +71,24 @@ class SuperAdminService {
   /// SUSPEND USER
   /// =====================================
 
-  static Future suspendUser(
-    String id,
-  ) async {
-    return await _dio.put(
-      "$baseUrl/suspend-user/$id",
-    );
+  static Future suspendUser(String id) async {
+    return await _dio.put("$baseUrl/suspend-user/$id");
   }
 
   /// =====================================
   /// ACTIVATE USER
   /// =====================================
 
-  static Future activateUser(
-    String id,
-  ) async {
-    return await _dio.put(
-      "$baseUrl/activate-user/$id",
-    );
+  static Future activateUser(String id) async {
+    return await _dio.put("$baseUrl/activate-user/$id");
   }
 
   /// =====================================
   /// DELETE USER
   /// =====================================
 
-  static Future deleteUser(
-    String id,
-  ) async {
-    return await _dio.delete(
-      "$baseUrl/delete-user/$id",
-    );
+  static Future deleteUser(String id) async {
+    return await _dio.delete("$baseUrl/delete-user/$id");
   }
 
   /// =====================================
@@ -143,13 +103,7 @@ class SuperAdminService {
     return await _dio.post(
       "$baseUrl/create-admin",
 
-      data: {
-        "fullName": fullName,
-
-        "phone": phone,
-
-        "district": district,
-      },
+      data: {"fullName": fullName, "phone": phone, "district": district},
     );
   }
 
@@ -157,70 +111,48 @@ class SuperAdminService {
   /// DELETE ADMIN
   /// =====================================
 
-  static Future deleteAdmin(
-    String id,
-  ) async {
-    return await _dio.delete(
-      "$baseUrl/delete-admin/$id",
-    );
+  static Future deleteAdmin(String id) async {
+    return await _dio.delete("$baseUrl/delete-admin/$id");
   }
 
   /// =====================================
   /// DELETE MENTOR
   /// =====================================
 
-  static Future deleteMentor(
-    String id,
-  ) async {
-    return await _dio.delete(
-      "$baseUrl/delete-mentor/$id",
-    );
+  static Future deleteMentor(String id) async {
+    return await _dio.delete("$baseUrl/delete-mentor/$id");
   }
 
   /// =====================================
-/// Edit Alloted Amount
-/// ====================================
-static Future<Map<String, dynamic>>
-    updateScholarshipAmount({
-  required String studentId,
-  required double amount,
-}) async {
-  final response =
-      await _dio.patch(
-    "$baseUrl/students/$studentId/allotment",
+  /// Edit Alloted Amount
+  /// ====================================
+  static Future<Map<String, dynamic>> updateScholarshipAmount({
+    required String studentId,
+    required double amount,
+  }) async {
+    final response = await _dio.patch(
+      "$baseUrl/students/$studentId/allotment",
 
-    data: {
-      "amount": amount,
-    },
-  );
+      data: {"amount": amount},
+    );
 
-  return response.data;
+    return response.data;
+  }
+
+  /// ====================================
+  /// GET STUDENT RANKINGS
+  /// ====================================
+
+  static Future<Map<String, dynamic>> getStudentRanking() async {
+    final response = await _dio.get("$baseUrl/students/ranking");
+
+    return response.data;
+  }
+
+  /// ===============================
+  /// Recalculate student ranking
+  /// ==============================
+  static Future<void> recalculateRankings() async {
+    await _dio.post("$baseUrl/students/ranking/recalculate");
+  }
 }
-
-/// ====================================
-/// GET STUDENT RANKINGS
-/// ====================================
-
-static Future<Map<String, dynamic>>
-    getStudentRanking() async {
-  final response =
-      await _dio.get(
-    "$baseUrl/students/ranking",
-  );
-
-  return response.data;
-}
-
-
-/// ===============================
-/// Recalculate student ranking
-/// ==============================
-static Future<void>
-    recalculateRankings() async {
-  await _dio.post(
-    "$baseUrl/students/ranking/recalculate",
-  );
-}
-
-}
-

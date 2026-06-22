@@ -12,12 +12,10 @@ class StudentDashboardScreen extends StatefulWidget {
   const StudentDashboardScreen({super.key});
 
   @override
-  State<StudentDashboardScreen> createState() =>
-      _StudentDashboardScreenState();
+  State<StudentDashboardScreen> createState() => _StudentDashboardScreenState();
 }
 
-class _StudentDashboardScreenState
-    extends State<StudentDashboardScreen> {
+class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
   int currentIndex = 0;
 
   late final List<Widget> screens;
@@ -28,7 +26,6 @@ class _StudentDashboardScreenState
 
     screens = [
       // HomeScreen(onNavigate: changeTab),
-
       SessionsScreen(onNavigate: changeTab),
 
       AchievementsScreen(onNavigate: changeTab),
@@ -50,10 +47,7 @@ class _StudentDashboardScreenState
     return Scaffold(
       backgroundColor: AppColors.background,
 
-      body: IndexedStack(
-        index: currentIndex,
-        children: screens,
-      ),
+      body: IndexedStack(index: currentIndex, children: screens),
 
       bottomNavigationBar: Container(
         margin: const EdgeInsets.all(16),
@@ -62,10 +56,7 @@ class _StudentDashboardScreenState
           borderRadius: BorderRadius.circular(26),
 
           gradient: const LinearGradient(
-            colors: [
-              Color(0xFF319699),
-              Color(0xFF319699),
-            ],
+            colors: [Color(0xFF319699), Color(0xFF319699)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -122,10 +113,7 @@ class _StudentDashboardScreenState
                 label: 'Expenses',
               ),
 
-              _buildNavItem(
-                icon: Icons.person_rounded,
-                label: 'Profile',
-              ),
+              _buildNavItem(icon: Icons.person_rounded, label: 'Profile'),
             ],
           ),
         ),
@@ -140,10 +128,7 @@ class _StudentDashboardScreenState
     return BottomNavigationBarItem(
       icon: Padding(
         padding: const EdgeInsets.only(bottom: 4),
-        child: Icon(
-          icon,
-          size: 26,
-        ),
+        child: Icon(icon, size: 26),
       ),
       label: label,
     );

@@ -6,25 +6,17 @@ import '../../../../../services/super_admin/super_admin_service.dart';
 
 import '../../../../../theme/app_colors.dart';
 
-class SuperAdminProfileScreen
-    extends StatefulWidget {
-  final Function(int index)
-      onNavigate;
+class SuperAdminProfileScreen extends StatefulWidget {
+  final Function(int index) onNavigate;
 
-  const SuperAdminProfileScreen({
-    super.key,
-    required this.onNavigate,
-  });
+  const SuperAdminProfileScreen({super.key, required this.onNavigate});
 
   @override
-  State<SuperAdminProfileScreen>
-      createState() =>
-          _SuperAdminProfileScreenState();
+  State<SuperAdminProfileScreen> createState() =>
+      _SuperAdminProfileScreenState();
 }
 
-class _SuperAdminProfileScreenState
-    extends State<
-        SuperAdminProfileScreen> {
+class _SuperAdminProfileScreenState extends State<SuperAdminProfileScreen> {
   bool loading = true;
 
   String? errorMessage;
@@ -51,19 +43,15 @@ class _SuperAdminProfileScreenState
         errorMessage = null;
       });
 
-      final me =
-          await AuthService.getMe();
+      final me = await AuthService.getMe();
 
-      final dashboard =
-          await SuperAdminService
-              .getDashboardStats();
+      final dashboard = await SuperAdminService.getDashboardStats();
 
       user = me["data"];
 
       stats = dashboard["data"];
     } catch (e) {
-      errorMessage =
-          "Failed to load profile";
+      errorMessage = "Failed to load profile";
 
       debugPrint(e.toString());
     } finally {
@@ -80,577 +68,385 @@ class _SuperAdminProfileScreenState
   /// =====================================
 
   Future<void> logout() async {
-    final prefs =
-        await SharedPreferences
-            .getInstance();
+    final prefs = await SharedPreferences.getInstance();
 
     await prefs.clear();
 
     if (!mounted) return;
 
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/',
-      (route) => false,
-    );
+    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          AppColors.background,
+      backgroundColor: AppColors.background,
 
       body: SafeArea(
         child: loading
-            ? const Center(
-                child:
-                    CircularProgressIndicator(),
-              )
-
+            ? const Center(child: CircularProgressIndicator())
             /// ERROR
             : errorMessage != null
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment:
-                          MainAxisAlignment
-                              .center,
-                      children: [
-                        const Icon(
-                          Icons.error,
-                          color:
-                              Colors.red,
-                          size: 70,
-                        ),
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error, color: Colors.red, size: 70),
 
-                        const SizedBox(
-                          height: 16,
-                        ),
+                    const SizedBox(height: 16),
 
-                        Text(
-                          errorMessage!,
-                        ),
+                    Text(errorMessage!),
 
-                        const SizedBox(
-                          height: 20,
-                        ),
+                    const SizedBox(height: 20),
 
-                        ElevatedButton(
-                          onPressed:
-                              loadData,
+                    ElevatedButton(
+                      onPressed: loadData,
 
-                          child:
-                              const Text(
-                            "Retry",
-                          ),
-                        ),
-                      ],
+                      child: const Text("Retry"),
                     ),
-                  )
+                  ],
+                ),
+              )
+            /// SUCCESS
+            : RefreshIndicator(
+                onRefresh: loadData,
 
-                /// SUCCESS
-                : RefreshIndicator(
-                    onRefresh:
-                        loadData,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
 
-                    child:
-                        SingleChildScrollView(
-                      physics:
-                          const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(20),
 
-                      padding:
-                          const EdgeInsets.all(
-                        20,
-                      ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
 
-                      child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment
-                                .start,
-
-                        children: [
-                          /// HEADER
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(20),
-                            margin: const EdgeInsets.only(
-                              bottom: 20,
+                    children: [
+                      /// HEADER
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        margin: const EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.25),
+                              blurRadius: 12,
+                              offset: const Offset(0, 6),
                             ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius:
-                                  BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.primary
-                                      .withValues(alpha:0.25),
-                                  blurRadius: 12,
-                                  offset: const Offset(0, 6),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              height: 70,
+                              width: 70,
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.asset(
+                                  "assets/images/app_logo2.png",
+                                  fit: BoxFit.contain,
                                 ),
-                              ],
+                              ),
                             ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  height: 70,
-                                  width: 70,
-                                  padding:
-                                      const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius:
-                                        BorderRadius.circular(
-                                      16,
+
+                            const SizedBox(width: 16),
+
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Super Admin",
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
                                     ),
                                   ),
-                                  child: ClipRRect(
-                                    borderRadius:
-                                        BorderRadius.circular(
-                                      12,
+
+                                  SizedBox(height: 6),
+
+                                  Text(
+                                    "Scholarship Control Center",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white70,
                                     ),
-                                    child: Image.asset(
-                                      "assets/images/app_logo2.png",
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                ),
-
-                                const SizedBox(width: 16),
-
-                                const Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "Super Admin",
-                                        style: TextStyle(
-                                          fontSize: 24,
-                                          fontWeight:
-                                              FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-
-                                      SizedBox(height: 6),
-
-                                      Text(
-                                        "Scholarship Control Center",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.white70,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(
-                            height: 28,
-                          ),
-
-                          /// PROFILE HERO
-                          Container(
-                            width:
-                                double.infinity,
-
-                            padding:
-                                const EdgeInsets.all(
-                              28,
-                            ),
-
-                            decoration:
-                                BoxDecoration(
-                              gradient:
-                                  const LinearGradient(
-                                colors: [
-                                  Color(
-                                    0xFF0A1931,
-                                  ),
-                                  Color(
-                                    0xFF132D46,
                                   ),
                                 ],
                               ),
-
-                              borderRadius:
-                                  BorderRadius.circular(
-                                30,
-                              ),
                             ),
-
-                            child:
-                                Column(
-                              children: [
-                                Container(
-                                  padding:
-                                      const EdgeInsets.all(
-                                    4,
-                                  ),
-
-                                  decoration:
-                                      const BoxDecoration(
-                                    color:
-                                        Colors.white,
-
-                                    shape:
-                                        BoxShape.circle,
-                                  ),
-
-                                  child:
-                                      CircleAvatar(
-                                    radius:
-                                        48,
-
-                                    backgroundColor:
-                                        AppColors.primary,
-
-                                    child:
-                                        Text(
-                                      (user?["fullName"] ??
-                                              "S")[0]
-                                          .toUpperCase(),
-
-                                      style:
-                                          const TextStyle(
-                                        color:
-                                            Colors.white,
-
-                                        fontSize:
-                                            36,
-
-                                        fontWeight:
-                                            FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                const SizedBox(
-                                  height:
-                                      20,
-                                ),
-
-                                Text(
-                                  user?["fullName"] ??
-                                      "Super Admin",
-
-                                  style:
-                                      const TextStyle(
-                                    color:
-                                        Colors.white,
-
-                                    fontSize:
-                                        30,
-
-                                    fontWeight:
-                                        FontWeight.bold,
-                                  ),
-                                ),
-
-                                const SizedBox(
-                                  height:
-                                      8,
-                                ),
-
-                                const Text(
-                                  "Labour Department Control Authority",
-
-                                  textAlign:
-                                      TextAlign.center,
-
-                                  style:
-                                      TextStyle(
-                                    color:
-                                        Colors.white70,
-
-                                    height:
-                                        1.5,
-                                  ),
-                                ),
-
-                                const SizedBox(
-                                  height:
-                                      26,
-                                ),
-
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child:
-                                          buildProfileStat(
-                                        title:
-                                            "Admins",
-
-                                        value:
-                                            "${stats?["totalAdmins"] ?? 0}",
-                                      ),
-                                    ),
-
-                                    Expanded(
-                                      child:
-                                          buildProfileStat(
-                                        title:
-                                            "Mentors",
-
-                                        value:
-                                            "${stats?["totalMentors"] ?? 0}",
-                                      ),
-                                    ),
-
-                                    Expanded(
-                                      child:
-                                          buildProfileStat(
-                                        title:
-                                            "Students",
-
-                                        value:
-                                            "${stats?["totalStudents"] ?? 0}",
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(
-                            height: 32,
-                          ),
-
-                          /// ACCOUNT DETAILS
-                          const Text(
-                            "Account Details",
-
-                            style:
-                                TextStyle(
-                              fontSize:
-                                  22,
-
-                              fontWeight:
-                                  FontWeight.bold,
-
-                              fontFamily:
-                                  'Poppins',
-                            ),
-                          ),
-
-                          const SizedBox(
-                            height: 18,
-                          ),
-
-                          buildInfoTile(
-                            icon:
-                                Icons.phone_rounded,
-
-                            title:
-                                "Phone Number",
-
-                            value:
-                                user?["phone"] ??
-                                    "-",
-                          ),
-
-                          buildInfoTile(
-                            icon:
-                                Icons.security_rounded,
-
-                            title:
-                                "Role",
-
-                            value:
-                                user?["role"] ??
-                                    "-",
-                          ),
-
-                          buildInfoTile(
-                            icon:
-                                Icons.verified_user_rounded,
-
-                            title:
-                                "Verification Status",
-
-                            value:
-                                user?["isVerified"] ==
-                                        true
-                                    ? "Verified"
-                                    : "Pending",
-                          ),
-
-                          buildInfoTile(
-                            icon:
-                                Icons.circle,
-
-                            title:
-                                "Account Status",
-
-                            value:
-                                user?["isActive"] ==
-                                        true
-                                    ? "Active"
-                                    : "Suspended",
-                          ),
-
-                          const SizedBox(
-                            height: 32,
-                          ),
-
-                          /// SYSTEM STATUS
-                          Container(
-                            width:
-                                double.infinity,
-
-                            padding:
-                                const EdgeInsets.all(
-                              24,
-                            ),
-
-                            decoration:
-                                BoxDecoration(
-                              color:
-                                  Colors.white,
-
-                              borderRadius:
-                                  BorderRadius.circular(
-                                24,
-                              ),
-                            ),
-
-                            child:
-                                Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment
-                                      .start,
-
-                              children: [
-                                const Text(
-                                  "System Status",
-
-                                  style:
-                                      TextStyle(
-                                    fontSize:
-                                        20,
-
-                                    fontWeight:
-                                        FontWeight.bold,
-                                  ),
-                                ),
-
-                                const SizedBox(
-                                  height:
-                                      18,
-                                ),
-
-                                buildStatusRow(
-                                  title:
-                                      "Server",
-
-                                  status:
-                                      "Operational",
-
-                                  color:
-                                      Colors.green,
-                                ),
-
-                                buildStatusRow(
-                                  title:
-                                      "Database",
-
-                                  status:
-                                      "Connected",
-
-                                  color:
-                                      Colors.green,
-                                ),
-
-                                buildStatusRow(
-                                  title:
-                                      "Authentication",
-
-                                  status:
-                                      "Secure",
-
-                                  color:
-                                      Colors.green,
-                                ),
-
-                                buildStatusRow(
-                                  title:
-                                      "Scholarship Engine",
-
-                                  status:
-                                      "Running",
-
-                                  color:
-                                      Colors.green,
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(
-                            height: 36,
-                          ),
-
-                          /// LOGOUT
-                          SizedBox(
-                            width:
-                                double.infinity,
-
-                            height: 58,
-
-                            child:
-                                ElevatedButton.icon(
-                              onPressed:
-                                  logout,
-
-                              icon:
-                                  const Icon(
-                                Icons
-                                    .logout_rounded,
-                              ),
-
-                              label:
-                                  const Text(
-                                "Logout",
-                              ),
-
-                              style:
-                                  ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Colors.red,
-
-                                shape:
-                                    RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(
-                                    20,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(
-                            height: 40,
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
+
+                      const SizedBox(height: 28),
+
+                      /// PROFILE HERO
+                      Container(
+                        width: double.infinity,
+
+                        padding: const EdgeInsets.all(28),
+
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF0A1931), Color(0xFF132D46)],
+                          ),
+
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(4),
+
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+
+                                shape: BoxShape.circle,
+                              ),
+
+                              child: CircleAvatar(
+                                radius: 48,
+
+                                backgroundColor: AppColors.primary,
+
+                                child: Text(
+                                  (user?["fullName"] ?? "S")[0].toUpperCase(),
+
+                                  style: const TextStyle(
+                                    color: Colors.white,
+
+                                    fontSize: 36,
+
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            Text(
+                              user?["fullName"] ?? "Super Admin",
+
+                              style: const TextStyle(
+                                color: Colors.white,
+
+                                fontSize: 30,
+
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            const Text(
+                              "Labour Department Control Authority",
+
+                              textAlign: TextAlign.center,
+
+                              style: TextStyle(
+                                color: Colors.white70,
+
+                                height: 1.5,
+                              ),
+                            ),
+
+                            const SizedBox(height: 26),
+
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: buildProfileStat(
+                                    title: "Admins",
+
+                                    value: "${stats?["totalAdmins"] ?? 0}",
+                                  ),
+                                ),
+
+                                Expanded(
+                                  child: buildProfileStat(
+                                    title: "Mentors",
+
+                                    value: "${stats?["totalMentors"] ?? 0}",
+                                  ),
+                                ),
+
+                                Expanded(
+                                  child: buildProfileStat(
+                                    title: "Students",
+
+                                    value: "${stats?["totalStudents"] ?? 0}",
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      /// ACCOUNT DETAILS
+                      const Text(
+                        "Account Details",
+
+                        style: TextStyle(
+                          fontSize: 22,
+
+                          fontWeight: FontWeight.bold,
+
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+
+                      const SizedBox(height: 18),
+
+                      buildInfoTile(
+                        icon: Icons.phone_rounded,
+
+                        title: "Phone Number",
+
+                        value: user?["phone"] ?? "-",
+                      ),
+
+                      buildInfoTile(
+                        icon: Icons.security_rounded,
+
+                        title: "Role",
+
+                        value: user?["role"] ?? "-",
+                      ),
+
+                      buildInfoTile(
+                        icon: Icons.verified_user_rounded,
+
+                        title: "Verification Status",
+
+                        value: user?["isVerified"] == true
+                            ? "Verified"
+                            : "Pending",
+                      ),
+
+                      buildInfoTile(
+                        icon: Icons.circle,
+
+                        title: "Account Status",
+
+                        value: user?["isActive"] == true
+                            ? "Active"
+                            : "Suspended",
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      /// SYSTEM STATUS
+                      Container(
+                        width: double.infinity,
+
+                        padding: const EdgeInsets.all(24),
+
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+
+                          children: [
+                            const Text(
+                              "System Status",
+
+                              style: TextStyle(
+                                fontSize: 20,
+
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            const SizedBox(height: 18),
+
+                            buildStatusRow(
+                              title: "Server",
+
+                              status: "Operational",
+
+                              color: Colors.green,
+                            ),
+
+                            buildStatusRow(
+                              title: "Database",
+
+                              status: "Connected",
+
+                              color: Colors.green,
+                            ),
+
+                            buildStatusRow(
+                              title: "Authentication",
+
+                              status: "Secure",
+
+                              color: Colors.green,
+                            ),
+
+                            buildStatusRow(
+                              title: "Scholarship Engine",
+
+                              status: "Running",
+
+                              color: Colors.green,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 36),
+
+                      /// LOGOUT
+                      SizedBox(
+                        width: double.infinity,
+
+                        height: 58,
+
+                        child: ElevatedButton.icon(
+                          onPressed: logout,
+
+                          icon: const Icon(Icons.logout_rounded),
+
+                          label: const Text("Logout"),
+
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 40),
+                    ],
                   ),
+                ),
+              ),
       ),
     );
   }
 
-  Widget buildProfileStat({
-    required String title,
-    required String value,
-  }) {
+  Widget buildProfileStat({required String title, required String value}) {
     return Column(
       children: [
         Text(
@@ -661,20 +457,13 @@ class _SuperAdminProfileScreenState
 
             fontSize: 24,
 
-            fontWeight:
-                FontWeight.bold,
+            fontWeight: FontWeight.bold,
           ),
         ),
 
         const SizedBox(height: 6),
 
-        Text(
-          title,
-
-          style: const TextStyle(
-            color: Colors.white70,
-          ),
-        ),
+        Text(title, style: const TextStyle(color: Colors.white70)),
       ],
     );
   }
@@ -685,86 +474,50 @@ class _SuperAdminProfileScreenState
     required String value,
   }) {
     return Container(
-      margin:
-          const EdgeInsets.only(
-        bottom: 16,
-      ),
+      margin: const EdgeInsets.only(bottom: 16),
 
-      padding:
-          const EdgeInsets.all(
-        18,
-      ),
+      padding: const EdgeInsets.all(18),
 
       decoration: BoxDecoration(
         color: Colors.white,
 
-        borderRadius:
-            BorderRadius.circular(
-          22,
-        ),
+        borderRadius: BorderRadius.circular(22),
       ),
 
       child: Row(
         children: [
           Container(
-            padding:
-                const EdgeInsets.all(
-              14,
+            padding: const EdgeInsets.all(14),
+
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+
+              borderRadius: BorderRadius.circular(16),
             ),
 
-            decoration:
-                BoxDecoration(
-              color: AppColors
-                  .primary
-                  .withValues(
-                    alpha: 0.1,
-                  ),
-
-              borderRadius:
-                  BorderRadius.circular(
-                16,
-              ),
-            ),
-
-            child: Icon(
-              icon,
-
-              color:
-                  AppColors.primary,
-            ),
+            child: Icon(icon, color: AppColors.primary),
           ),
 
           const SizedBox(width: 16),
 
           Expanded(
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment
-                      .start,
+              crossAxisAlignment: CrossAxisAlignment.start,
 
               children: [
                 Text(
                   title,
 
-                  style:
-                      const TextStyle(
-                    color: AppColors
-                        .textSecondary,
-                  ),
+                  style: const TextStyle(color: AppColors.textSecondary),
                 ),
 
-                const SizedBox(
-                  height: 6,
-                ),
+                const SizedBox(height: 6),
 
                 Text(
                   value,
 
-                  style:
-                      const TextStyle(
-                    fontWeight:
-                        FontWeight
-                            .bold,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
 
                     fontSize: 16,
                   ),
@@ -783,10 +536,7 @@ class _SuperAdminProfileScreenState
     required Color color,
   }) {
     return Padding(
-      padding:
-          const EdgeInsets.only(
-        bottom: 16,
-      ),
+      padding: const EdgeInsets.only(bottom: 16),
 
       child: Row(
         children: [
@@ -794,42 +544,23 @@ class _SuperAdminProfileScreenState
             child: Text(
               title,
 
-              style: const TextStyle(
-                fontWeight:
-                    FontWeight.w500,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.w500),
             ),
           ),
 
           Container(
-            padding:
-                const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 8,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
 
-            decoration:
-                BoxDecoration(
-              color:
-                  color.withValues(
-                alpha: 0.1,
-              ),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
 
-              borderRadius:
-                  BorderRadius.circular(
-                20,
-              ),
+              borderRadius: BorderRadius.circular(20),
             ),
 
             child: Text(
               status,
 
-              style: TextStyle(
-                color: color,
-
-                fontWeight:
-                    FontWeight.bold,
-              ),
+              style: TextStyle(color: color, fontWeight: FontWeight.bold),
             ),
           ),
         ],

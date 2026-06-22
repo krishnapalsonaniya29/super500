@@ -5,63 +5,37 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter_application_1/services/student/student_service.dart';
 import '../../../student/presentation/screens/student_approval_status_screen.dart';
 import '../../../../services/auth/auth_service.dart';
-class StudentRegisterScreen
-    extends StatefulWidget {
-  const StudentRegisterScreen({
-    super.key,
-  });
+
+class StudentRegisterScreen extends StatefulWidget {
+  const StudentRegisterScreen({super.key});
 
   @override
-  State<StudentRegisterScreen>
-      createState() =>
-          _StudentRegisterScreenState();
+  State<StudentRegisterScreen> createState() => _StudentRegisterScreenState();
 }
 
-class _StudentRegisterScreenState
-    extends State<StudentRegisterScreen> {
+class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
   static const int samagraLength = 9;
 
-  final formKey =
-      GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
 
-  final samagraController =
-      TextEditingController();
-  final apaarController =
-    TextEditingController();
-  final fullNameController =
-      TextEditingController();
-  final fatherNameController =
-      TextEditingController();
-  final districtController =
-      TextEditingController();
-  final genderController =
-      TextEditingController();
-  final dateOfBirthController =
-      TextEditingController();
-  final addressController =
-      TextEditingController();
-  final categoryController =
-      TextEditingController();
-  final schoolController =
-      TextEditingController();
-  final currentClassController =
-      TextEditingController();
-  final annualIncomeController =
-      TextEditingController();
-  final marksController =
-      TextEditingController();
-  final pincodeController =
-      TextEditingController();
+  final samagraController = TextEditingController();
+  final apaarController = TextEditingController();
+  final fullNameController = TextEditingController();
+  final fatherNameController = TextEditingController();
+  final districtController = TextEditingController();
+  final genderController = TextEditingController();
+  final dateOfBirthController = TextEditingController();
+  final addressController = TextEditingController();
+  final categoryController = TextEditingController();
+  final schoolController = TextEditingController();
+  final currentClassController = TextEditingController();
+  final annualIncomeController = TextEditingController();
+  final marksController = TextEditingController();
+  final pincodeController = TextEditingController();
 
-  static const List<String>
-      classOptions = [
-    '10',
-    '11',
-    '12',
-  ];
+  static const List<String> classOptions = ['10', '11', '12'];
 
-  final Map<String, _SelectedDocument>
-      selectedDocuments = {};
+  final Map<String, _SelectedDocument> selectedDocuments = {};
   bool documentsUploaded = false;
 
   bool loading = false;
@@ -94,31 +68,22 @@ class _StudentRegisterScreenState
 
   Future<void> _loadExistingDocuments() async {
     try {
-      final documents =
-          await StudentService
-              .getMyDocuments();
+      final documents = await StudentService.getMyDocuments();
       final uploadedTypes = documents
-          .map(
-            (item) =>
-                item["documentType"]
-                    ?.toString(),
-          )
+          .map((item) => item["documentType"]?.toString())
           .whereType<String>()
           .toSet();
 
       if (!mounted) return;
 
       setState(() {
-        documentsUploaded =
-            uploadedTypes.containsAll(
-          const {
-            'MARKSHEET',
-            'AADHAR',
-            'PHOTO',
-            'CASTE_CERTIFICATE',
-            'INCOME_CERTIFICATE',
-          },
-        );
+        documentsUploaded = uploadedTypes.containsAll(const {
+          'MARKSHEET',
+          'AADHAR',
+          'PHOTO',
+          'CASTE_CERTIFICATE',
+          'INCOME_CERTIFICATE',
+        });
       });
     } catch (_) {
       // Ignore document preload failures and let the user continue manually.
@@ -126,30 +91,18 @@ class _StudentRegisterScreenState
   }
 
   Future<void> fetchSamagra() async {
-    final samagraId =
-        samagraController.text.trim();
+    final samagraId = samagraController.text.trim();
 
     if (samagraId.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-          content: Text(
-            "Enter Samagra ID first",
-          ),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Enter Samagra ID first")));
       return;
     }
 
-    if (samagraId.length <
-        samagraLength) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-          content: Text(
-            "Samagra ID must be 9 digits",
-          ),
-        ),
+    if (samagraId.length < samagraLength) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Samagra ID must be 9 digits")),
       );
       return;
     }
@@ -159,33 +112,19 @@ class _StudentRegisterScreenState
         loading = true;
       });
 
-      final response =
-          await StudentService
-              .fetchSamagra(
-        samagraId,
+      final response = await StudentService.fetchSamagra(samagraId);
+
+      final samagra = Map<String, dynamic>.from(
+        response["data"]?["samagra"] ?? {},
       );
 
-      final samagra =
-          Map<String, dynamic>.from(
-        response["data"]
-                ?["samagra"] ??
-            {},
-      );
-
-      fullNameController.text =
-          samagra["fullName"] ?? "";
-      fatherNameController.text =
-          samagra["fatherName"] ?? "";
-      districtController.text =
-          samagra["district"] ?? "";
-      genderController.text =
-          samagra["gender"] ?? "";
-      dateOfBirthController.text =
-          samagra["dateOfBirth"] ?? "";
-      addressController.text =
-          samagra["address"] ?? "";
-      categoryController.text =
-          samagra["category"] ?? "";
+      fullNameController.text = samagra["fullName"] ?? "";
+      fatherNameController.text = samagra["fatherName"] ?? "";
+      districtController.text = samagra["district"] ?? "";
+      genderController.text = samagra["gender"] ?? "";
+      dateOfBirthController.text = samagra["dateOfBirth"] ?? "";
+      addressController.text = samagra["address"] ?? "";
+      categoryController.text = samagra["category"] ?? "";
 
       if (!mounted) return;
 
@@ -193,25 +132,15 @@ class _StudentRegisterScreenState
         samagraFetched = true;
       });
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-          content: Text(
-            "Samagra details fetched successfully",
-          ),
-        ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Samagra details fetched successfully")),
       );
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        SnackBar(
-          content: Text(
-            e.toString(),
-          ),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
       if (mounted) {
         setState(() {
@@ -222,14 +151,12 @@ class _StudentRegisterScreenState
   }
 
   Future<void> completeProfile() async {
-    if (!formKey.currentState!
-        .validate()) {
+    if (!formKey.currentState!.validate()) {
       return;
     }
 
     if (!documentsUploaded) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
             "Upload all required documents before completing registration",
@@ -244,79 +171,45 @@ class _StudentRegisterScreenState
         loading = true;
       });
 
-      await StudentService
-          .completeProfile(
+      await StudentService.completeProfile(
         payload: {
-          "samagraId":
-              samagraController.text
-                  .trim(),
-          "apaarId":
-              apaarController.text.trim(),
-          
-          "schoolName":
-              schoolController.text
-                  .trim(),
-          "currentClass":
-              currentClassController.text
-                  .trim(),
-          "annualIncome":
-              double.parse(
-            annualIncomeController.text
-                .trim(),
-          ),
-          "marks10th":
-              double.parse(
-            marksController.text
-                .trim(),
-          ), 
-          "pincode":
-              pincodeController.text
-                  .trim(),
+          "samagraId": samagraController.text.trim(),
+          "apaarId": apaarController.text.trim(),
+
+          "schoolName": schoolController.text.trim(),
+          "currentClass": currentClassController.text.trim(),
+          "annualIncome": double.parse(annualIncomeController.text.trim()),
+          "marks10th": double.parse(marksController.text.trim()),
+          "pincode": pincodeController.text.trim(),
         },
       );
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-          content: Text(
-            "Profile completed successfully",
-          ),
-        ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Profile completed successfully")),
       );
 
-      final user =
-            await AuthService.getCurrentUser();
+      final user = await AuthService.getCurrentUser();
 
-        if (!mounted) return;
+      if (!mounted) return;
 
-        final studentProfile =
-            Map<String, dynamic>.from(
-          user["studentProfile"],
-        );
+      final studentProfile = Map<String, dynamic>.from(user["studentProfile"]);
 
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (_) =>
-                StudentApprovalStatusScreen(
-              studentProfile: studentProfile,
-            ),
-          ),
-          (route) => false,
-        );
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              StudentApprovalStatusScreen(studentProfile: studentProfile),
+        ),
+        (route) => false,
+      );
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        SnackBar(
-          content: Text(
-            e.toString(),
-          ),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
       if (mounted) {
         setState(() {
@@ -328,39 +221,26 @@ class _StudentRegisterScreenState
 
   Future<void> pickDocument({
     required String fieldKey,
-    required List<String>
-        allowedExtensions,
+    required List<String> allowedExtensions,
     required bool imageOnly,
   }) async {
-    final result =
-        await FilePicker.platform.pickFiles(
-      type: imageOnly
-          ? FileType.image
-          : FileType.custom,
-      allowedExtensions:
-          imageOnly
-              ? null
-              : allowedExtensions,
+    final result = await FilePicker.platform.pickFiles(
+      type: imageOnly ? FileType.image : FileType.custom,
+      allowedExtensions: imageOnly ? null : allowedExtensions,
       withData: true,
     );
 
-    final file =
-        result?.files.single;
+    final file = result?.files.single;
 
     if (file?.bytes == null) {
       return;
     }
 
     setState(() {
-      selectedDocuments[fieldKey] =
-          _SelectedDocument(
+      selectedDocuments[fieldKey] = _SelectedDocument(
         fileName: file!.name,
         bytes: file.bytes!,
-        contentType:
-            _resolveContentType(
-          file.extension,
-          imageOnly: imageOnly,
-        ),
+        contentType: _resolveContentType(file.extension, imageOnly: imageOnly),
       );
       documentsUploaded = false;
     });
@@ -375,21 +255,13 @@ class _StudentRegisterScreenState
       'incomeCertificate',
     ];
 
-    final missingFields =
-        requiredFields.where(
-      (field) =>
-          !selectedDocuments
-              .containsKey(field),
+    final missingFields = requiredFields.where(
+      (field) => !selectedDocuments.containsKey(field),
     );
 
     if (missingFields.isNotEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-          content: Text(
-            "Please select all required documents",
-          ),
-        ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select all required documents")),
       );
       return;
     }
@@ -399,31 +271,19 @@ class _StudentRegisterScreenState
         loading = true;
       });
 
-      final files =
-          <String, dynamic>{};
+      final files = <String, dynamic>{};
 
-      for (final entry
-          in selectedDocuments.entries) {
-        final document =
-            entry.value;
-        files[entry.key] =
-            StudentService
-                .buildMultipartFile(
+      for (final entry in selectedDocuments.entries) {
+        final document = entry.value;
+        files[entry.key] = StudentService.buildMultipartFile(
           bytes: document.bytes,
-          filename:
-              document.fileName,
-          contentType:
-              document.contentType,
+          filename: document.fileName,
+          contentType: document.contentType,
         );
       }
 
-      await StudentService
-          .uploadDocuments(
-        files:
-            Map<String,
-                MultipartFile>.from(
-          files,
-        ),
+      await StudentService.uploadDocuments(
+        files: Map<String, MultipartFile>.from(files),
       );
 
       if (!mounted) return;
@@ -432,25 +292,15 @@ class _StudentRegisterScreenState
         documentsUploaded = true;
       });
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-          content: Text(
-            "Documents uploaded successfully",
-          ),
-        ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Documents uploaded successfully")),
       );
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        SnackBar(
-          content: Text(
-            e.toString(),
-          ),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
       if (mounted) {
         setState(() {
@@ -459,87 +309,64 @@ class _StudentRegisterScreenState
       }
     }
   }
-  String _resolveContentType(
-    String? extension, {
-    required bool imageOnly,
-  }) {
-    final normalized =
-        extension
-            ?.toLowerCase()
-            .trim();
+
+  String _resolveContentType(String? extension, {required bool imageOnly}) {
+    final normalized = extension?.toLowerCase().trim();
 
     if (normalized == 'png') {
       return 'image/png';
     }
 
-    if (normalized == 'jpg' ||
-        normalized == 'jpeg') {
+    if (normalized == 'jpg' || normalized == 'jpeg') {
       return 'image/jpeg';
     }
 
-    if (!imageOnly &&
-        normalized == 'pdf') {
+    if (!imageOnly && normalized == 'pdf') {
       return 'application/pdf';
     }
 
-    return imageOnly
-        ? 'image/jpeg'
-        : 'application/pdf';
+    return imageOnly ? 'image/jpeg' : 'application/pdf';
   }
 
   Widget buildField({
     required String hint,
-    required TextEditingController
-        controller,
-    TextInputType keyboard =
-        TextInputType.text,
+    required TextEditingController controller,
+    TextInputType keyboard = TextInputType.text,
     bool enabled = true,
     String? Function(String?)? validator,
-    List<TextInputFormatter>?
-        inputFormatters,
+    List<TextInputFormatter>? inputFormatters,
     bool readOnly = false,
   }) {
     return Padding(
-      padding:
-          const EdgeInsets.only(
-        bottom: 16,
-      ),
+      padding: const EdgeInsets.only(bottom: 16),
       child: TextFormField(
         controller: controller,
         enabled: enabled,
         readOnly: readOnly,
         keyboardType: keyboard,
-        inputFormatters:
-            inputFormatters,
+        inputFormatters: inputFormatters,
         validator:
             validator ??
             (value) {
-          if (value == null ||
-              value.trim().isEmpty) {
-            return "$hint is required";
-          }
+              if (value == null || value.trim().isEmpty) {
+                return "$hint is required";
+              }
 
-          return null;
-        },
+              return null;
+            },
         decoration: InputDecoration(
           hintText: hint,
           filled: true,
           fillColor: enabled
               ? readOnly
-                  ? Colors.grey.shade100
-                  : Colors.white
+                    ? Colors.grey.shade100
+                    : Colors.white
               : Colors.grey.shade200,
-          border:
-              OutlineInputBorder(
-            borderRadius:
-                BorderRadius.circular(
-              16,
-            ),
-            borderSide:
-                BorderSide.none,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide.none,
           ),
-          contentPadding:
-              const EdgeInsets.symmetric(
+          contentPadding: const EdgeInsets.symmetric(
             horizontal: 18,
             vertical: 18,
           ),
@@ -550,39 +377,21 @@ class _StudentRegisterScreenState
 
   Widget buildClassDropdown() {
     return Padding(
-      padding:
-          const EdgeInsets.only(
-        bottom: 16,
-      ),
-      child:
-          DropdownButtonFormField<String>(
-        initialValue:
-            currentClassController
-                    .text
-                .isEmpty
-                ? null
-                : currentClassController
-                    .text,
+      padding: const EdgeInsets.only(bottom: 16),
+      child: DropdownButtonFormField<String>(
+        initialValue: currentClassController.text.isEmpty
+            ? null
+            : currentClassController.text,
         items: classOptions
-            .map(
-              (value) =>
-                  DropdownMenuItem(
-                value: value,
-                child: Text(
-                  value,
-                ),
-              ),
-            )
+            .map((value) => DropdownMenuItem(value: value, child: Text(value)))
             .toList(),
         onChanged: loading
             ? null
             : (value) {
-                currentClassController
-                    .text = value ?? '';
+                currentClassController.text = value ?? '';
               },
         validator: (value) {
-          if (value == null ||
-              value.isEmpty) {
+          if (value == null || value.isEmpty) {
             return "Current Class is required";
           }
 
@@ -592,17 +401,11 @@ class _StudentRegisterScreenState
           hintText: "Current Class",
           filled: true,
           fillColor: Colors.white,
-          border:
-              OutlineInputBorder(
-            borderRadius:
-                BorderRadius.circular(
-              16,
-            ),
-            borderSide:
-                BorderSide.none,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide.none,
           ),
-          contentPadding:
-              const EdgeInsets.symmetric(
+          contentPadding: const EdgeInsets.symmetric(
             horizontal: 18,
             vertical: 18,
           ),
@@ -616,67 +419,40 @@ class _StudentRegisterScreenState
     required String fieldKey,
     required VoidCallback onTap,
   }) {
-    final fileName =
-        selectedDocuments[fieldKey]
-            ?.fileName;
+    final fileName = selectedDocuments[fieldKey]?.fileName;
 
     return Container(
-      margin:
-          const EdgeInsets.only(
-        bottom: 14,
-      ),
-      padding:
-          const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(
-          16,
-        ),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.upload_file,
-            color: Color(0xFF0A1931),
-          ),
+          const Icon(Icons.upload_file, color: Color(0xFF0A1931)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment
-                      .start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style:
-                      const TextStyle(
-                    fontWeight:
-                        FontWeight.w600,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
-                const SizedBox(
-                  height: 4,
-                ),
+                const SizedBox(height: 4),
                 Text(
-                  fileName ??
-                      "No file selected",
+                  fileName ?? "No file selected",
                   style: TextStyle(
-                    color:
-                        fileName == null
-                            ? Colors.grey
-                            : Colors.green,
+                    color: fileName == null ? Colors.grey : Colors.green,
                   ),
                 ),
               ],
             ),
           ),
           TextButton(
-            onPressed:
-                loading ? null : onTap,
-            child: const Text(
-              "Choose",
-            ),
+            onPressed: loading ? null : onTap,
+            child: const Text("Choose"),
           ),
         ],
       ),
@@ -686,80 +462,50 @@ class _StudentRegisterScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          const Color(0xFFF5F7FB),
+      backgroundColor: const Color(0xFFF5F7FB),
       appBar: AppBar(
         elevation: 0,
-        backgroundColor:
-            Colors.transparent,
+        backgroundColor: Colors.transparent,
         title: const Text(
           "Student Onboarding",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight:
-                FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
       ),
       body: SafeArea(
         child: Form(
           key: formKey,
           child: SingleChildScrollView(
-            padding:
-                const EdgeInsets.all(
-              20,
-            ),
+            padding: const EdgeInsets.all(20),
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment
-                      .start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
                   "Complete Registration",
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight:
-                        FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(
-                  height: 8,
-                ),
+                const SizedBox(height: 8),
                 const Text(
                   "Link Samagra first, then fill the remaining student details.",
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 16,
-                  ),
+                  style: TextStyle(color: Colors.grey, fontSize: 16),
                 ),
-                const SizedBox(
-                  height: 24,
-                ),
+                const SizedBox(height: 24),
                 buildField(
                   hint: "Samagra ID",
-                  controller:
-                      samagraController,
-                  keyboard:
-                      TextInputType.number,
+                  controller: samagraController,
+                  keyboard: TextInputType.number,
                   enabled: !samagraFetched,
                   inputFormatters: [
-                    FilteringTextInputFormatter
-                        .digitsOnly,
-                    LengthLimitingTextInputFormatter(
-                      samagraLength,
-                    ),
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(samagraLength),
                   ],
                   validator: (value) {
-                    final samagraId =
-                        value?.trim() ?? "";
+                    final samagraId = value?.trim() ?? "";
 
-                    if (samagraId
-                        .isEmpty) {
+                    if (samagraId.isEmpty) {
                       return "Samagra ID is required";
                     }
 
-                    if (samagraId.length <
-                        samagraLength) {
+                    if (samagraId.length < samagraLength) {
                       return "Samagra ID must be 9 digits";
                     }
 
@@ -770,71 +516,54 @@ class _StudentRegisterScreenState
                   width: double.infinity,
                   height: 54,
                   child: ElevatedButton(
-                    onPressed: loading ||
-                            samagraFetched
-                        ? null
-                        : fetchSamagra,
+                    onPressed: loading || samagraFetched ? null : fetchSamagra,
                     child: Text(
                       loading
                           ? "Please wait..."
                           : samagraFetched
-                              ? "Samagra Linked"
-                              : "Fetch Samagra Details",
+                          ? "Samagra Linked"
+                          : "Fetch Samagra Details",
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 28,
-                ),
+                const SizedBox(height: 28),
                 if (samagraFetched) ...[
                   buildField(
                     hint: "Full Name",
-                    controller:
-                        fullNameController,
+                    controller: fullNameController,
                     readOnly: true,
                   ),
                   buildField(
                     hint: "Father Name",
-                    controller:
-                        fatherNameController,
+                    controller: fatherNameController,
                     readOnly: true,
                   ),
                   buildField(
                     hint: "District",
-                    controller:
-                        districtController,
+                    controller: districtController,
                     readOnly: true,
                   ),
                   buildField(
                     hint: "Gender",
-                    controller:
-                        genderController,
+                    controller: genderController,
                     readOnly: true,
                   ),
                   buildField(
-                    hint:
-                        "Date of Birth (YYYY-MM-DD)",
-                    controller:
-                        dateOfBirthController,
+                    hint: "Date of Birth (YYYY-MM-DD)",
+                    controller: dateOfBirthController,
                     readOnly: true,
                   ),
                   buildField(
                     hint: "Address",
-                    controller:
-                        addressController,
+                    controller: addressController,
                     readOnly: true,
                   ),
                   buildField(
                     hint: "Category",
-                    controller:
-                        categoryController,
+                    controller: categoryController,
                     readOnly: true,
                   ),
-                  buildField(
-                    hint: "School Name",
-                    controller:
-                        schoolController,
-                  ),
+                  buildField(hint: "School Name", controller: schoolController),
                   const SizedBox(height: 16),
 
                   buildField(
@@ -842,15 +571,11 @@ class _StudentRegisterScreenState
                     controller: apaarController,
                     keyboard: TextInputType.number,
                     inputFormatters: [
-                      FilteringTextInputFormatter
-                          .digitsOnly,
-                      LengthLimitingTextInputFormatter(
-                        12,
-                      ),
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(12),
                     ],
                     validator: (value) {
-                      final apaarId =
-                          value?.trim() ?? "";
+                      final apaarId = value?.trim() ?? "";
 
                       if (apaarId.isEmpty) {
                         return "APAAR ID is required";
@@ -866,18 +591,15 @@ class _StudentRegisterScreenState
                   buildClassDropdown(),
                   buildField(
                     hint: "Annual Income",
-                    controller:
-                        annualIncomeController,
-                    keyboard:
-                        TextInputType.number,
+                    controller: annualIncomeController,
+                    keyboard: TextInputType.number,
                   ),
                   buildField(
                     hint: "Total Marks Obtained in Class 10 (Out of 500)",
                     controller: marksController,
                     keyboard: TextInputType.number,
                     validator: (value) {
-                      final marks =
-                          int.tryParse(value ?? "");
+                      final marks = int.tryParse(value ?? "");
 
                       if (marks == null) {
                         return "Enter valid marks";
@@ -892,164 +614,98 @@ class _StudentRegisterScreenState
                   ),
                   buildField(
                     hint: "Pincode",
-                    controller:
-                        pincodeController,
-                    keyboard:
-                        TextInputType.number,
+                    controller: pincodeController,
+                    keyboard: TextInputType.number,
                   ),
-                  const SizedBox(
-                    height: 8,
-                  ),
+                  const SizedBox(height: 8),
                   const Text(
                     "Upload Documents",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight:
-                          FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(
-                    height: 8,
-                  ),
+                  const SizedBox(height: 8),
                   const Text(
                     "Upload all required documents before completing registration.",
-                    style: TextStyle(
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(color: Colors.grey),
                   ),
-                  const SizedBox(
-                    height: 16,
-                  ),
+                  const SizedBox(height: 16),
                   buildUploadCard(
-                    title:
-                        "10th Marksheet (PDF)",
-                    fieldKey:
-                        "marksheet",
-                    onTap: () =>
-                        pickDocument(
-                      fieldKey:
-                          "marksheet",
-                      allowedExtensions: [
-                        'pdf',
-                      ],
-                      imageOnly:
-                          false,
+                    title: "10th Marksheet (PDF)",
+                    fieldKey: "marksheet",
+                    onTap: () => pickDocument(
+                      fieldKey: "marksheet",
+                      allowedExtensions: ['pdf'],
+                      imageOnly: false,
                     ),
                   ),
                   buildUploadCard(
-                    title:
-                        "Aadhar Card (PDF)",
-                    fieldKey:
-                        "aadhar",
-                    onTap: () =>
-                        pickDocument(
-                      fieldKey:
-                          "aadhar",
-                      allowedExtensions: [
-                        'pdf',
-                      ],
-                      imageOnly:
-                          false,
+                    title: "Aadhar Card (PDF)",
+                    fieldKey: "aadhar",
+                    onTap: () => pickDocument(
+                      fieldKey: "aadhar",
+                      allowedExtensions: ['pdf'],
+                      imageOnly: false,
                     ),
                   ),
                   buildUploadCard(
-                    title:
-                        "Student Photo (JPG/PNG)",
+                    title: "Student Photo (JPG/PNG)",
                     fieldKey: "photo",
-                    onTap: () =>
-                        pickDocument(
-                      fieldKey:
-                          "photo",
+                    onTap: () => pickDocument(
+                      fieldKey: "photo",
                       allowedExtensions: const [],
                       imageOnly: true,
                     ),
                   ),
                   buildUploadCard(
-                    title:
-                        "Caste Certificate (PDF)",
-                    fieldKey:
-                        "casteCertificate",
-                    onTap: () =>
-                        pickDocument(
-                      fieldKey:
-                          "casteCertificate",
-                      allowedExtensions: [
-                        'pdf',
-                      ],
-                      imageOnly:
-                          false,
+                    title: "Caste Certificate (PDF)",
+                    fieldKey: "casteCertificate",
+                    onTap: () => pickDocument(
+                      fieldKey: "casteCertificate",
+                      allowedExtensions: ['pdf'],
+                      imageOnly: false,
                     ),
                   ),
                   buildUploadCard(
-                    title:
-                        "Income Certificate (PDF)",
-                    fieldKey:
-                        "incomeCertificate",
-                    onTap: () =>
-                        pickDocument(
-                      fieldKey:
-                          "incomeCertificate",
-                      allowedExtensions: [
-                        'pdf',
-                      ],
-                      imageOnly:
-                          false,
+                    title: "Income Certificate (PDF)",
+                    fieldKey: "incomeCertificate",
+                    onTap: () => pickDocument(
+                      fieldKey: "incomeCertificate",
+                      allowedExtensions: ['pdf'],
+                      imageOnly: false,
                     ),
                   ),
-                  const SizedBox(
-                    height: 8,
-                  ),
+                  const SizedBox(height: 8),
                   SizedBox(
                     width: double.infinity,
                     height: 54,
                     child: OutlinedButton(
-                      onPressed: loading
-                          ? null
-                          : uploadDocuments,
+                      onPressed: loading ? null : uploadDocuments,
                       child: Text(
                         loading
                             ? "Please wait..."
                             : documentsUploaded
-                                ? "Documents Uploaded"
-                                : "Upload Documents",
+                            ? "Documents Uploaded"
+                            : "Upload Documents",
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 12,
-                  ),
+                  const SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,
                     height: 58,
                     child: ElevatedButton(
-                      onPressed: loading
-                          ? null
-                          : completeProfile,
-                      style:
-                          ElevatedButton.styleFrom(
-                        backgroundColor:
-                            const Color(
-                          0xFF0A1931,
-                        ),
-                        foregroundColor:
-                            Colors.white,
-                        shape:
-                            RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(
-                            18,
-                          ),
+                      onPressed: loading ? null : completeProfile,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0A1931),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
                         ),
                       ),
                       child: Text(
-                        loading
-                            ? "Please wait..."
-                            : "Complete Profile",
-                        style:
-                            const TextStyle(
+                        loading ? "Please wait..." : "Complete Profile",
+                        style: const TextStyle(
                           fontSize: 17,
-                          fontWeight:
-                              FontWeight.bold,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),

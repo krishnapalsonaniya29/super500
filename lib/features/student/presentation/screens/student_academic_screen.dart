@@ -9,40 +9,29 @@ class StudentAcademicScreen extends StatefulWidget {
   const StudentAcademicScreen({super.key});
 
   @override
-  State<StudentAcademicScreen> createState() =>
-      _StudentAcademicScreenState();
+  State<StudentAcademicScreen> createState() => _StudentAcademicScreenState();
 }
 
-class _StudentAcademicScreenState
-    extends State<StudentAcademicScreen> {
+class _StudentAcademicScreenState extends State<StudentAcademicScreen> {
   final formKey = GlobalKey<FormState>();
 
-  final addressController =
-      TextEditingController();
+  final addressController = TextEditingController();
 
-  final stateController =
-      TextEditingController();
+  final stateController = TextEditingController();
 
-  final pincodeController =
-      TextEditingController();
+  final pincodeController = TextEditingController();
 
-  final annualIncomeController =
-      TextEditingController();
+  final annualIncomeController = TextEditingController();
 
-  final joiningYearController =
-      TextEditingController();
+  final joiningYearController = TextEditingController();
 
-  final currentYearController =
-      TextEditingController();
+  final currentYearController = TextEditingController();
 
-  final bankNameController =
-      TextEditingController();
+  final bankNameController = TextEditingController();
 
-  final accountNumberController =
-      TextEditingController();
+  final accountNumberController = TextEditingController();
 
-  final ifscController =
-      TextEditingController();
+  final ifscController = TextEditingController();
 
   DateTime? selectedDate;
 
@@ -72,11 +61,7 @@ class _StudentAcademicScreenState
 
     if (selectedDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            "Please select date of birth",
-          ),
-        ),
+        const SnackBar(content: Text("Please select date of birth")),
       );
 
       return;
@@ -87,86 +72,59 @@ class _StudentAcademicScreenState
         loading = true;
       });
 
-      final prefs =
-          await SharedPreferences.getInstance();
+      final prefs = await SharedPreferences.getInstance();
 
-      final token =
-          prefs.getString("accessToken");
+      final token = prefs.getString("accessToken");
 
       await Dio().put(
         "${AuthService.baseUrl.replaceAll('/auth', '')}/users/complete-profile",
 
         data: {
-          "dateOfBirth":
-              selectedDate!.toIso8601String(),
+          "dateOfBirth": selectedDate!.toIso8601String(),
 
-          "address":
-              addressController.text.trim(),
+          "address": addressController.text.trim(),
 
-          "state":
-              stateController.text.trim(),
+          "state": stateController.text.trim(),
 
-          "pincode":
-              pincodeController.text.trim(),
+          "pincode": pincodeController.text.trim(),
 
           "category": category,
 
-          "annualIncome": double.parse(
-            annualIncomeController.text.trim(),
-          ),
+          "annualIncome": double.parse(annualIncomeController.text.trim()),
 
-          "joiningYear": int.parse(
-            joiningYearController.text.trim(),
-          ),
+          "joiningYear": int.parse(joiningYearController.text.trim()),
 
-          "currentYear": int.parse(
-            currentYearController.text.trim(),
-          ),
+          "currentYear": int.parse(currentYearController.text.trim()),
 
-          "bankName":
-              bankNameController.text.trim(),
+          "bankName": bankNameController.text.trim(),
 
-          "bankAccountNumber":
-              accountNumberController.text.trim(),
+          "bankAccountNumber": accountNumberController.text.trim(),
 
-          "ifscCode":
-              ifscController.text.trim(),
+          "ifscCode": ifscController.text.trim(),
 
           "profileCompleted": true,
         },
 
-        options: Options(
-          headers: {
-            "Authorization":
-                "Bearer $token",
-          },
-        ),
+        options: Options(headers: {"Authorization": "Bearer $token"}),
       );
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            "Academic details submitted successfully",
-          ),
+          content: Text("Academic details submitted successfully"),
         ),
       );
 
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(
-          builder: (_) =>
-              const StudentDocumentUploadScreen(),
-        ),
+        MaterialPageRoute(builder: (_) => const StudentDocumentUploadScreen()),
         (route) => false,
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString()),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
       setState(() {
         loading = false;
@@ -177,8 +135,7 @@ class _StudentAcademicScreenState
   Widget buildField({
     required String hint,
     required TextEditingController controller,
-    TextInputType keyboard =
-        TextInputType.text,
+    TextInputType keyboard = TextInputType.text,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 18),
@@ -188,8 +145,7 @@ class _StudentAcademicScreenState
         keyboardType: keyboard,
 
         validator: (value) {
-          if (value == null ||
-              value.trim().isEmpty) {
+          if (value == null || value.trim().isEmpty) {
             return "$hint is required";
           }
 
@@ -203,14 +159,12 @@ class _StudentAcademicScreenState
           fillColor: Colors.white,
 
           border: OutlineInputBorder(
-            borderRadius:
-                BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(16),
 
             borderSide: BorderSide.none,
           ),
 
-          contentPadding:
-              const EdgeInsets.symmetric(
+          contentPadding: const EdgeInsets.symmetric(
             horizontal: 18,
             vertical: 18,
           ),
@@ -222,8 +176,7 @@ class _StudentAcademicScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          const Color(0xFFF5F7FB),
+      backgroundColor: const Color(0xFFF5F7FB),
 
       appBar: AppBar(
         elevation: 0,
@@ -231,10 +184,7 @@ class _StudentAcademicScreenState
 
         title: const Text(
           "Academic Details",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
       ),
 
@@ -246,36 +196,26 @@ class _StudentAcademicScreenState
             padding: const EdgeInsets.all(20),
 
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
 
               children: [
                 const Text(
                   "Complete Academic Profile",
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight:
-                        FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                 ),
 
                 const SizedBox(height: 8),
 
                 const Text(
                   "Fill remaining details to continue",
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 16,
-                  ),
+                  style: TextStyle(color: Colors.grey, fontSize: 16),
                 ),
 
                 const SizedBox(height: 30),
 
                 const Text(
                   "Date of Birth",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.w600),
                 ),
 
                 const SizedBox(height: 10),
@@ -285,8 +225,7 @@ class _StudentAcademicScreenState
 
                   child: Container(
                     width: double.infinity,
-                    padding:
-                        const EdgeInsets.symmetric(
+                    padding: const EdgeInsets.symmetric(
                       horizontal: 18,
                       vertical: 18,
                     ),
@@ -294,10 +233,7 @@ class _StudentAcademicScreenState
                     decoration: BoxDecoration(
                       color: Colors.white,
 
-                      borderRadius:
-                          BorderRadius.circular(
-                        16,
-                      ),
+                      borderRadius: BorderRadius.circular(16),
                     ),
 
                     child: Text(
@@ -306,10 +242,9 @@ class _StudentAcademicScreenState
                           : "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}",
 
                       style: TextStyle(
-                        color:
-                            selectedDate == null
-                                ? Colors.grey
-                                : Colors.black,
+                        color: selectedDate == null
+                            ? Colors.grey
+                            : Colors.black,
                       ),
                     ),
                   ),
@@ -317,71 +252,39 @@ class _StudentAcademicScreenState
 
                 const SizedBox(height: 18),
 
-                buildField(
-                  hint: "Address",
-                  controller:
-                      addressController,
-                ),
+                buildField(hint: "Address", controller: addressController),
 
-                buildField(
-                  hint: "State",
-                  controller:
-                      stateController,
-                ),
+                buildField(hint: "State", controller: stateController),
 
                 buildField(
                   hint: "Pincode",
-                  controller:
-                      pincodeController,
-                  keyboard:
-                      TextInputType.number,
+                  controller: pincodeController,
+                  keyboard: TextInputType.number,
                 ),
 
                 DropdownButtonFormField<String>(
                   initialValue: category,
-                  decoration:
-                      InputDecoration(
+                  decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
 
-                    border:
-                        OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius
-                              .circular(
-                        16,
-                      ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
 
-                      borderSide:
-                          BorderSide.none,
+                      borderSide: BorderSide.none,
                     ),
                   ),
 
                   items: const [
-                    DropdownMenuItem(
-                      value: "General",
-                      child: Text("General"),
-                    ),
+                    DropdownMenuItem(value: "General", child: Text("General")),
 
-                    DropdownMenuItem(
-                      value: "OBC",
-                      child: Text("OBC"),
-                    ),
+                    DropdownMenuItem(value: "OBC", child: Text("OBC")),
 
-                    DropdownMenuItem(
-                      value: "SC",
-                      child: Text("SC"),
-                    ),
+                    DropdownMenuItem(value: "SC", child: Text("SC")),
 
-                    DropdownMenuItem(
-                      value: "ST",
-                      child: Text("ST"),
-                    ),
+                    DropdownMenuItem(value: "ST", child: Text("ST")),
 
-                    DropdownMenuItem(
-                      value: "EWS",
-                      child: Text("EWS"),
-                    ),
+                    DropdownMenuItem(value: "EWS", child: Text("EWS")),
                   ],
 
                   onChanged: (value) {
@@ -395,47 +298,31 @@ class _StudentAcademicScreenState
 
                 buildField(
                   hint: "Annual Family Income",
-                  controller:
-                      annualIncomeController,
-                  keyboard:
-                      TextInputType.number,
+                  controller: annualIncomeController,
+                  keyboard: TextInputType.number,
                 ),
 
                 buildField(
                   hint: "Joining Year",
-                  controller:
-                      joiningYearController,
-                  keyboard:
-                      TextInputType.number,
+                  controller: joiningYearController,
+                  keyboard: TextInputType.number,
                 ),
 
                 buildField(
                   hint: "Current Year",
-                  controller:
-                      currentYearController,
-                  keyboard:
-                      TextInputType.number,
+                  controller: currentYearController,
+                  keyboard: TextInputType.number,
                 ),
 
-                buildField(
-                  hint: "Bank Name",
-                  controller:
-                      bankNameController,
-                ),
+                buildField(hint: "Bank Name", controller: bankNameController),
 
                 buildField(
                   hint: "Bank Account Number",
-                  controller:
-                      accountNumberController,
-                  keyboard:
-                      TextInputType.number,
+                  controller: accountNumberController,
+                  keyboard: TextInputType.number,
                 ),
 
-                buildField(
-                  hint: "IFSC Code",
-                  controller:
-                      ifscController,
-                ),
+                buildField(hint: "IFSC Code", controller: ifscController),
 
                 const SizedBox(height: 35),
 
@@ -444,39 +331,23 @@ class _StudentAcademicScreenState
                   height: 58,
 
                   child: ElevatedButton(
-                    onPressed: loading
-                        ? null
-                        : submitAcademicDetails,
+                    onPressed: loading ? null : submitAcademicDetails,
 
-                    style:
-                        ElevatedButton.styleFrom(
-                      backgroundColor:
-                          const Color(
-                        0xFF0A1931,
-                      ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0A1931),
 
-                      shape:
-                          RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius
-                                .circular(
-                          18,
-                        ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
                       ),
                     ),
 
                     child: loading
-                        ? const CircularProgressIndicator(
-                            color:
-                                Colors.white,
-                          )
+                        ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
                             "Submit Details",
                             style: TextStyle(
                               fontSize: 17,
-                              fontWeight:
-                                  FontWeight
-                                      .bold,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                   ),

@@ -6,23 +6,15 @@ import '../../../../services/auth/auth_service.dart';
 
 import '../../../../theme/app_colors.dart';
 
-class AdminLoginScreen
-    extends StatefulWidget {
-  const AdminLoginScreen({
-    super.key,
-  });
+class AdminLoginScreen extends StatefulWidget {
+  const AdminLoginScreen({super.key});
 
   @override
-  State<AdminLoginScreen>
-      createState() =>
-          _AdminLoginScreenState();
+  State<AdminLoginScreen> createState() => _AdminLoginScreenState();
 }
 
-class _AdminLoginScreenState
-    extends State<
-        AdminLoginScreen> {
-  final phoneController =
-      TextEditingController();
+class _AdminLoginScreenState extends State<AdminLoginScreen> {
+  final phoneController = TextEditingController();
 
   bool loading = false;
 
@@ -31,17 +23,11 @@ class _AdminLoginScreenState
   /// =====================================
 
   Future<void> sendOtp() async {
-    if (phoneController.text
-        .trim()
-        .isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+    if (phoneController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          backgroundColor:
-              Colors.red,
-          content: Text(
-            "Please enter phone number",
-          ),
+          backgroundColor: Colors.red,
+          content: Text("Please enter phone number"),
         ),
       );
 
@@ -53,28 +39,19 @@ class _AdminLoginScreenState
         loading = true;
       });
 
-      final response =
-          await AuthService.sendOtp(
-            phone:
-                phoneController.text.trim(),
-            role: "ADMIN",
-          );
-      
-
-      debugPrint(
-        response.toString(),
+      final response = await AuthService.sendOtp(
+        phone: phoneController.text.trim(),
+        role: "ADMIN",
       );
+
+      debugPrint(response.toString());
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          backgroundColor:
-              Colors.green,
-          content: Text(
-            "OTP sent successfully",
-          ),
+          backgroundColor: Colors.green,
+          content: Text("OTP sent successfully"),
         ),
       );
 
@@ -82,26 +59,13 @@ class _AdminLoginScreenState
         context,
         AppRoutes.otpVerification,
 
-        arguments: {
-          "phone":
-              phoneController.text
-                  .trim(),
-
-          "role": "ADMIN",
-        },
+        arguments: {"phone": phoneController.text.trim(), "role": "ADMIN"},
       );
     } catch (e) {
       debugPrint(e.toString());
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        SnackBar(
-          backgroundColor:
-              Colors.red,
-          content: Text(
-            e.toString(),
-          ),
-        ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(backgroundColor: Colors.red, content: Text(e.toString())),
       );
     } finally {
       if (mounted) {
@@ -115,20 +79,14 @@ class _AdminLoginScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          AppColors.background,
+      backgroundColor: AppColors.background,
 
       body: SafeArea(
         child: SingleChildScrollView(
-          padding:
-              const EdgeInsets.all(
-            24,
-          ),
+          padding: const EdgeInsets.all(24),
 
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment
-                    .start,
+            crossAxisAlignment: CrossAxisAlignment.start,
 
             children: [
               Container(
@@ -155,12 +113,10 @@ class _AdminLoginScreenState
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius:
-                                BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                           child: ClipRRect(
-                            borderRadius:
-                                BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(12),
                             child: Image.asset(
                               "assets/images/app_logo2.png",
                               fit: BoxFit.contain,
@@ -172,15 +128,13 @@ class _AdminLoginScreenState
 
                         const Expanded(
                           child: Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 "Admin Portal",
                                 style: TextStyle(
                                   fontSize: 24,
-                                  fontWeight:
-                                      FontWeight.bold,
+                                  fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
                               ),
@@ -202,10 +156,7 @@ class _AdminLoginScreenState
 
                     const SizedBox(height: 20),
 
-                    Image.asset(
-                      "assets/images/admin_role.png",
-                      height: 120,
-                    ),
+                    Image.asset("assets/images/admin_role.png", height: 120),
 
                     const SizedBox(height: 12),
 
@@ -238,178 +189,110 @@ class _AdminLoginScreenState
               const Text(
                 "Phone Number",
 
-                style: TextStyle(
-                  fontSize: 16,
-
-                  fontWeight:
-                      FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
 
-              const SizedBox(
-                height: 12,
-              ),
+              const SizedBox(height: 12),
 
               TextField(
-                controller:
-                    phoneController,
+                controller: phoneController,
 
-                keyboardType:
-                    TextInputType.phone,
+                keyboardType: TextInputType.phone,
 
-                decoration:
-                    InputDecoration(
-                  hintText:
-                      "Enter phone number",
+                decoration: InputDecoration(
+                  hintText: "Enter phone number",
 
-                  prefixIcon:
-                      const Icon(
-                    Icons.phone,
-                  ),
+                  prefixIcon: const Icon(Icons.phone),
 
                   filled: true,
 
-                  fillColor:
-                      Colors.white,
+                  fillColor: Colors.white,
 
-                  border:
-                      OutlineInputBorder(
-                    borderRadius:
-                        BorderRadius.circular(
-                      20,
-                    ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
 
-                    borderSide:
-                        BorderSide.none,
+                    borderSide: BorderSide.none,
                   ),
 
-                  contentPadding:
-                      const EdgeInsets.symmetric(
-                    vertical: 20,
-                  ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 20),
                 ),
               ),
 
-              const SizedBox(
-                height: 36,
-              ),
+              const SizedBox(height: 36),
 
               /// LOGIN BUTTON
               SizedBox(
-                width:
-                    double.infinity,
+                width: double.infinity,
 
                 height: 58,
 
-                child:
-                    ElevatedButton(
-                  onPressed:
-                      loading
-                          ? null
-                          : sendOtp,
+                child: ElevatedButton(
+                  onPressed: loading ? null : sendOtp,
 
-                  style:
-                      ElevatedButton.styleFrom(
-                    backgroundColor:
-                        AppColors.primary,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
 
-                    shape:
-                        RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(
-                        20,
-                      ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
                     ),
                   ),
 
-                  child:
-                      loading
-                          ? const SizedBox(
-                              height:
-                                  24,
+                  child: loading
+                      ? const SizedBox(
+                          height: 24,
 
-                              width:
-                                  24,
+                          width: 24,
 
-                              child:
-                                  CircularProgressIndicator(
-                                color:
-                                    Colors.white,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
 
-                                strokeWidth:
-                                    2.5,
-                              ),
-                            )
-                          : const Text(
-                              "Send OTP",
+                            strokeWidth: 2.5,
+                          ),
+                        )
+                      : const Text(
+                          "Send OTP",
 
-                              style:
-                                  TextStyle(
-                                fontSize:
-                                    16,
+                          style: TextStyle(
+                            fontSize: 16,
 
-                                fontWeight:
-                                    FontWeight.bold,
+                            fontWeight: FontWeight.bold,
 
-                                color:
-                                    Colors.white,
-                              ),
-                            ),
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
               ),
 
-              const SizedBox(
-                height: 28,
-              ),
+              const SizedBox(height: 28),
 
               /// INFO CARD
               Container(
-                padding:
-                    const EdgeInsets.all(
-                  18,
-                ),
+                padding: const EdgeInsets.all(18),
 
-                decoration:
-                    BoxDecoration(
-                  color:
-                      Colors.white,
+                decoration: BoxDecoration(
+                  color: Colors.white,
 
-                  borderRadius:
-                      BorderRadius.circular(
-                    20,
-                  ),
+                  borderRadius: BorderRadius.circular(20),
                 ),
 
                 child: const Row(
                   children: [
-                    Icon(
-                      Icons.info_outline,
+                    Icon(Icons.info_outline, color: AppColors.primary),
 
-                      color:
-                          AppColors.primary,
-                    ),
-
-                    SizedBox(
-                      width: 14,
-                    ),
+                    SizedBox(width: 14),
 
                     Expanded(
                       child: Text(
                         "Use your registered district admin phone number to continue.",
 
-                        style:
-                            TextStyle(
-                          height: 1.5,
-                        ),
+                        style: TextStyle(height: 1.5),
                       ),
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(
-                height: 40,
-              ),
+              const SizedBox(height: 40),
             ],
           ),
         ),

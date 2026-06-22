@@ -4,25 +4,16 @@ import '../../../../../services/admin/admin_service.dart';
 
 import '../../../../../theme/app_colors.dart';
 
-class PendingDocumentsScreen
-    extends StatefulWidget {
-  final Function(int index)
-      onNavigate;
+class PendingDocumentsScreen extends StatefulWidget {
+  final Function(int index) onNavigate;
 
-  const PendingDocumentsScreen({
-    super.key,
-    required this.onNavigate,
-  });
+  const PendingDocumentsScreen({super.key, required this.onNavigate});
 
   @override
-  State<PendingDocumentsScreen>
-      createState() =>
-          _PendingDocumentsScreenState();
+  State<PendingDocumentsScreen> createState() => _PendingDocumentsScreenState();
 }
 
-class _PendingDocumentsScreenState
-    extends State<
-        PendingDocumentsScreen> {
+class _PendingDocumentsScreenState extends State<PendingDocumentsScreen> {
   List documents = [];
 
   List filteredDocuments = [];
@@ -35,8 +26,7 @@ class _PendingDocumentsScreenState
 
   String? errorMessage;
 
-  final searchController =
-      TextEditingController();
+  final searchController = TextEditingController();
 
   /// PAGINATION
   int currentPage = 1;
@@ -61,30 +51,18 @@ class _PendingDocumentsScreenState
         errorMessage = null;
       });
 
-      final response =
-          await AdminService
-              .getStudents();
+      final response = await AdminService.getStudents();
 
-      final students =
-          response["data"] ?? [];
+      final students = response["data"] ?? [];
 
       List pendingDocs = [];
 
-      for (final student
-          in students) {
-        final studentDocs =
-            student["documents"] ??
-                [];
+      for (final student in students) {
+        final studentDocs = student["documents"] ?? [];
 
-        for (final doc
-            in studentDocs) {
-          if (doc["verified"] !=
-              true) {
-            pendingDocs.add({
-              ...doc,
-              "student":
-                  student,
-            });
+        for (final doc in studentDocs) {
+          if (doc["verified"] != true) {
+            pendingDocs.add({...doc, "student": student});
           }
         }
       }
@@ -95,8 +73,7 @@ class _PendingDocumentsScreenState
     } catch (e) {
       debugPrint(e.toString());
 
-      errorMessage =
-          "Failed to load documents";
+      errorMessage = "Failed to load documents";
     } finally {
       if (mounted) {
         setState(() {
@@ -111,31 +88,17 @@ class _PendingDocumentsScreenState
   /// =====================================
 
   void applySearch() {
-    filteredDocuments =
-        documents.where((doc) {
-      final student =
-          doc["student"];
+    filteredDocuments = documents.where((doc) {
+      final student = doc["student"];
 
-      final user =
-          student["user"];
+      final user = student["user"];
 
-      final name =
-          (user["fullName"] ?? "")
-              .toString()
-              .toLowerCase();
+      final name = (user["fullName"] ?? "").toString().toLowerCase();
 
-      final type =
-          (doc["documentType"] ??
-                  "")
-              .toString()
-              .toLowerCase();
+      final type = (doc["documentType"] ?? "").toString().toLowerCase();
 
-      return name.contains(
-            searchQuery.toLowerCase(),
-          ) ||
-          type.contains(
-            searchQuery.toLowerCase(),
-          );
+      return name.contains(searchQuery.toLowerCase()) ||
+          type.contains(searchQuery.toLowerCase());
     }).toList();
 
     currentPage = 1;
@@ -147,73 +110,51 @@ class _PendingDocumentsScreenState
   /// PAGINATION
   /// =====================================
 
-  int get totalPages =>
-      (filteredDocuments.length /
-              itemsPerPage)
-          .ceil();
+  int get totalPages => (filteredDocuments.length / itemsPerPage).ceil();
 
   List get paginatedDocuments {
-    final start =
-        (currentPage - 1) *
-            itemsPerPage;
+    final start = (currentPage - 1) * itemsPerPage;
 
-    int end =
-        start + itemsPerPage;
+    int end = start + itemsPerPage;
 
-    if (end >
-        filteredDocuments.length) {
-      end =
-          filteredDocuments.length;
+    if (end > filteredDocuments.length) {
+      end = filteredDocuments.length;
     }
 
-    return filteredDocuments.sublist(
-      start,
-      end,
-    );
+    return filteredDocuments.sublist(start, end);
   }
 
   /// =====================================
   /// APPROVE DOCUMENT
   /// =====================================
 
-  Future<void> approveDocument(
-    String id,
-  ) async {
+  Future<void> approveDocument(String id) async {
     try {
       setState(() {
         actionLoading = true;
       });
 
-      await AdminService
-          .approveDocument(id);
+      await AdminService.approveDocument(id);
 
       await fetchDocuments();
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          backgroundColor:
-              Colors.green,
+          backgroundColor: Colors.green,
 
-          content: Text(
-            "Document approved successfully",
-          ),
+          content: Text("Document approved successfully"),
         ),
       );
     } catch (e) {
       debugPrint(e.toString());
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          backgroundColor:
-              Colors.red,
+          backgroundColor: Colors.red,
 
-          content: Text(
-            "Failed to approve document",
-          ),
+          content: Text("Failed to approve document"),
         ),
       );
     } finally {
@@ -238,39 +179,27 @@ class _PendingDocumentsScreenState
         actionLoading = true;
       });
 
-      await AdminService
-          .rejectDocument(
-        id: id,
-        remarks: remarks,
-      );
+      await AdminService.rejectDocument(id: id, remarks: remarks);
 
       await fetchDocuments();
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          backgroundColor:
-              Colors.orange,
+          backgroundColor: Colors.orange,
 
-          content: Text(
-            "Document rejected",
-          ),
+          content: Text("Document rejected"),
         ),
       );
     } catch (e) {
       debugPrint(e.toString());
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          backgroundColor:
-              Colors.red,
+          backgroundColor: Colors.red,
 
-          content: Text(
-            "Failed to reject document",
-          ),
+          content: Text("Failed to reject document"),
         ),
       );
     } finally {
@@ -286,70 +215,43 @@ class _PendingDocumentsScreenState
   /// REJECTION DIALOG
   /// =====================================
 
-  void showRejectDialog(
-    String id,
-  ) {
-    final controller =
-        TextEditingController();
+  void showRejectDialog(String id) {
+    final controller = TextEditingController();
 
     showDialog(
       context: context,
-      builder:
-          (_) => AlertDialog(
-        title:
-            const Text(
-          "Reject Document",
-        ),
+      builder: (_) => AlertDialog(
+        title: const Text("Reject Document"),
 
         content: TextField(
           controller: controller,
 
           maxLines: 3,
 
-          decoration:
-              const InputDecoration(
-            hintText:
-                "Enter rejection remarks",
+          decoration: const InputDecoration(
+            hintText: "Enter rejection remarks",
           ),
         ),
 
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(
-                context,
-              );
+              Navigator.pop(context);
             },
 
-            child:
-                const Text(
-              "Cancel",
-            ),
+            child: const Text("Cancel"),
           ),
 
           ElevatedButton(
             onPressed: () async {
-              Navigator.pop(
-                context,
-              );
+              Navigator.pop(context);
 
-              await rejectDocument(
-                id: id,
-                remarks:
-                    controller.text,
-              );
+              await rejectDocument(id: id, remarks: controller.text);
             },
 
-            style:
-                ElevatedButton.styleFrom(
-              backgroundColor:
-                  Colors.red,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
 
-            child:
-                const Text(
-              "Reject",
-            ),
+            child: const Text("Reject"),
           ),
         ],
       ),
@@ -359,455 +261,290 @@ class _PendingDocumentsScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          AppColors.background,
+      backgroundColor: AppColors.background,
 
       body: SafeArea(
         child: loading
-            ? const Center(
-                child:
-                    CircularProgressIndicator(),
-              )
-
+            ? const Center(child: CircularProgressIndicator())
             /// ERROR
             : errorMessage != null
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment:
-                          MainAxisAlignment
-                              .center,
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
 
-                      children: [
-                        const Icon(
-                          Icons.error,
-                          color:
-                              Colors.red,
-                          size: 70,
-                        ),
+                  children: [
+                    const Icon(Icons.error, color: Colors.red, size: 70),
 
-                        const SizedBox(
-                          height: 16,
-                        ),
+                    const SizedBox(height: 16),
 
-                        Text(
-                          errorMessage!,
-                        ),
+                    Text(errorMessage!),
 
-                        const SizedBox(
-                          height: 20,
-                        ),
+                    const SizedBox(height: 20),
 
-                        ElevatedButton(
-                          onPressed:
-                              fetchDocuments,
+                    ElevatedButton(
+                      onPressed: fetchDocuments,
 
-                          child:
-                              const Text(
-                            "Retry",
-                          ),
-                        ),
-                      ],
+                      child: const Text("Retry"),
                     ),
-                  )
+                  ],
+                ),
+              )
+            /// SUCCESS
+            : RefreshIndicator(
+                onRefresh: fetchDocuments,
 
-                /// SUCCESS
-                : RefreshIndicator(
-                    onRefresh:
-                        fetchDocuments,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
 
-                    child:
-                        SingleChildScrollView(
-                      physics:
-                          const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(20),
 
-                      padding:
-                          const EdgeInsets.all(
-                        20,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+
+                    children: [
+                      /// HEADER
+                      const Text(
+                        "Pending Documents",
+
+                        style: TextStyle(
+                          fontSize: 30,
+
+                          fontWeight: FontWeight.bold,
+
+                          fontFamily: 'Poppins',
+                        ),
                       ),
 
-                      child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment
-                                .start,
+                      const SizedBox(height: 8),
 
-                        children: [
-                          /// HEADER
-                          const Text(
-                            "Pending Documents",
+                      Text(
+                        "${filteredDocuments.length} pending documents",
 
-                            style:
-                                TextStyle(
-                              fontSize:
-                                  30,
+                        style: const TextStyle(color: AppColors.textSecondary),
+                      ),
 
-                              fontWeight:
-                                  FontWeight.bold,
+                      const SizedBox(height: 24),
 
-                              fontFamily:
-                                  'Poppins',
+                      /// SEARCH
+                      TextField(
+                        controller: searchController,
+
+                        onChanged: (value) {
+                          searchQuery = value;
+
+                          applySearch();
+                        },
+
+                        decoration: InputDecoration(
+                          hintText: "Search documents",
+
+                          prefixIcon: const Icon(Icons.search),
+
+                          filled: true,
+
+                          fillColor: Colors.white,
+
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
+
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      /// LIST
+                      ListView.builder(
+                        shrinkWrap: true,
+
+                        physics: const NeverScrollableScrollPhysics(),
+
+                        itemCount: paginatedDocuments.length,
+
+                        itemBuilder: (_, index) {
+                          final doc = paginatedDocuments[index];
+
+                          final student = doc["student"];
+
+                          final user = student["user"];
+
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 18),
+
+                            padding: const EdgeInsets.all(20),
+
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+
+                              borderRadius: BorderRadius.circular(24),
                             ),
-                          ),
 
-                          const SizedBox(
-                            height: 8,
-                          ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
 
-                          Text(
-                            "${filteredDocuments.length} pending documents",
-
-                            style:
-                                const TextStyle(
-                              color: AppColors
-                                  .textSecondary,
-                            ),
-                          ),
-
-                          const SizedBox(
-                            height: 24,
-                          ),
-
-                          /// SEARCH
-                          TextField(
-                            controller:
-                                searchController,
-
-                            onChanged:
-                                (value) {
-                              searchQuery =
-                                  value;
-
-                              applySearch();
-                            },
-
-                            decoration:
-                                InputDecoration(
-                              hintText:
-                                  "Search documents",
-
-                              prefixIcon:
-                                  const Icon(
-                                Icons.search,
-                              ),
-
-                              filled: true,
-
-                              fillColor:
-                                  Colors.white,
-
-                              border:
-                                  OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.circular(
-                                  20,
-                                ),
-
-                                borderSide:
-                                    BorderSide.none,
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(
-                            height: 24,
-                          ),
-
-                          /// LIST
-                          ListView.builder(
-                            shrinkWrap:
-                                true,
-
-                            physics:
-                                const NeverScrollableScrollPhysics(),
-
-                            itemCount:
-                                paginatedDocuments
-                                    .length,
-
-                            itemBuilder:
-                                (_, index) {
-                              final doc =
-                                  paginatedDocuments[
-                                      index];
-
-                              final student =
-                                  doc["student"];
-
-                              final user =
-                                  student["user"];
-
-                              return Container(
-                                margin:
-                                    const EdgeInsets.only(
-                                  bottom:
-                                      18,
-                                ),
-
-                                padding:
-                                    const EdgeInsets.all(
-                                  20,
-                                ),
-
-                                decoration:
-                                    BoxDecoration(
-                                  color:
-                                      Colors.white,
-
-                                  borderRadius:
-                                      BorderRadius.circular(
-                                    24,
-                                  ),
-                                ),
-
-                                child:
-                                    Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-
+                              children: [
+                                Row(
                                   children: [
-                                    Row(
-                                      children: [
-                                        CircleAvatar(
-                                          radius:
-                                              28,
+                                    CircleAvatar(
+                                      radius: 28,
 
-                                          backgroundColor:
-                                              AppColors.primary,
+                                      backgroundColor: AppColors.primary,
 
-                                          child:
-                                              Text(
-                                            user["fullName"][0],
+                                      child: Text(
+                                        user["fullName"][0],
 
-                                            style:
-                                                const TextStyle(
-                                              color:
-                                                  Colors.white,
+                                        style: const TextStyle(
+                                          color: Colors.white,
 
-                                              fontWeight:
-                                                  FontWeight.bold,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+
+                                    const SizedBox(width: 14),
+
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+
+                                        children: [
+                                          Text(
+                                            user["fullName"],
+
+                                            style: const TextStyle(
+                                              fontSize: 18,
+
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                        ),
 
-                                        const SizedBox(
-                                          width:
-                                              14,
-                                        ),
+                                          const SizedBox(height: 6),
 
-                                        Expanded(
-                                          child:
-                                              Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-
-                                            children: [
-                                              Text(
-                                                user["fullName"],
-
-                                                style:
-                                                    const TextStyle(
-                                                  fontSize:
-                                                      18,
-
-                                                  fontWeight:
-                                                      FontWeight.bold,
-                                                ),
-                                              ),
-
-                                              const SizedBox(
-                                                height:
-                                                    6,
-                                              ),
-
-                                              Text(
-                                                doc["documentType"] ??
-                                                    "-",
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-
-                                    const SizedBox(
-                                      height:
-                                          20,
-                                    ),
-
-                                    buildInfoRow(
-                                      icon:
-                                          Icons.phone,
-                                      title:
-                                          "Phone",
-                                      value:
-                                          user["phone"] ??
-                                              "-",
-                                    ),
-
-                                    const SizedBox(
-                                      height:
-                                          10,
-                                    ),
-
-                                    buildInfoRow(
-                                      icon:
-                                          Icons.description,
-                                      title:
-                                          "Document",
-                                      value:
-                                          doc["documentType"] ??
-                                              "-",
-                                    ),
-
-                                    const SizedBox(
-                                      height:
-                                          10,
-                                    ),
-
-                                    buildInfoRow(
-                                      icon:
-                                          Icons.link,
-                                      title:
-                                          "URL",
-                                      value:
-                                          doc["fileUrl"] ??
-                                              "-",
-                                    ),
-
-                                    const SizedBox(
-                                      height:
-                                          22,
-                                    ),
-
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child:
-                                              ElevatedButton(
-                                            onPressed:
-                                                actionLoading
-                                                    ? null
-                                                    : () {
-                                                        approveDocument(
-                                                          doc["id"],
-                                                        );
-                                                      },
-
-                                            style:
-                                                ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  Colors.green,
-                                            ),
-
-                                            child:
-                                                const Text(
-                                              "Approve",
-                                            ),
-                                          ),
-                                        ),
-
-                                        const SizedBox(
-                                          width:
-                                              14,
-                                        ),
-
-                                        Expanded(
-                                          child:
-                                              ElevatedButton(
-                                            onPressed:
-                                                actionLoading
-                                                    ? null
-                                                    : () {
-                                                        showRejectDialog(
-                                                          doc["id"],
-                                                        );
-                                                      },
-
-                                            style:
-                                                ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  Colors.red,
-                                            ),
-
-                                            child:
-                                                const Text(
-                                              "Reject",
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                          Text(doc["documentType"] ?? "-"),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
-                              );
-                            },
-                          ),
 
-                          const SizedBox(
-                            height: 20,
-                          ),
+                                const SizedBox(height: 20),
 
-                          /// PAGINATION
-                          if (totalPages > 1)
-                            Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.center,
-
-                              children: [
-                                IconButton(
-                                  onPressed:
-                                      currentPage >
-                                              1
-                                          ? () {
-                                              setState(() {
-                                                currentPage--;
-                                              });
-                                            }
-                                          : null,
-
-                                  icon:
-                                      const Icon(
-                                    Icons
-                                        .chevron_left,
-                                  ),
+                                buildInfoRow(
+                                  icon: Icons.phone,
+                                  title: "Phone",
+                                  value: user["phone"] ?? "-",
                                 ),
 
-                                Text(
-                                  "$currentPage / $totalPages",
+                                const SizedBox(height: 10),
 
-                                  style:
-                                      const TextStyle(
-                                    fontWeight:
-                                        FontWeight.bold,
-                                  ),
+                                buildInfoRow(
+                                  icon: Icons.description,
+                                  title: "Document",
+                                  value: doc["documentType"] ?? "-",
                                 ),
 
-                                IconButton(
-                                  onPressed:
-                                      currentPage <
-                                              totalPages
-                                          ? () {
-                                              setState(() {
-                                                currentPage++;
-                                              });
-                                            }
-                                          : null,
+                                const SizedBox(height: 10),
 
-                                  icon:
-                                      const Icon(
-                                    Icons
-                                        .chevron_right,
-                                  ),
+                                buildInfoRow(
+                                  icon: Icons.link,
+                                  title: "URL",
+                                  value: doc["fileUrl"] ?? "-",
+                                ),
+
+                                const SizedBox(height: 22),
+
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        onPressed: actionLoading
+                                            ? null
+                                            : () {
+                                                approveDocument(doc["id"]);
+                                              },
+
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.green,
+                                        ),
+
+                                        child: const Text("Approve"),
+                                      ),
+                                    ),
+
+                                    const SizedBox(width: 14),
+
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        onPressed: actionLoading
+                                            ? null
+                                            : () {
+                                                showRejectDialog(doc["id"]);
+                                              },
+
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.red,
+                                        ),
+
+                                        child: const Text("Reject"),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-
-                          const SizedBox(
-                            height: 100,
-                          ),
-                        ],
+                          );
+                        },
                       ),
-                    ),
+
+                      const SizedBox(height: 20),
+
+                      /// PAGINATION
+                      if (totalPages > 1)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+
+                          children: [
+                            IconButton(
+                              onPressed: currentPage > 1
+                                  ? () {
+                                      setState(() {
+                                        currentPage--;
+                                      });
+                                    }
+                                  : null,
+
+                              icon: const Icon(Icons.chevron_left),
+                            ),
+
+                            Text(
+                              "$currentPage / $totalPages",
+
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            IconButton(
+                              onPressed: currentPage < totalPages
+                                  ? () {
+                                      setState(() {
+                                        currentPage++;
+                                      });
+                                    }
+                                  : null,
+
+                              icon: const Icon(Icons.chevron_right),
+                            ),
+                          ],
+                        ),
+
+                      const SizedBox(height: 100),
+                    ],
                   ),
+                ),
+              ),
       ),
     );
   }
@@ -819,32 +556,13 @@ class _PendingDocumentsScreenState
   }) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 18,
-          color:
-              AppColors.primary,
-        ),
+        Icon(icon, size: 18, color: AppColors.primary),
 
-        const SizedBox(
-          width: 10,
-        ),
+        const SizedBox(width: 10),
 
-        Text(
-          "$title: ",
+        Text("$title: ", style: const TextStyle(fontWeight: FontWeight.bold)),
 
-          style:
-              const TextStyle(
-            fontWeight:
-                FontWeight.bold,
-          ),
-        ),
-
-        Expanded(
-          child: Text(
-            value,
-          ),
-        ),
+        Expanded(child: Text(value)),
       ],
     );
   }

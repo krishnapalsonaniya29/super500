@@ -2,23 +2,18 @@ import 'package:dio/dio.dart';
 
 import '../../core/network/dio_client.dart';
 import 'package:flutter/foundation.dart';
-class AdminService {
-  static final Dio _dio =
-      DioClient.instance;
 
-  static const String baseUrl =
-      "/v1/admin";
+class AdminService {
+  static final Dio _dio = DioClient.instance;
+
+  static const String baseUrl = "/v1/admin";
 
   /// =====================================
   /// DASHBOARD STATS
   /// =====================================
 
-  static Future<Map<String, dynamic>>
-      getDashboardStats() async {
-    final response =
-        await _dio.get(
-      "$baseUrl/dashboard-stats",
-    );
+  static Future<Map<String, dynamic>> getDashboardStats() async {
+    final response = await _dio.get("$baseUrl/dashboard-stats");
 
     return response.data;
   }
@@ -27,12 +22,8 @@ class AdminService {
   /// GET DISTRICT STUDENTS
   /// =====================================
 
-  static Future<Map<String, dynamic>>
-      getStudents() async {
-    final response =
-        await _dio.get(
-      "$baseUrl/students",
-    );
+  static Future<Map<String, dynamic>> getStudents() async {
+    final response = await _dio.get("$baseUrl/students");
 
     return response.data;
   }
@@ -41,12 +32,8 @@ class AdminService {
   /// GET DISTRICT MENTORS
   /// =====================================
 
-  static Future<Map<String, dynamic>>
-      getMentors() async {
-    final response =
-        await _dio.get(
-      "$baseUrl/mentors",
-    );
+  static Future<Map<String, dynamic>> getMentors() async {
+    final response = await _dio.get("$baseUrl/mentors");
 
     return response.data;
   }
@@ -55,18 +42,13 @@ class AdminService {
   /// VERIFY STUDENT
   /// =====================================
 
-static Future verifyStudent(
-  String id,
-  double allottedAmount,
-) async {
-  return await _dio.put(
-    "$baseUrl/verify-student/$id",
-    data: {
-      "allottedAmount":
-          allottedAmount,
-    },
-  );
-}
+  static Future verifyStudent(String id, double allottedAmount) async {
+    return await _dio.put(
+      "$baseUrl/verify-student/$id",
+      data: {"allottedAmount": allottedAmount},
+    );
+  }
+
   /// =====================================
   /// REJECT STUDENT
   /// =====================================
@@ -78,49 +60,32 @@ static Future verifyStudent(
     return await _dio.put(
       "$baseUrl/reject-student/$id",
 
-      data: {
-        "rejectionReason":
-            reason,
-      },
+      data: {"rejectionReason": reason},
     );
   }
 
+  /// =====================================
+  /// DEACTIVATE STUDENT
+  /// =====================================
 
-/// =====================================
-/// DEACTIVATE STUDENT
-/// =====================================
-
-static Future deactivateStudent(
-  String id,
-) async {
-  return await _dio.put(
-    "$baseUrl/deactivate-student/$id",
-  );
-}
-
+  static Future deactivateStudent(String id) async {
+    return await _dio.put("$baseUrl/deactivate-student/$id");
+  }
 
   /// =====================================
   /// VERIFY MENTOR
   /// =====================================
 
-  static Future verifyMentor(
-    String id,
-  ) async {
-    return await _dio.put(
-      "$baseUrl/verify-mentor/$id",
-    );
+  static Future verifyMentor(String id) async {
+    return await _dio.put("$baseUrl/verify-mentor/$id");
   }
 
   /// =====================================
   /// APPROVE DOCUMENT
   /// =====================================
 
-  static Future approveDocument(
-    String id,
-  ) async {
-    return await _dio.put(
-      "$baseUrl/approve-document/$id",
-    );
+  static Future approveDocument(String id) async {
+    return await _dio.put("$baseUrl/approve-document/$id");
   }
 
   /// =====================================
@@ -134,43 +99,37 @@ static Future deactivateStudent(
     return await _dio.put(
       "$baseUrl/reject-document/$id",
 
-      data: {
-        "remarks": remarks,
-      },
+      data: {"remarks": remarks},
     );
   }
 
-/// =====================================
-/// APPROVE EXPENSE
-/// =====================================
+  /// =====================================
+  /// APPROVE EXPENSE
+  /// =====================================
 
-static Future approveExpense({
-  required String id,
-  String remarks = "",
-}) async {
-  return await _dio.put(
-    "$baseUrl/expenses/$id/approve",
-    data: {
-      "remarks": remarks,
-    },
-  );
-}
+  static Future approveExpense({
+    required String id,
+    String remarks = "",
+  }) async {
+    return await _dio.put(
+      "$baseUrl/expenses/$id/approve",
+      data: {"remarks": remarks},
+    );
+  }
 
-/// =====================================
-/// REJECT EXPENSE
-/// =====================================
+  /// =====================================
+  /// REJECT EXPENSE
+  /// =====================================
 
-static Future rejectExpense({
-  required String id,
-  required String remarks,
-}) async {
-  return await _dio.put(
-    "$baseUrl/expenses/$id/reject",
-    data: {
-      "remarks": remarks,
-    },
-  );
-}
+  static Future rejectExpense({
+    required String id,
+    required String remarks,
+  }) async {
+    return await _dio.put(
+      "$baseUrl/expenses/$id/reject",
+      data: {"remarks": remarks},
+    );
+  }
 
   /// =====================================
   /// ASSIGN MENTOR
@@ -183,54 +142,40 @@ static Future rejectExpense({
     return await _dio.put(
       "$baseUrl/assign-mentor",
 
-      data: {
-        "studentId":
-            studentId,
-
-        "mentorId":
-            mentorId,
-      },
+      data: {"studentId": studentId, "mentorId": mentorId},
     );
   }
+
   /// =====================================
-/// GET ALL EXPENSES
-/// =====================================
+  /// GET ALL EXPENSES
+  /// =====================================
 
-static Future<Map<String, dynamic>>
-    getExpenses() async {
-  final response = await _dio.get(
-    "$baseUrl/expenses",
-  );
+  static Future<Map<String, dynamic>> getExpenses() async {
+    final response = await _dio.get("$baseUrl/expenses");
 
-  return response.data;
-}
+    return response.data;
+  }
 
+  /// =====================================
+  /// update achievement status
+  /// =====================================
+  static Future<void> updateAchievementStatus({
+    required String achievementId,
+    required String status,
+  }) async {
+    debugPrint(
+      "UPDATING ACHIEVEMENT => "
+      "$achievementId : $status",
+    );
 
-/// =====================================
-/// update achievement status
-/// =====================================
-static Future<void>
-    updateAchievementStatus({
-  required String achievementId,
-  required String status,
-}) async {
+    final response = await _dio.put(
+      "$baseUrl/achievements/$achievementId/status",
+      data: {"status": status},
+    );
 
-  debugPrint(
-    "UPDATING ACHIEVEMENT => "
-    "$achievementId : $status",
-  );
-
-  final response =
-      await _dio.put(
-    "$baseUrl/achievements/$achievementId/status",
-    data: {
-      "status": status,
-    },
-  );
-
-  debugPrint(
-    "ACHIEVEMENT RESPONSE => "
-    "${response.data}",
-  );
-}
+    debugPrint(
+      "ACHIEVEMENT RESPONSE => "
+      "${response.data}",
+    );
+  }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../theme/app_colors.dart';
 
-
 import 'admin_login_screen.dart';
 import 'mentor_login_screen.dart';
 import 'student_login_screen.dart';
@@ -26,18 +25,10 @@ class RoleSelectionScreen extends StatelessWidget {
             /// ==========================
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(
-                24,
-                20,
-                24,
-                30,
-              ),
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 30),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    AppColors.primary,
-                    AppColors.secondary,
-                  ],
+                  colors: [AppColors.primary, AppColors.secondary],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -50,20 +41,15 @@ class RoleSelectionScreen extends StatelessWidget {
                 children: [
                   /// Logos
                   Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
                         height: 70,
                         width: 70,
-                        padding:
-                            const EdgeInsets.all(6),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius:
-                              BorderRadius.circular(
-                            16,
-                          ),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                         child: Image.asset(
                           "assets/images/mp_gov_logo.png",
@@ -76,14 +62,10 @@ class RoleSelectionScreen extends StatelessWidget {
                       Container(
                         height: 70,
                         width: 70,
-                        padding:
-                            const EdgeInsets.all(6),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius:
-                              BorderRadius.circular(
-                            16,
-                          ),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                         child: Image.asset(
                           "assets/images/app_logo2.png",
@@ -110,10 +92,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   const Text(
                     "School Education Department",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: Colors.white70, fontSize: 13),
                   ),
 
                   const SizedBox(height: 20),
@@ -133,35 +112,26 @@ class RoleSelectionScreen extends StatelessWidget {
                   const Text(
                     "Excellence Program for Future Engineers & Doctors",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
 
                   const SizedBox(height: 16),
 
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(
+                    padding: const EdgeInsets.symmetric(
                       horizontal: 14,
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white
-                          .withValues(alpha: 0.15),
-                      borderRadius:
-                          BorderRadius.circular(
-                        30,
-                      ),
+                      color: Colors.white.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(30),
                     ),
                     child: const Text(
                       "Official Government Initiative",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 12,
-                        fontWeight:
-                            FontWeight.w600,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -181,10 +151,8 @@ class RoleSelectionScreen extends StatelessWidget {
                       "Select Your Role",
                       style: TextStyle(
                         fontSize: 24,
-                        fontWeight:
-                            FontWeight.bold,
-                        color: AppColors
-                            .textPrimary,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
                       ),
                     ),
 
@@ -194,8 +162,7 @@ class RoleSelectionScreen extends StatelessWidget {
                       "Choose your portal to continue",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color:
-                            AppColors.textSecondary,
+                        color: AppColors.textSecondary,
                         fontSize: 14,
                       ),
                     ),
@@ -204,8 +171,7 @@ class RoleSelectionScreen extends StatelessWidget {
 
                     GridView.count(
                       shrinkWrap: true,
-                      physics:
-                          const NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       crossAxisCount: 2,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
@@ -213,14 +179,12 @@ class RoleSelectionScreen extends StatelessWidget {
                       children: [
                         RoleCard(
                           title: "Student",
-                          imagePath:
-                              "assets/images/student_role.png",
+                          imagePath: "assets/images/student_role.png",
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    const StudentLoginScreen(),
+                                builder: (_) => const StudentLoginScreen(),
                               ),
                             );
                           },
@@ -228,14 +192,12 @@ class RoleSelectionScreen extends StatelessWidget {
 
                         RoleCard(
                           title: "Mentor",
-                          imagePath:
-                              "assets/images/mentor_role.png",
+                          imagePath: "assets/images/mentor_role.png",
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    const MentorLoginScreen(),
+                                builder: (_) => const MentorLoginScreen(),
                               ),
                             );
                           },
@@ -243,14 +205,12 @@ class RoleSelectionScreen extends StatelessWidget {
 
                         RoleCard(
                           title: "Admin",
-                          imagePath:
-                              "assets/images/admin_role.png",
+                          imagePath: "assets/images/admin_role.png",
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    const AdminLoginScreen(),
+                                builder: (_) => const AdminLoginScreen(),
                               ),
                             );
                           },
@@ -258,14 +218,12 @@ class RoleSelectionScreen extends StatelessWidget {
 
                         RoleCard(
                           title: "Super Admin",
-                          imagePath:
-                              'assets/images/super_admin_role.png',
+                          imagePath: 'assets/images/super_admin_role.png',
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    const SuperAdminLoginScreen(),
+                                builder: (_) => const SuperAdminLoginScreen(),
                               ),
                             );
                           },
@@ -273,9 +231,7 @@ class RoleSelectionScreen extends StatelessWidget {
                       ],
                     ),
 
-                    SizedBox(
-                      height: size.height * 0.03,
-                    ),
+                    SizedBox(height: size.height * 0.03),
 
                     const Divider(),
 
@@ -284,10 +240,8 @@ class RoleSelectionScreen extends StatelessWidget {
                     const Text(
                       "School Education Department",
                       style: TextStyle(
-                        fontWeight:
-                            FontWeight.w600,
-                        color:
-                            AppColors.textPrimary,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
                       ),
                     ),
 
@@ -296,8 +250,7 @@ class RoleSelectionScreen extends StatelessWidget {
                     const Text(
                       "Government of Madhya Pradesh",
                       style: TextStyle(
-                        color:
-                            AppColors.textSecondary,
+                        color: AppColors.textSecondary,
                         fontSize: 12,
                       ),
                     ),
@@ -335,51 +288,34 @@ class RoleCard extends StatelessWidget {
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(
-            22,
-          ),
-          border: Border.all(
-            color: const Color(0xFFE8ECF4),
-          ),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: const Color(0xFFE8ECF4)),
           boxShadow: [
             BoxShadow(
-              color:
-                  Colors.black.withValues(alpha:0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 15,
               offset: const Offset(0, 6),
             ),
           ],
         ),
         child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Expanded(
-              child: Image.asset(
-                imagePath,
-                fit: BoxFit.contain,
-              ),
-            ),
+            Expanded(child: Image.asset(imagePath, fit: BoxFit.contain)),
 
             const SizedBox(height: 12),
 
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
             ),
 
             const SizedBox(height: 4),
 
             const Text(
               "Access Portal",
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
-              ),
+              style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
         ),

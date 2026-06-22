@@ -13,7 +13,7 @@ class AuthSwitchText extends StatelessWidget {
     required this.actionText,
     required this.onTap,
   });
-   @override
+  @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,

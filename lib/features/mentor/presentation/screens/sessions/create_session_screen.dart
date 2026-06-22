@@ -10,29 +10,19 @@ import '../../../../../widgets/inputs/custom_textfield.dart';
 
 import '../../../../../widgets/loaders/app_loader.dart';
 
-class CreateSessionScreen
-    extends StatefulWidget {
-  const CreateSessionScreen({
-    super.key,
-  });
+class CreateSessionScreen extends StatefulWidget {
+  const CreateSessionScreen({super.key});
 
   @override
-  State<CreateSessionScreen>
-      createState() =>
-          _CreateSessionScreenState();
+  State<CreateSessionScreen> createState() => _CreateSessionScreenState();
 }
 
-class _CreateSessionScreenState
-    extends State<
-        CreateSessionScreen> {
-  final titleController =
-      TextEditingController();
+class _CreateSessionScreenState extends State<CreateSessionScreen> {
+  final titleController = TextEditingController();
 
-  final descriptionController =
-      TextEditingController();
+  final descriptionController = TextEditingController();
 
-  final meetingLinkController =
-      TextEditingController();
+  final meetingLinkController = TextEditingController();
 
   bool isLoading = false;
 
@@ -49,72 +39,58 @@ class _CreateSessionScreenState
     loadStudents();
   }
 
-Future<void> loadStudents() async {
-  try {
-    final response =
-        await MentorService.getStudents();
+  Future<void> loadStudents() async {
+    try {
+      final response = await MentorService.getStudents();
 
-    if (!mounted) return;
+      if (!mounted) return;
+
+      setState(() {
+        students = response["students"];
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  Future<void> pickDateTime() async {
+    final date = await showDatePicker(
+      context: context,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2030),
+      initialDate: DateTime.now(),
+    );
+
+    if (!mounted || date == null) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (!mounted || time == null) return;
 
     setState(() {
-      students =
-          response["students"];
+      selectedDateTime = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        time.hour,
+        time.minute,
+      );
     });
-  } catch (e) {
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          e.toString(),
-        ),
-      ),
-    );
   }
-}
-Future<void> pickDateTime() async {
-  final date = await showDatePicker(
-    context: context,
-    firstDate: DateTime.now(),
-    lastDate: DateTime(2030),
-    initialDate: DateTime.now(),
-  );
 
-  if (!mounted || date == null) return;
-
-  final time = await showTimePicker(
-    context: context,
-    initialTime: TimeOfDay.now(),
-  );
-
-  if (!mounted || time == null) return;
-
-  setState(() {
-    selectedDateTime = DateTime(
-      date.year,
-      date.month,
-      date.day,
-      time.hour,
-      time.minute,
-    );
-  });
-}
-  Future<void>
-      createSession() async {
-    if (titleController.text
-            .trim()
-            .isEmpty ||
-        selectedStudentId ==
-            null ||
-        selectedDateTime ==
-            null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-          content: Text(
-            "Please fill all required fields",
-          ),
-        ),
+  Future<void> createSession() async {
+    if (titleController.text.trim().isEmpty ||
+        selectedStudentId == null ||
+        selectedDateTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill all required fields")),
       );
 
       return;
@@ -125,245 +101,158 @@ Future<void> pickDateTime() async {
         isLoading = true;
       });
 
-      await MentorService
-          .createSession(
-        title:
-            titleController.text
-                .trim(),
+      await MentorService.createSession(
+        title: titleController.text.trim(),
 
-        studentId:
-            selectedStudentId!,
+        studentId: selectedStudentId!,
 
-        scheduledAt:
-            selectedDateTime!
-                .toIso8601String(),
+        scheduledAt: selectedDateTime!.toIso8601String(),
 
-        description:
-            descriptionController.text
-                .trim(),
+        description: descriptionController.text.trim(),
 
-        meetingLink:
-            meetingLinkController.text
-                .trim(),
+        meetingLink: meetingLinkController.text.trim(),
       );
 
       if (!mounted) return;
 
       Navigator.pop(context);
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-          content: Text(
-            "Session created successfully",
-          ),
-        ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Session created successfully")),
       );
     } catch (e) {
       setState(() {
         isLoading = false;
       });
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        SnackBar(
-          content: Text(
-            e.toString(),
-          ),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          AppColors.background,
+      backgroundColor: AppColors.background,
 
       appBar: AppBar(
-        backgroundColor:
-            AppColors.primary,
+        backgroundColor: AppColors.primary,
 
-        title: const Text(
-          "Create Session",
-        ),
+        title: const Text("Create Session"),
       ),
 
       body: isLoading
-          ? const Center(
-              child: AppLoader(),
-            )
+          ? const Center(child: AppLoader())
           : SingleChildScrollView(
-              padding:
-                  const EdgeInsets.all(
-                16,
-              ),
+              padding: const EdgeInsets.all(16),
 
               child: Column(
                 children: [
                   /// ======================
                   /// TITLE
                   /// ======================
-
                   CustomTextField(
-                    controller:
-                        titleController,
+                    controller: titleController,
 
-                    hintText:
-                        "Session Title",
+                    hintText: "Session Title",
                   ),
 
-                  const SizedBox(
-                    height: 16,
-                  ),
+                  const SizedBox(height: 16),
 
                   /// ======================
                   /// DESCRIPTION
                   /// ======================
-
                   CustomTextField(
-                    controller:
-                        descriptionController,
+                    controller: descriptionController,
 
-                    hintText:
-                        "Description",
+                    hintText: "Description",
 
                     maxLines: 4,
                   ),
 
-                  const SizedBox(
-                    height: 16,
-                  ),
+                  const SizedBox(height: 16),
 
                   /// ======================
                   /// MEETING LINK
                   /// ======================
-
                   CustomTextField(
-                    controller:
-                        meetingLinkController,
+                    controller: meetingLinkController,
 
-                    hintText:
-                        "Meeting Link",
+                    hintText: "Meeting Link",
                   ),
 
-                  const SizedBox(
-                    height: 16,
-                  ),
+                  const SizedBox(height: 16),
 
                   /// ======================
                   /// STUDENT DROPDOWN
                   /// ======================
+                  DropdownButtonFormField<String>(
+                    initialValue: selectedStudentId,
 
-                  DropdownButtonFormField<
-                      String>(
-                    initialValue:
-                        selectedStudentId,
-
-                    decoration:
-                        InputDecoration(
+                    decoration: InputDecoration(
                       filled: true,
 
-                      fillColor:
-                          Colors.white,
+                      fillColor: Colors.white,
 
-                      border:
-                          OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(
-                          12,
-                        ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
 
-                    hint: const Text(
-                      "Select Student",
-                    ),
+                    hint: const Text("Select Student"),
 
-                    items:
-                        students.map(
-                      (student) {
-                        return DropdownMenuItem<
-                            String>(
-                          value:
-                              student["id"],
+                    items: students.map((student) {
+                      return DropdownMenuItem<String>(
+                        value: student["id"],
 
-                          child: Text(
-                            student["user"]
-                                    ["fullName"] ??
-                                "",
-                          ),
-                        );
-                      },
-                    ).toList(),
+                        child: Text(student["user"]["fullName"] ?? ""),
+                      );
+                    }).toList(),
 
-                    onChanged: (
-                      value,
-                    ) {
+                    onChanged: (value) {
                       setState(() {
-                        selectedStudentId =
-                            value;
+                        selectedStudentId = value;
                       });
                     },
                   ),
 
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
 
                   /// ======================
                   /// DATE TIME
                   /// ======================
-
                   InkWell(
-                    onTap:
-                        pickDateTime,
+                    onTap: pickDateTime,
 
                     child: Container(
-                      width:
-                          double.infinity,
+                      width: double.infinity,
 
-                      padding:
-                          const EdgeInsets.all(
-                        16,
-                      ),
+                      padding: const EdgeInsets.all(16),
 
-                      decoration:
-                          BoxDecoration(
-                        color:
-                            Colors.white,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
 
-                        borderRadius:
-                            BorderRadius.circular(
-                          12,
-                        ),
+                        borderRadius: BorderRadius.circular(12),
                       ),
 
                       child: Text(
-                        selectedDateTime ==
-                                null
+                        selectedDateTime == null
                             ? "Select Session Date & Time"
-                            : selectedDateTime
-                                .toString(),
+                            : selectedDateTime.toString(),
                       ),
                     ),
                   ),
 
-                  const SizedBox(
-                    height: 30,
-                  ),
+                  const SizedBox(height: 30),
 
                   /// ======================
                   /// BUTTON
                   /// ======================
-
                   CustomButton(
-                    text:
-                        "Create Session",
+                    text: "Create Session",
 
-                    onPressed:
-                        createSession,
+                    onPressed: createSession,
                   ),
                 ],
               ),

@@ -5,7 +5,7 @@ import '../../theme/app_text_styles.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
-final VoidCallback? onPressed;
+  final VoidCallback? onPressed;
   final bool isLoading;
 
   const CustomButton({
@@ -14,7 +14,7 @@ final VoidCallback? onPressed;
     required this.onPressed,
     this.isLoading = false,
   });
-    @override
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
@@ -31,14 +31,9 @@ final VoidCallback? onPressed;
         ),
 
         child: isLoading
-            ? const CircularProgressIndicator(
-                color: Colors.white,
-              )
-            : Text(
-                text,
-                style: AppTextStyles.button,
-              ),
+            ? const CircularProgressIndicator(color: Colors.white)
+            : Text(text, style: AppTextStyles.button),
       ),
-          );
+    );
   }
 }

@@ -3,19 +3,13 @@ import 'package:flutter/material.dart';
 import '../../../../../theme/app_colors.dart';
 import 'student_expenses_screen.dart';
 import '../../../../../services/admin/admin_service.dart';
-class StudentDetailScreen
-    extends StatelessWidget {
-  final Map<String, dynamic>
-      student;
 
-  const StudentDetailScreen({
-    super.key,
-    required this.student,
-  });
+class StudentDetailScreen extends StatelessWidget {
+  final Map<String, dynamic> student;
 
-  Color getStatusColor(
-    String status,
-  ) {
+  const StudentDetailScreen({super.key, required this.student});
+
+  Color getStatusColor(String status) {
     switch (status) {
       case "APPROVED":
         return Colors.green;
@@ -32,107 +26,63 @@ class StudentDetailScreen
   Widget build(BuildContext context) {
     final user = student["user"];
 
-    final documents =
-        student["documents"] ?? [];
+    final documents = student["documents"] ?? [];
 
-    final expenses =
-        student["expenses"] ?? [];
+    final expenses = student["expenses"] ?? [];
 
-    final achievements =
-        student["achievements"] ??
-            [];
+    final achievements = student["achievements"] ?? [];
 
-    final mentor =
-        student["mentor"];
+    final mentor = student["mentor"];
 
-    final status =
-        student[
-                "verificationStatus"] ??
-            "PENDING";
-    
+    final status = student["verificationStatus"] ?? "PENDING";
+
     final allottedAmount =
-        double.tryParse(
-              student["allottedAmount"]
-                  ?.toString() ??
-                  "0",
-            ) ??
-            0;
+        double.tryParse(student["allottedAmount"]?.toString() ?? "0") ?? 0;
 
-    final approvedExpenses =
-        expenses.where((expense) {
-      return expense["status"] ==
-          "APPROVED";
+    final approvedExpenses = expenses.where((expense) {
+      return expense["status"] == "APPROVED";
     }).toList();
 
     double usedAmount = 0;
 
-    for (final expense
-        in approvedExpenses) {
-      usedAmount +=
-          double.tryParse(
-                expense["amount"]
-                    .toString(),
-              ) ??
-              0;
+    for (final expense in approvedExpenses) {
+      usedAmount += double.tryParse(expense["amount"].toString()) ?? 0;
     }
 
-    final remainingAmount =
-        allottedAmount - usedAmount;
+    final remainingAmount = allottedAmount - usedAmount;
 
-    final utilizationPercentage =
-        allottedAmount > 0
-            ? (usedAmount /
-                    allottedAmount)
-                .clamp(0.0, 1.0)
-            : 0.0;
+    final utilizationPercentage = allottedAmount > 0
+        ? (usedAmount / allottedAmount).clamp(0.0, 1.0)
+        : 0.0;
 
     return Scaffold(
-      backgroundColor:
-          AppColors.background,
+      backgroundColor: AppColors.background,
 
       appBar: AppBar(
-        title: const Text(
-          "Student Details",
-        ),
+        title: const Text("Student Details"),
 
-        backgroundColor:
-            AppColors.primary,
+        backgroundColor: AppColors.primary,
 
-        foregroundColor:
-            Colors.white,
+        foregroundColor: Colors.white,
       ),
 
       body: SingleChildScrollView(
-        padding:
-            const EdgeInsets.all(
-          20,
-        ),
+        padding: const EdgeInsets.all(20),
 
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment
-                  .start,
+          crossAxisAlignment: CrossAxisAlignment.start,
 
           children: [
             /// PROFILE CARD
             Container(
-              width:
-                  double.infinity,
+              width: double.infinity,
 
-              padding:
-                  const EdgeInsets.all(
-                24,
-              ),
+              padding: const EdgeInsets.all(24),
 
-              decoration:
-                  BoxDecoration(
-                color:
-                    Colors.white,
+              decoration: BoxDecoration(
+                color: Colors.white,
 
-                borderRadius:
-                    BorderRadius.circular(
-                  24,
-                ),
+                borderRadius: BorderRadius.circular(24),
               ),
 
               child: Column(
@@ -140,145 +90,92 @@ class StudentDetailScreen
                   CircleAvatar(
                     radius: 40,
 
-                    backgroundColor:
-                        AppColors.primary,
+                    backgroundColor: AppColors.primary,
 
                     child: Text(
                       user["fullName"][0],
 
-                      style:
-                          const TextStyle(
-                        color:
-                            Colors.white,
+                      style: const TextStyle(
+                        color: Colors.white,
 
                         fontSize: 28,
 
-                        fontWeight:
-                            FontWeight.bold,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
 
-                  const SizedBox(
-                    height: 16,
-                  ),
+                  const SizedBox(height: 16),
 
                   Text(
                     user["fullName"],
 
-                    style:
-                        const TextStyle(
+                    style: const TextStyle(
                       fontSize: 24,
 
-                      fontWeight:
-                          FontWeight.bold,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
 
-                  const SizedBox(
-                    height: 8,
-                  ),
+                  const SizedBox(height: 8),
 
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(
-                      horizontal:
-                          14,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
                       vertical: 8,
                     ),
 
-                    decoration:
-                        BoxDecoration(
-                      color:
-                          getStatusColor(
-                        status,
-                      ).withValues(
-                        alpha: 0.1,
-                      ),
+                    decoration: BoxDecoration(
+                      color: getStatusColor(status).withValues(alpha: 0.1),
 
-                      borderRadius:
-                          BorderRadius.circular(
-                        20,
-                      ),
+                      borderRadius: BorderRadius.circular(20),
                     ),
 
                     child: Text(
                       status,
 
-                      style:
-                          TextStyle(
-                        color:
-                            getStatusColor(
-                          status,
-                        ),
+                      style: TextStyle(
+                        color: getStatusColor(status),
 
-                        fontWeight:
-                            FontWeight.bold,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
 
-                  const SizedBox(
-                    height: 24,
-                  ),
+                  const SizedBox(height: 24),
 
-                  buildInfoRow(
-                    "Phone",
-                    user["phone"] ??
-                        "-",
-                  ),
+                  buildInfoRow("Phone", user["phone"] ?? "-"),
 
-                  buildInfoRow(
-                    "District",
-                    student["district"] ??
-                        "-",
-                  ),
+                  buildInfoRow("District", student["district"] ?? "-"),
 
-                  buildInfoRow(
-                    "School",
-                    student["schoolName"] ??
-                        "-",
-                  ),
+                  buildInfoRow("School", student["schoolName"] ?? "-"),
 
-                  buildInfoRow(
-                    "Class",
-                    student["currentClass"] ??
-                        "-",
-                  ),
+                  buildInfoRow("Class", student["currentClass"] ?? "-"),
                 ],
               ),
             ),
 
-            const SizedBox(
-              height: 28,
-            ),
+            const SizedBox(height: 28),
 
             /// SCHOLARSHIP FUND
-            buildSectionTitle(
-              "Scholarship Fund",
-            ),
+            buildSectionTitle("Scholarship Fund"),
 
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius:
-                    BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   buildInfoRow(
                     "Allotted",
                     "₹${allottedAmount.toStringAsFixed(0)}",
                   ),
 
-                  buildInfoRow(
-                    "Used",
-                    "₹${usedAmount.toStringAsFixed(0)}",
-                  ),
+                  buildInfoRow("Used", "₹${usedAmount.toStringAsFixed(0)}"),
 
                   buildInfoRow(
                     "Remaining",
@@ -288,12 +185,9 @@ class StudentDetailScreen
                   const SizedBox(height: 16),
 
                   ClipRRect(
-                    borderRadius:
-                        BorderRadius.circular(10),
-                    child:
-                        LinearProgressIndicator(
-                      value:
-                          utilizationPercentage,
+                    borderRadius: BorderRadius.circular(10),
+                    child: LinearProgressIndicator(
+                      value: utilizationPercentage,
                       minHeight: 10,
                     ),
                   ),
@@ -302,74 +196,51 @@ class StudentDetailScreen
 
                   Text(
                     "${(utilizationPercentage * 100).toStringAsFixed(1)}% Fund Utilized",
-                    style: const TextStyle(
-                      fontWeight:
-                          FontWeight.bold,
-                    ),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ),
 
             /// DOCUMENTS
-            buildSectionTitle(
-              "Documents",
-            ),
+            buildSectionTitle("Documents"),
 
             ...documents.map(
               (doc) => buildCard(
-                title:
-                    doc["documentType"] ??
-                        "-",
+                title: doc["documentType"] ?? "-",
 
-                subtitle:
-                    doc["fileUrl"] ??
-                        "-",
+                subtitle: doc["fileUrl"] ?? "-",
 
-                trailing:
-                    doc["verified"] ==
-                            true
-                        ? "Verified"
-                        : "Pending",
+                trailing: doc["verified"] == true ? "Verified" : "Pending",
               ),
             ),
 
-            const SizedBox(
-              height: 28,
-            ),
+            const SizedBox(height: 28),
 
             /// EXPENSES
-            buildSectionTitle(
-              "Expenses",
-            ),
+            buildSectionTitle("Expenses"),
 
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius:
-                    BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
                 children: [
                   Row(
                     children: [
-                      const Icon(
-                        Icons.receipt_long,
-                        color: AppColors.primary,
-                      ),
+                      const Icon(Icons.receipt_long, color: AppColors.primary),
 
                       const SizedBox(width: 12),
 
                       Expanded(
                         child: Text(
                           "${expenses.length} Expenses Submitted",
-                          style:
-                              const TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
-                            fontWeight:
-                                FontWeight.bold,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -381,20 +252,14 @@ class StudentDetailScreen
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      icon: const Icon(
-                        Icons.visibility,
-                      ),
-                      label: const Text(
-                        "View Expenses",
-                      ),
+                      icon: const Icon(Icons.visibility),
+                      label: const Text("View Expenses"),
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (_) =>
-                                StudentExpensesScreen(
-                              student: student,
-                            ),
+                                StudentExpensesScreen(student: student),
                           ),
                         );
                       },
@@ -404,87 +269,50 @@ class StudentDetailScreen
               ),
             ),
 
-            const SizedBox(
-              height: 28,
-            ),
+            const SizedBox(height: 28),
 
             /// ACHIEVEMENTS
-            buildSectionTitle(
-              "Achievements",
-            ),
+            buildSectionTitle("Achievements"),
 
             ...achievements.map(
-            (achievement) =>
-                buildAchievementCard(
-              context,
-              achievement,
+              (achievement) => buildAchievementCard(context, achievement),
             ),
-          ),
 
-            const SizedBox(
-              height: 28,
-            ),
+            const SizedBox(height: 28),
 
             /// MENTOR
-            buildSectionTitle(
-              "Assigned Mentor",
-            ),
+            buildSectionTitle("Assigned Mentor"),
 
             mentor != null
                 ? buildCard(
-                    title:
-                        mentor["user"]
-                                ?[
-                                "fullName"] ??
-                            "-",
+                    title: mentor["user"]?["fullName"] ?? "-",
 
-                    subtitle:
-                        mentor["district"] ??
-                            "-",
+                    subtitle: mentor["district"] ?? "-",
                   )
                 : Container(
-                    width:
-                        double.infinity,
+                    width: double.infinity,
 
-                    padding:
-                        const EdgeInsets.all(
-                      20,
+                    padding: const EdgeInsets.all(20),
+
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+
+                      borderRadius: BorderRadius.circular(20),
                     ),
 
-                    decoration:
-                        BoxDecoration(
-                      color:
-                          Colors.white,
-
-                      borderRadius:
-                          BorderRadius.circular(
-                        20,
-                      ),
-                    ),
-
-                    child:
-                        const Text(
-                      "No mentor assigned",
-                    ),
+                    child: const Text("No mentor assigned"),
                   ),
 
-            const SizedBox(
-              height: 40,
-            ),
+            const SizedBox(height: 40),
           ],
         ),
       ),
     );
   }
 
-  Widget buildSectionTitle(
-    String title,
-  ) {
+  Widget buildSectionTitle(String title) {
     return Padding(
-      padding:
-          const EdgeInsets.only(
-        bottom: 16,
-      ),
+      padding: const EdgeInsets.only(bottom: 16),
 
       child: Text(
         title,
@@ -492,11 +320,9 @@ class StudentDetailScreen
         style: const TextStyle(
           fontSize: 22,
 
-          fontWeight:
-              FontWeight.bold,
+          fontWeight: FontWeight.bold,
 
-          fontFamily:
-              'Poppins',
+          fontFamily: 'Poppins',
         ),
       ),
     );
@@ -510,59 +336,39 @@ class StudentDetailScreen
     return Container(
       width: double.infinity,
 
-      margin:
-          const EdgeInsets.only(
-        bottom: 14,
-      ),
+      margin: const EdgeInsets.only(bottom: 14),
 
-      padding:
-          const EdgeInsets.all(
-        18,
-      ),
+      padding: const EdgeInsets.all(18),
 
       decoration: BoxDecoration(
         color: Colors.white,
 
-        borderRadius:
-            BorderRadius.circular(
-          20,
-        ),
+        borderRadius: BorderRadius.circular(20),
       ),
 
       child: Row(
         children: [
           Expanded(
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment
-                      .start,
+              crossAxisAlignment: CrossAxisAlignment.start,
 
               children: [
                 Text(
                   title,
 
-                  style:
-                      const TextStyle(
-                    fontWeight:
-                        FontWeight
-                            .bold,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
 
                     fontSize: 16,
                   ),
                 ),
 
-                const SizedBox(
-                  height: 6,
-                ),
+                const SizedBox(height: 6),
 
                 Text(
                   subtitle,
 
-                  style:
-                      const TextStyle(
-                    color: AppColors
-                        .textSecondary,
-                  ),
+                  style: const TextStyle(color: AppColors.textSecondary),
                 ),
               ],
             ),
@@ -573,16 +379,11 @@ class StudentDetailScreen
               trailing,
 
               style: TextStyle(
-                color:
-                    trailing ==
-                            "Verified" ||
-                        trailing ==
-                            "Approved"
+                color: trailing == "Verified" || trailing == "Approved"
                     ? Colors.green
                     : Colors.orange,
 
-                fontWeight:
-                    FontWeight.bold,
+                fontWeight: FontWeight.bold,
               ),
             ),
         ],
@@ -590,109 +391,68 @@ class StudentDetailScreen
     );
   }
 
-
   Widget buildAchievementCard(
-  BuildContext context,
-  Map<String, dynamic>
-      achievement,
-) {
-  final status =
-      achievement["status"] ??
-      "PENDING";
+    BuildContext context,
+    Map<String, dynamic> achievement,
+  ) {
+    final status = achievement["status"] ?? "PENDING";
 
-  return Container(
-    margin:
-        const EdgeInsets.only(
-      bottom: 16,
-    ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
 
-    padding:
-        const EdgeInsets.all(
-      16,
-    ),
+      padding: const EdgeInsets.all(16),
 
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius:
-          BorderRadius.circular(
-        20,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
       ),
-    ),
 
-    child: Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
-      children: [
-
-        if (achievement[
-                "proofImageUrl"] !=
-            null)
-          ClipRRect(
-            borderRadius:
-                BorderRadius.circular(
-              16,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (achievement["proofImageUrl"] != null)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: GestureDetector(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) {
+                      return Dialog(
+                        insetPadding: const EdgeInsets.all(12),
+                        child: InteractiveViewer(
+                          child: Image.network(
+                            achievement["proofImageUrl"],
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: Image.network(
+                  achievement["proofImageUrl"],
+                  height: 220,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
-            child: GestureDetector(
-  onTap: () {
-    showDialog(
-      context: context,
-      builder: (_) {
-        return Dialog(
-          insetPadding:
-              const EdgeInsets.all(
-            12,
-          ),
-          child: InteractiveViewer(
-            child: Image.network(
-              achievement[
-                  "proofImageUrl"],
-              fit: BoxFit.contain,
-            ),
-          ),
-        );
-      },
-    );
-  },
-  child: Image.network(
-    achievement[
-        "proofImageUrl"],
-    height: 220,
-    width: double.infinity,
-    fit: BoxFit.cover,
-  ),
-),
+
+          const SizedBox(height: 12),
+
+          Text(
+            achievement["title"] ?? "-",
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
 
-        const SizedBox(
-          height: 12,
-        ),
+          const SizedBox(height: 6),
 
-        Text(
-          achievement["title"] ??
-              "-",
-          style:
-              const TextStyle(
-            fontSize: 18,
-            fontWeight:
-                FontWeight.bold,
-          ),
-        ),
+          Text(achievement["description"] ?? "-"),
 
-        const SizedBox(
-          height: 6,
-        ),
+          const SizedBox(height: 12),
 
-        Text(
-          achievement[
-                  "description"] ??
-              "-",
-        ),
-
-        const SizedBox(
-          height: 12,
-        ),
-
-        Row(
+          Row(
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -700,22 +460,14 @@ class StudentDetailScreen
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: getStatusColor(
-                    status,
-                  ).withValues(
-                    alpha: 0.1,
-                  ),
-                  borderRadius:
-                      BorderRadius.circular(20),
+                  color: getStatusColor(status).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   status,
                   style: TextStyle(
-                    color: getStatusColor(
-                      status,
-                    ),
-                    fontWeight:
-                        FontWeight.bold,
+                    color: getStatusColor(status),
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -726,39 +478,25 @@ class StudentDetailScreen
                 ElevatedButton(
                   onPressed: () async {
                     try {
-                      await AdminService
-                          .updateAchievementStatus(
-                        achievementId:
-                            achievement["id"],
+                      await AdminService.updateAchievementStatus(
+                        achievementId: achievement["id"],
                         status: "APPROVED",
                       );
 
-                      achievement["status"] =
-                          "APPROVED";
+                      achievement["status"] = "APPROVED";
 
                       if (!context.mounted) return;
 
-                      (context as Element)
-                          .markNeedsBuild();
+                      (context as Element).markNeedsBuild();
 
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            "Achievement approved",
-                          ),
-                        ),
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Achievement approved")),
                       );
                     } catch (e) {
-                      debugPrint(
-                        "Approve Error: $e",
-                      );
+                      debugPrint("Approve Error: $e");
                     }
                   },
-                  child: const Text(
-                    "Approve",
-                  ),
+                  child: const Text("Approve"),
                 ),
 
                 const SizedBox(width: 8),
@@ -766,62 +504,38 @@ class StudentDetailScreen
                 ElevatedButton(
                   onPressed: () async {
                     try {
-                      await AdminService
-                          .updateAchievementStatus(
-                        achievementId:
-                            achievement["id"],
+                      await AdminService.updateAchievementStatus(
+                        achievementId: achievement["id"],
                         status: "REJECTED",
                       );
 
-                      achievement["status"] =
-                          "REJECTED";
+                      achievement["status"] = "REJECTED";
 
                       if (!context.mounted) return;
 
-                      (context as Element)
-                          .markNeedsBuild();
+                      (context as Element).markNeedsBuild();
 
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            "Achievement rejected",
-                          ),
-                        ),
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Achievement rejected")),
                       );
                     } catch (e) {
-                      debugPrint(
-                        "Reject Error: $e",
-                      );
+                      debugPrint("Reject Error: $e");
                     }
                   },
-                  style:
-                      ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Colors.red,
-                  ),
-                  child: const Text(
-                    "Reject",
-                  ),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  child: const Text("Reject"),
                 ),
               ],
             ],
-          )
-      ],
-    ),
-  );
-}
-
-  Widget buildInfoRow(
-    String title,
-    String value,
-  ) {
-    return Padding(
-      padding:
-          const EdgeInsets.only(
-        bottom: 12,
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget buildInfoRow(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
 
       child: Row(
         children: [
@@ -831,21 +545,11 @@ class StudentDetailScreen
             child: Text(
               title,
 
-              style:
-                  const TextStyle(
-                fontWeight:
-                    FontWeight.bold,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
 
-          Expanded(
-            flex: 3,
-
-            child: Text(
-              value,
-            ),
-          ),
+          Expanded(flex: 3, child: Text(value)),
         ],
       ),
     );

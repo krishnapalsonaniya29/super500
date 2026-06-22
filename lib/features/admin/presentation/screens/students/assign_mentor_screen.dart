@@ -4,25 +4,16 @@ import '../../../../../services/admin/admin_service.dart';
 
 import '../../../../../theme/app_colors.dart';
 
-class AssignMentorScreen
-    extends StatefulWidget {
-  final Map<String, dynamic>
-      student;
+class AssignMentorScreen extends StatefulWidget {
+  final Map<String, dynamic> student;
 
-  const AssignMentorScreen({
-    super.key,
-    required this.student,
-  });
+  const AssignMentorScreen({super.key, required this.student});
 
   @override
-  State<AssignMentorScreen>
-      createState() =>
-          _AssignMentorScreenState();
+  State<AssignMentorScreen> createState() => _AssignMentorScreenState();
 }
 
-class _AssignMentorScreenState
-    extends State<
-        AssignMentorScreen> {
+class _AssignMentorScreenState extends State<AssignMentorScreen> {
   List mentors = [];
 
   List filteredMentors = [];
@@ -33,8 +24,7 @@ class _AssignMentorScreenState
 
   String searchQuery = "";
 
-  final searchController =
-      TextEditingController();
+  final searchController = TextEditingController();
 
   @override
   void initState() {
@@ -53,12 +43,9 @@ class _AssignMentorScreenState
         loading = true;
       });
 
-      final response =
-          await AdminService
-              .getMentors();
+      final response = await AdminService.getMentors();
 
-      mentors =
-          response["data"] ?? [];
+      mentors = response["data"] ?? [];
 
       applySearch();
     } catch (e) {
@@ -77,31 +64,19 @@ class _AssignMentorScreenState
   /// =====================================
 
   void applySearch() {
-    filteredMentors =
-        mentors.where((mentor) {
-      if (mentor[
-              "verificationStatus"] !=
-          "APPROVED") {
+    filteredMentors = mentors.where((mentor) {
+      if (mentor["verificationStatus"] != "APPROVED") {
         return false;
       }
 
       final user = mentor["user"];
 
-      final name =
-          (user["fullName"] ?? "")
-              .toString()
-              .toLowerCase();
+      final name = (user["fullName"] ?? "").toString().toLowerCase();
 
-      final phone =
-          (user["phone"] ?? "")
-              .toString();
+      final phone = (user["phone"] ?? "").toString();
 
-      return name.contains(
-            searchQuery.toLowerCase(),
-          ) ||
-          phone.contains(
-            searchQuery,
-          );
+      return name.contains(searchQuery.toLowerCase()) ||
+          phone.contains(searchQuery);
     }).toList();
 
     setState(() {});
@@ -111,52 +86,37 @@ class _AssignMentorScreenState
   /// ASSIGN MENTOR
   /// =====================================
 
-  Future<void> assignMentor(
-    String mentorId,
-  ) async {
+  Future<void> assignMentor(String mentorId) async {
     try {
       setState(() {
         assigning = true;
       });
 
-      await AdminService
-          .assignMentor(
-        studentId:
-            widget.student["id"],
+      await AdminService.assignMentor(
+        studentId: widget.student["id"],
 
         mentorId: mentorId,
       );
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          backgroundColor:
-              Colors.green,
+          backgroundColor: Colors.green,
 
-          content: Text(
-            "Mentor assigned successfully",
-          ),
+          content: Text("Mentor assigned successfully"),
         ),
       );
 
-      Navigator.pop(
-        context,
-        true,
-      );
+      Navigator.pop(context, true);
     } catch (e) {
       debugPrint(e.toString());
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          backgroundColor:
-              Colors.red,
+          backgroundColor: Colors.red,
 
-          content: Text(
-            "Failed to assign mentor",
-          ),
+          content: Text("Failed to assign mentor"),
         ),
       );
     } finally {
@@ -170,54 +130,33 @@ class _AssignMentorScreenState
 
   @override
   Widget build(BuildContext context) {
-    final studentUser =
-        widget.student["user"];
+    final studentUser = widget.student["user"];
 
     return Scaffold(
-      backgroundColor:
-          AppColors.background,
+      backgroundColor: AppColors.background,
 
       appBar: AppBar(
-        title: const Text(
-          "Assign Mentor",
-        ),
+        title: const Text("Assign Mentor"),
 
-        backgroundColor:
-            AppColors.primary,
+        backgroundColor: AppColors.primary,
 
-        foregroundColor:
-            Colors.white,
+        foregroundColor: Colors.white,
       ),
 
       body: loading
-          ? const Center(
-              child:
-                  CircularProgressIndicator(),
-            )
-
+          ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
                 /// STUDENT CARD
                 Container(
-                  margin:
-                      const EdgeInsets.all(
-                    20,
-                  ),
+                  margin: const EdgeInsets.all(20),
 
-                  padding:
-                      const EdgeInsets.all(
-                    20,
-                  ),
+                  padding: const EdgeInsets.all(20),
 
-                  decoration:
-                      BoxDecoration(
-                    color:
-                        Colors.white,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
 
-                    borderRadius:
-                        BorderRadius.circular(
-                      24,
-                    ),
+                    borderRadius: BorderRadius.circular(24),
                   ),
 
                   child: Row(
@@ -225,60 +164,39 @@ class _AssignMentorScreenState
                       CircleAvatar(
                         radius: 28,
 
-                        backgroundColor:
-                            AppColors.primary,
+                        backgroundColor: AppColors.primary,
 
                         child: Text(
-                          studentUser[
-                                  "fullName"][0]
-                              .toUpperCase(),
+                          studentUser["fullName"][0].toUpperCase(),
 
-                          style:
-                              const TextStyle(
-                            color:
-                                Colors.white,
+                          style: const TextStyle(
+                            color: Colors.white,
 
-                            fontWeight:
-                                FontWeight.bold,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
 
-                      const SizedBox(
-                        width: 14,
-                      ),
+                      const SizedBox(width: 14),
 
                       Expanded(
                         child: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment
-                                  .start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
 
                           children: [
                             Text(
-                              studentUser[
-                                      "fullName"] ??
-                                  "-",
+                              studentUser["fullName"] ?? "-",
 
-                              style:
-                                  const TextStyle(
-                                fontSize:
-                                    18,
+                              style: const TextStyle(
+                                fontSize: 18,
 
-                                fontWeight:
-                                    FontWeight.bold,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
 
-                            const SizedBox(
-                              height: 6,
-                            ),
+                            const SizedBox(height: 6),
 
-                            Text(
-                              widget.student[
-                                      "schoolName"] ??
-                                  "-",
-                            ),
+                            Text(widget.student["schoolName"] ?? "-"),
                           ],
                         ),
                       ),
@@ -288,152 +206,89 @@ class _AssignMentorScreenState
 
                 /// SEARCH
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(
-                    horizontal: 20,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
 
                   child: TextField(
-                    controller:
-                        searchController,
+                    controller: searchController,
 
-                    onChanged:
-                        (value) {
-                      searchQuery =
-                          value;
+                    onChanged: (value) {
+                      searchQuery = value;
 
                       applySearch();
                     },
 
-                    decoration:
-                        InputDecoration(
-                      hintText:
-                          "Search mentors",
+                    decoration: InputDecoration(
+                      hintText: "Search mentors",
 
-                      prefixIcon:
-                          const Icon(
-                        Icons.search,
-                      ),
+                      prefixIcon: const Icon(Icons.search),
 
                       filled: true,
 
-                      fillColor:
-                          Colors.white,
+                      fillColor: Colors.white,
 
-                      border:
-                          OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(
-                          20,
-                        ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
 
-                        borderSide:
-                            BorderSide.none,
+                        borderSide: BorderSide.none,
                       ),
                     ),
                   ),
                 ),
 
-                const SizedBox(
-                  height: 20,
-                ),
+                const SizedBox(height: 20),
 
                 /// LIST
                 Expanded(
-                  child: filteredMentors
-                          .isEmpty
-                      ? const Center(
-                          child: Text(
-                            "No mentors found",
-                          ),
-                        )
-
+                  child: filteredMentors.isEmpty
+                      ? const Center(child: Text("No mentors found"))
                       : ListView.builder(
-                          padding:
-                              const EdgeInsets.symmetric(
-                            horizontal:
-                                20,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
 
-                          itemCount:
-                              filteredMentors
-                                  .length,
+                          itemCount: filteredMentors.length,
 
-                          itemBuilder:
-                              (_, index) {
-                            final mentor =
-                                filteredMentors[
-                                    index];
+                          itemBuilder: (_, index) {
+                            final mentor = filteredMentors[index];
 
-                            final user =
-                                mentor[
-                                    "user"];
+                            final user = mentor["user"];
 
                             final studentCount =
-                                (mentor["students"]
-                                            as List?)
-                                        ?.length ??
-                                    0;
+                                (mentor["students"] as List?)?.length ?? 0;
 
                             return Container(
-                              margin:
-                                  const EdgeInsets.only(
-                                bottom:
-                                    18,
+                              margin: const EdgeInsets.only(bottom: 18),
+
+                              padding: const EdgeInsets.all(20),
+
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+
+                                borderRadius: BorderRadius.circular(24),
                               ),
 
-                              padding:
-                                  const EdgeInsets.all(
-                                20,
-                              ),
-
-                              decoration:
-                                  BoxDecoration(
-                                color:
-                                    Colors.white,
-
-                                borderRadius:
-                                    BorderRadius.circular(
-                                  24,
-                                ),
-                              ),
-
-                              child:
-                                  Column(
+                              child: Column(
                                 children: [
                                   Row(
                                     children: [
                                       CircleAvatar(
-                                        radius:
-                                            28,
+                                        radius: 28,
 
-                                        backgroundColor:
-                                            AppColors.primary,
+                                        backgroundColor: AppColors.primary,
 
-                                        child:
-                                            Text(
-                                          user["fullName"][0]
-                                              .toUpperCase(),
+                                        child: Text(
+                                          user["fullName"][0].toUpperCase(),
 
-                                          style:
-                                              const TextStyle(
-                                            color:
-                                                Colors.white,
+                                          style: const TextStyle(
+                                            color: Colors.white,
 
-                                            fontWeight:
-                                                FontWeight.bold,
+                                            fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                       ),
 
-                                      const SizedBox(
-                                        width:
-                                            14,
-                                      ),
+                                      const SizedBox(width: 14),
 
                                       Expanded(
-                                        child:
-                                            Column(
+                                        child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
 
@@ -441,114 +296,71 @@ class _AssignMentorScreenState
                                             Text(
                                               user["fullName"],
 
-                                              style:
-                                                  const TextStyle(
-                                                fontSize:
-                                                    18,
+                                              style: const TextStyle(
+                                                fontSize: 18,
 
-                                                fontWeight:
-                                                    FontWeight.bold,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                             ),
 
-                                            const SizedBox(
-                                              height:
-                                                  6,
-                                            ),
+                                            const SizedBox(height: 6),
 
-                                            Text(
-                                              user["phone"] ??
-                                                  "-",
-                                            ),
+                                            Text(user["phone"] ?? "-"),
                                           ],
                                         ),
                                       ),
                                     ],
                                   ),
 
-                                  const SizedBox(
-                                    height:
-                                        18,
-                                  ),
+                                  const SizedBox(height: 18),
 
                                   buildInfoRow(
-                                    icon:
-                                        Icons
-                                            .groups_rounded,
+                                    icon: Icons.groups_rounded,
 
-                                    title:
-                                        "Students Assigned",
+                                    title: "Students Assigned",
 
-                                    value:
-                                        studentCount
-                                            .toString(),
+                                    value: studentCount.toString(),
                                   ),
 
-                                  const SizedBox(
-                                    height:
-                                        10,
-                                  ),
+                                  const SizedBox(height: 10),
 
                                   buildInfoRow(
-                                    icon:
-                                        Icons
-                                            .location_city,
+                                    icon: Icons.location_city,
 
-                                    title:
-                                        "District",
+                                    title: "District",
 
-                                    value:
-                                        mentor["district"] ??
-                                            "-",
+                                    value: mentor["district"] ?? "-",
                                   ),
 
-                                  const SizedBox(
-                                    height:
-                                        22,
-                                  ),
+                                  const SizedBox(height: 22),
 
                                   SizedBox(
-                                    width:
-                                        double.infinity,
+                                    width: double.infinity,
 
-                                    child:
-                                        ElevatedButton(
-                                      onPressed:
-                                          assigning
-                                              ? null
-                                              : () {
-                                                  assignMentor(
-                                                    mentor["id"],
-                                                  );
-                                                },
+                                    child: ElevatedButton(
+                                      onPressed: assigning
+                                          ? null
+                                          : () {
+                                              assignMentor(mentor["id"]);
+                                            },
 
-                                      style:
-                                          ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            AppColors.primary,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.primary,
                                       ),
 
-                                      child:
-                                          assigning
-                                              ? const SizedBox(
-                                                  height:
-                                                      18,
+                                      child: assigning
+                                          ? const SizedBox(
+                                              height: 18,
 
-                                                  width:
-                                                      18,
+                                              width: 18,
 
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                    color:
-                                                        Colors.white,
+                                              child: CircularProgressIndicator(
+                                                color: Colors.white,
 
-                                                    strokeWidth:
-                                                        2,
-                                                  ),
-                                                )
-                                              : const Text(
-                                                  "Assign Mentor",
-                                                ),
+                                                strokeWidth: 2,
+                                              ),
+                                            )
+                                          : const Text("Assign Mentor"),
                                     ),
                                   ),
                                 ],
@@ -569,32 +381,13 @@ class _AssignMentorScreenState
   }) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 18,
-          color:
-              AppColors.primary,
-        ),
+        Icon(icon, size: 18, color: AppColors.primary),
 
-        const SizedBox(
-          width: 10,
-        ),
+        const SizedBox(width: 10),
 
-        Text(
-          "$title: ",
+        Text("$title: ", style: const TextStyle(fontWeight: FontWeight.bold)),
 
-          style:
-              const TextStyle(
-            fontWeight:
-                FontWeight.bold,
-          ),
-        ),
-
-        Expanded(
-          child: Text(
-            value,
-          ),
-        ),
+        Expanded(child: Text(value)),
       ],
     );
   }

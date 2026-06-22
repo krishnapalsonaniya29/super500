@@ -6,9 +6,7 @@ import '../../../../../theme/app_colors.dart';
 
 import '../../../../../widgets/buttons/custom_button.dart';
 
-class CreateReportScreen
-    extends StatefulWidget {
-
+class CreateReportScreen extends StatefulWidget {
   final String studentId;
 
   final String studentName;
@@ -20,25 +18,15 @@ class CreateReportScreen
   });
 
   @override
-  State<CreateReportScreen>
-      createState() =>
-          _CreateReportScreenState();
+  State<CreateReportScreen> createState() => _CreateReportScreenState();
 }
 
-class _CreateReportScreenState
-    extends State<
-        CreateReportScreen> {
+class _CreateReportScreenState extends State<CreateReportScreen> {
+  final TextEditingController contentController = TextEditingController();
 
-  final TextEditingController
-  contentController =
-      TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final GlobalKey<FormState>
-  _formKey =
-      GlobalKey<FormState>();
-
-  String reportType =
-      "MONTHLY";
+  String reportType = "MONTHLY";
 
   bool isLoading = false;
 
@@ -49,11 +37,8 @@ class _CreateReportScreenState
     super.dispose();
   }
 
-  Future<void>
-      submitReport() async {
-
-    if (!_formKey.currentState!
-        .validate()) {
+  Future<void> submitReport() async {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
@@ -62,148 +47,98 @@ class _CreateReportScreenState
         isLoading = true;
       });
 
-      await MentorService
-          .createReport(
-        studentId:
-            widget.studentId,
+      await MentorService.createReport(
+        studentId: widget.studentId,
 
-        content:
-            contentController.text
-                .trim(),
+        content: contentController.text.trim(),
 
-        reportType:
-            reportType,
+        reportType: reportType,
       );
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-          content: Text(
-            "Report submitted successfully",
-          ),
-        ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Report submitted successfully")),
       );
 
       Navigator.pop(context);
-
     } catch (e) {
-
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        SnackBar(
-          content: Text(
-            e.toString(),
-          ),
-        ),
-      );
-
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
-
       if (mounted) {
-          setState(() {
-        isLoading = false;
-      });
+        setState(() {
+          isLoading = false;
+        });
       }
-
-      
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      backgroundColor:
-          AppColors.background,
+      backgroundColor: AppColors.background,
 
       appBar: AppBar(
-        backgroundColor:
-            AppColors.primary,
+        backgroundColor: AppColors.primary,
 
-        title: const Text(
-          "Create Report",
-        ),
+        title: const Text("Create Report"),
       ),
 
       body: SingleChildScrollView(
-        padding:
-            const EdgeInsets.all(
-          16,
-        ),
+        padding: const EdgeInsets.all(16),
 
         child: Form(
           key: _formKey,
 
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment
-                    .start,
+            crossAxisAlignment: CrossAxisAlignment.start,
 
             children: [
-
               /// =====================
               /// STUDENT CARD
               /// =====================
-
               Card(
-                shape:
-                    RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(
-                    16,
-                  ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
 
                 child: Padding(
-                  padding:
-                      const EdgeInsets.all(
-                    16,
-                  ),
+                  padding: const EdgeInsets.all(16),
 
                   child: Row(
                     children: [
-
                       CircleAvatar(
                         radius: 28,
 
-                        backgroundColor:
-                            AppColors.gold,
+                        backgroundColor: AppColors.gold,
 
                         child: Text(
                           widget.studentName.isNotEmpty
-                        ? widget.studentName[0]
-                            .toUpperCase()
-                        : "S",
+                              ? widget.studentName[0].toUpperCase()
+                              : "S",
 
-                          style:
-                              const TextStyle(
-                            color:
-                                Colors.black,
+                          style: const TextStyle(
+                            color: Colors.black,
 
-                            fontWeight:
-                                FontWeight.bold,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
 
-                      const SizedBox(
-                        width: 14,
-                      ),
+                      const SizedBox(width: 14),
 
                       Expanded(
                         child: Text(
                           widget.studentName,
 
-                          style:
-                              const TextStyle(
+                          style: const TextStyle(
                             fontSize: 18,
 
-                            fontWeight:
-                                FontWeight.bold,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -212,164 +147,107 @@ class _CreateReportScreenState
                 ),
               ),
 
-              const SizedBox(
-                height: 24,
-              ),
+              const SizedBox(height: 24),
 
               /// =====================
               /// REPORT TYPE
               /// =====================
-
               const Text(
                 "Report Type",
 
-                style: TextStyle(
-                  fontWeight:
-                      FontWeight.bold,
-                ),
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
 
-              const SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
 
               DropdownButtonFormField<String>(
                 initialValue: reportType,
 
-                decoration:
-                    InputDecoration(
+                decoration: InputDecoration(
                   filled: true,
 
-                  fillColor:
-                      Colors.white,
+                  fillColor: Colors.white,
 
-                  border:
-                      OutlineInputBorder(
-                    borderRadius:
-                        BorderRadius.circular(
-                      12,
-                    ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
 
                 items: const [
+                  DropdownMenuItem(value: "MONTHLY", child: Text("Monthly")),
 
                   DropdownMenuItem(
-                    value:
-                        "MONTHLY",
+                    value: "QUARTERLY",
 
-                    child: Text(
-                      "Monthly",
-                    ),
+                    child: Text("Quarterly"),
                   ),
 
                   DropdownMenuItem(
-                    value:
-                        "QUARTERLY",
+                    value: "PERFORMANCE",
 
-                    child: Text(
-                      "Quarterly",
-                    ),
-                  ),
-
-                  DropdownMenuItem(
-                    value:
-                        "PERFORMANCE",
-
-                    child: Text(
-                      "Performance",
-                    ),
+                    child: Text("Performance"),
                   ),
                 ],
 
                 onChanged: (value) {
-
                   if (value == null) {
                     return;
                   }
 
                   setState(() {
-                    reportType =
-                        value;
+                    reportType = value;
                   });
                 },
               ),
 
-              const SizedBox(
-                height: 24,
-              ),
+              const SizedBox(height: 24),
 
               /// =====================
               /// CONTENT
               /// =====================
-
               const Text(
                 "Report Content",
 
-                style: TextStyle(
-                  fontWeight:
-                      FontWeight.bold,
-                ),
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
 
-              const SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
 
               TextFormField(
-                controller:
-                    contentController,
+                controller: contentController,
 
                 maxLines: 8,
 
                 validator: (value) {
-
-                  if (value == null ||
-                      value.trim().isEmpty) {
-
+                  if (value == null || value.trim().isEmpty) {
                     return "Please write report content";
                   }
 
                   return null;
                 },
 
-                decoration:
-                    InputDecoration(
-                  hintText:
-                      "Write mentor report...",
+                decoration: InputDecoration(
+                  hintText: "Write mentor report...",
 
                   filled: true,
 
-                  fillColor:
-                      Colors.white,
+                  fillColor: Colors.white,
 
-                  border:
-                      OutlineInputBorder(
-                    borderRadius:
-                        BorderRadius.circular(
-                      12,
-                    ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
               ),
 
-              const SizedBox(
-                height: 30,
-              ),
+              const SizedBox(height: 30),
 
               /// =====================
               /// SUBMIT BUTTON
               /// =====================
-
               CustomButton(
-                text: isLoading
-                    ? "Submitting..."
-                    : "Submit Report",
+                text: isLoading ? "Submitting..." : "Submit Report",
 
-                onPressed:
-                    isLoading
-                        ? null
-                        : submitReport,
+                onPressed: isLoading ? null : submitReport,
               ),
             ],
           ),

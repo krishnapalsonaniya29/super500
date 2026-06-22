@@ -2,28 +2,23 @@ import 'package:flutter/material.dart';
 
 import '../../theme/app_colors.dart';
 import 'package:flutter/services.dart';
-class CustomTextField
-    extends StatelessWidget {
+
+class CustomTextField extends StatelessWidget {
   final String hintText;
 
-  final TextEditingController
-  controller;
+  final TextEditingController controller;
 
-  final TextInputType
-  keyboardType;
+  final TextInputType keyboardType;
 
   final bool obscureText;
 
-  final String? Function(String?)?
-      validator;
+  final String? Function(String?)? validator;
 
   final int maxLines;
-  final List<TextInputFormatter>?
-    inputFormatters;
+  final List<TextInputFormatter>? inputFormatters;
 
-final TextCapitalization
-    textCapitalization;
-  
+  final TextCapitalization textCapitalization;
+
   const CustomTextField({
     super.key,
 
@@ -31,39 +26,35 @@ final TextCapitalization
 
     required this.controller,
 
-    this.keyboardType =
-        TextInputType.text,
+    this.keyboardType = TextInputType.text,
 
     this.obscureText = false,
 
     this.validator,
 
-this.maxLines = 1,
+    this.maxLines = 1,
 
-this.inputFormatters,
+    this.inputFormatters,
 
-this.textCapitalization =
-    TextCapitalization.none,
+    this.textCapitalization = TextCapitalization.none,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-  controller: controller,
+      controller: controller,
 
-  keyboardType: keyboardType,
+      keyboardType: keyboardType,
 
-  obscureText: obscureText,
+      obscureText: obscureText,
 
-  validator: validator,
+      validator: validator,
 
-  maxLines: maxLines,
+      maxLines: maxLines,
 
-  inputFormatters:
-      inputFormatters,
+      inputFormatters: inputFormatters,
 
-  textCapitalization:
-      textCapitalization,
+      textCapitalization: textCapitalization,
 
       decoration: InputDecoration(
         hintText: hintText,
@@ -72,66 +63,39 @@ this.textCapitalization =
 
         fillColor: Colors.white,
 
-        contentPadding:
-            const EdgeInsets.symmetric(
+        contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 18,
         ),
 
         border: OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14),
 
-          borderSide:
-              const BorderSide(
-            color: AppColors.border,
-          ),
+          borderSide: const BorderSide(color: AppColors.border),
         ),
 
-        enabledBorder:
-            OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(14),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
 
-          borderSide:
-              const BorderSide(
-            color: AppColors.border,
-          ),
+          borderSide: const BorderSide(color: AppColors.border),
         ),
 
-        focusedBorder:
-            OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(14),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
 
-          borderSide:
-              const BorderSide(
-            color: AppColors.primary,
-            width: 1.5,
-          ),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
 
-        errorBorder:
-            OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(14),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
 
-          borderSide:
-              const BorderSide(
-            color: Colors.red,
-          ),
+          borderSide: const BorderSide(color: Colors.red),
         ),
 
-        focusedErrorBorder:
-            OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(14),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
 
-          borderSide:
-              const BorderSide(
-            color: Colors.red,
-            width: 1.5,
-          ),
+          borderSide: const BorderSide(color: Colors.red, width: 1.5),
         ),
       ),
     );

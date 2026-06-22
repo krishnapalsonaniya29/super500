@@ -4,64 +4,43 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../../services/super_admin/super_admin_service.dart';
 import '../../../../../theme/app_colors.dart';
 
-class StudentDetailScreen
-    extends StatefulWidget {
+class StudentDetailScreen extends StatefulWidget {
   final Map<String, dynamic> student;
 
-  const StudentDetailScreen({
-    super.key,
-    required this.student,
-  });
+  const StudentDetailScreen({super.key, required this.student});
 
   @override
-  State<StudentDetailScreen>
-      createState() =>
-          _StudentDetailScreenState();
+  State<StudentDetailScreen> createState() => _StudentDetailScreenState();
 }
 
-class _StudentDetailScreenState
-    extends State<
-        StudentDetailScreen> {
+class _StudentDetailScreenState extends State<StudentDetailScreen> {
   bool loading = false;
 
-  late Map<String, dynamic>
-      student;
+  late Map<String, dynamic> student;
 
   @override
-  void initState() { 
+  void initState() {
     super.initState();
 
     student = widget.student;
-    
   }
 
-  Future<void> verifyStudent()
-  async {
+  Future<void> verifyStudent() async {
     try {
       setState(() {
         loading = true;
       });
 
-      await SuperAdminService
-          .verifyStudent(
-        student["id"],
-      );
+      await SuperAdminService.verifyStudent(student["id"]);
 
       setState(() {
-        student[
-                "verificationStatus"] =
-            "APPROVED";
+        student["verificationStatus"] = "APPROVED";
       });
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-          content: Text(
-            "Student verified successfully",
-          ),
-        ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Student verified successfully")),
       );
     } catch (e) {
       debugPrint(e.toString());
@@ -72,33 +51,23 @@ class _StudentDetailScreenState
     }
   }
 
-  Future<void> suspendUser()
-  async {
+  Future<void> suspendUser() async {
     try {
       setState(() {
         loading = true;
       });
 
-      await SuperAdminService
-          .suspendUser(
-        student["user"]["id"],
-      );
+      await SuperAdminService.suspendUser(student["user"]["id"]);
 
       setState(() {
-        student["user"]
-            ["isActive"] = false;
+        student["user"]["isActive"] = false;
       });
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-          content: Text(
-            "User suspended",
-          ),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("User suspended")));
     } catch (e) {
       debugPrint(e.toString());
     } finally {
@@ -108,94 +77,66 @@ class _StudentDetailScreenState
     }
   }
 
-  Future<void> rejectStudent()
-  async {
-    final controller =
-        TextEditingController();
+  Future<void> rejectStudent() async {
+    final controller = TextEditingController();
 
     showDialog(
       context: context,
 
       builder: (_) {
         return AlertDialog(
-          title: const Text(
-            "Reject Student",
-          ),
+          title: const Text("Reject Student"),
 
           content: TextField(
             controller: controller,
 
-            decoration:
-                const InputDecoration(
-              hintText:
-                  "Reason",
-            ),
+            decoration: const InputDecoration(hintText: "Reason"),
           ),
 
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(
-                  context,
-                );
+                Navigator.pop(context);
               },
 
-              child:
-                  const Text("Cancel"),
+              child: const Text("Cancel"),
             ),
 
             ElevatedButton(
               onPressed: () async {
-                Navigator.pop(
-                  context,
-                );
+                Navigator.pop(context);
 
                 try {
                   setState(() {
                     loading = true;
                   });
 
-                  await SuperAdminService
-                      .rejectStudent(
+                  await SuperAdminService.rejectStudent(
                     student["id"],
                     controller.text,
                   );
 
                   setState(() {
-                    student[
-                            "verificationStatus"] =
-                        "REJECTED";
+                    student["verificationStatus"] = "REJECTED";
                   });
 
                   if (!mounted) {
                     return;
                   }
 
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        "Student rejected",
-                      ),
-                    ),
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Student rejected")),
                   );
                 } catch (e) {
-                  debugPrint(
-                    e.toString(),
-                  );
+                  debugPrint(e.toString());
                 } finally {
                   setState(() {
-                    loading =
-                        false;
+                    loading = false;
                   });
                 }
               },
 
-              child:
-                  const Text(
-                "Reject",
-              ),
+              child: const Text("Reject"),
             ),
           ],
         );
@@ -203,411 +144,263 @@ class _StudentDetailScreenState
     );
   }
 
-  Future<void>
-    updateScholarshipAmount() async {
-  final controller =
-      TextEditingController(
-    text: student["allottedAmount"]
-        .toString(),
-  );
+  Future<void> updateScholarshipAmount() async {
+    final controller = TextEditingController(
+      text: student["allottedAmount"].toString(),
+    );
 
-  showDialog(
-    context: context,
+    showDialog(
+      context: context,
 
-    builder: (_) {
-      return AlertDialog(
-        title: const Text(
-          "Update Scholarship Amount",
-        ),
+      builder: (_) {
+        return AlertDialog(
+          title: const Text("Update Scholarship Amount"),
 
-        content: TextField(
-          controller: controller,
+          content: TextField(
+            controller: controller,
 
-          keyboardType:
-              TextInputType.number,
+            keyboardType: TextInputType.number,
 
-          decoration:
-              const InputDecoration(
-            hintText:
-                "Enter amount",
-          ),
-        ),
-
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(
-                context,
-              );
-            },
-
-            child:
-                const Text("Cancel"),
+            decoration: const InputDecoration(hintText: "Enter amount"),
           ),
 
-          ElevatedButton(
-            onPressed: () async {
-              try {
-                final amount =
-                    double.parse(
-                  controller.text,
-                );
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
 
-                await SuperAdminService
-                    .updateScholarshipAmount(
-                  studentId:
-                      student["id"],
-
-                  amount: amount,
-                );
-
-                setState(() {
-                  student[
-                          "allottedAmount"] =
-                      amount;
-                });
-
-                if (!mounted) {
-                  return;
-                }
-
-                Navigator.pop(
-                  context,
-                );
-
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      "Scholarship updated",
-                    ),
-                  ),
-                );
-              } catch (e) {
-                debugPrint(
-                  e.toString(),
-                );
-              }
-            },
-
-            child:
-                const Text(
-              "Save",
+              child: const Text("Cancel"),
             ),
-          ),
-        ],
-      );
-    },
-  );
-}
+
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  final amount = double.parse(controller.text);
+
+                  await SuperAdminService.updateScholarshipAmount(
+                    studentId: student["id"],
+
+                    amount: amount,
+                  );
+
+                  setState(() {
+                    student["allottedAmount"] = amount;
+                  });
+
+                  if (!mounted) {
+                    return;
+                  }
+
+                  Navigator.pop(context);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Scholarship updated")),
+                  );
+                } catch (e) {
+                  debugPrint(e.toString());
+                }
+              },
+
+              child: const Text("Save"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final user =
-        student["user"];
+    final user = student["user"];
 
-    final documents =
-        student["documents"] ??
-            [];
+    final documents = student["documents"] ?? [];
 
-    final achievements =
-        student[
-                "achievements"] ??
-            [];
+    final achievements = student["achievements"] ?? [];
 
-    final expenses =
-        student["expenses"] ??
-            [];
+    final expenses = student["expenses"] ?? [];
 
-    final reports =
-        student["reports"] ?? [];
+    final reports = student["reports"] ?? [];
 
     final allottedAmount =
-        double.tryParse(
-          student["allottedAmount"]
-                  ?.toString() ??
-              "0",
-        ) ??
-        0;
+        double.tryParse(student["allottedAmount"]?.toString() ?? "0") ?? 0;
 
-    final approvedExpenses =
-        expenses.where((expense) {
-      return expense["status"] ==
-          "APPROVED";
+    final approvedExpenses = expenses.where((expense) {
+      return expense["status"] == "APPROVED";
     }).toList();
 
     double usedAmount = 0;
 
-    for (final expense
-        in approvedExpenses) {
-      usedAmount +=
-          double.tryParse(
-                expense["amount"]
-                    .toString(),
-              ) ??
-              0;
+    for (final expense in approvedExpenses) {
+      usedAmount += double.tryParse(expense["amount"].toString()) ?? 0;
     }
 
-    final remainingAmount =
-        allottedAmount - usedAmount;
+    final remainingAmount = allottedAmount - usedAmount;
 
-    final utilizationPercentage =
-        allottedAmount > 0
-            ? (usedAmount /
-                    allottedAmount)
-                .clamp(0.0, 1.0)
-            : 0.0;
+    final utilizationPercentage = allottedAmount > 0
+        ? (usedAmount / allottedAmount).clamp(0.0, 1.0)
+        : 0.0;
 
     return Scaffold(
-      backgroundColor:
-          AppColors.background,
-
-      
+      backgroundColor: AppColors.background,
 
       body: loading
-          ? const Center(
-              child:
-                  CircularProgressIndicator(),
-            )
+          ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-              padding:
-                  const EdgeInsets.all(
-                20,
-              ),
+              padding: const EdgeInsets.all(20),
 
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment
-                        .start,
+                crossAxisAlignment: CrossAxisAlignment.start,
 
                 children: [
                   //header:
                   Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  margin: const EdgeInsets.only(
-                    bottom: 20,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius:
-                        BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary
-                            .withValues(alpha: 0.25),
-                        blurRadius: 12,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        height: 70,
-                        width: 70,
-                        padding:
-                            const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius:
-                              BorderRadius.circular(
-                            16,
-                          ),
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.25),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
                         ),
-                        child: ClipRRect(
-                          borderRadius:
-                              BorderRadius.circular(
-                            12,
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          height: 70,
+                          width: 70,
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                          child: Image.asset(
-                            "assets/images/app_logo2.png",
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(width: 16),
-
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Student Details",
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight:
-                                    FontWeight.bold,
-                                color: Colors.white,
-                              ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.asset(
+                              "assets/images/app_logo2.png",
+                              fit: BoxFit.contain,
                             ),
-
-                            SizedBox(height: 6),
-
-                            Text(
-                              "Details of Student",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.white70,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
 
-                      
-                    ],
+                        const SizedBox(width: 16),
+
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Student Details",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+
+                              SizedBox(height: 6),
+
+                              Text(
+                                "Details of Student",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+
                   /// PROFILE
                   Container(
-                    width:
-                        double.infinity,
+                    width: double.infinity,
 
-                    padding:
-                        const EdgeInsets.all(
-                      24,
-                    ),
+                    padding: const EdgeInsets.all(24),
 
-                    decoration:
-                        BoxDecoration(
-                      gradient:
-                          const LinearGradient(
-                        colors: [
-                          Color(
-                            0xFF0A1931,
-                          ),
-
-                          Color(
-                            0xFF132D46,
-                          ),
-                        ],
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF0A1931), Color(0xFF132D46)],
                       ),
 
-                      borderRadius:
-                          BorderRadius.circular(
-                        30,
-                      ),
+                      borderRadius: BorderRadius.circular(30),
                     ),
 
                     child: Column(
                       children: [
                         CircleAvatar(
-                          radius:
-                              50,
+                          radius: 50,
 
-                          backgroundColor:
-                              Colors.white,
+                          backgroundColor: Colors.white,
 
-                          backgroundImage:
-                              getProfileImage(
-                                        documents,
-                                      ) !=
-                                      null
-                                  ? NetworkImage(
-                                      getProfileImage(
-                                        documents,
-                                      )!,
-                                    )
-                                  : null,
+                          backgroundImage: getProfileImage(documents) != null
+                              ? NetworkImage(getProfileImage(documents)!)
+                              : null,
 
-                          child:
-                              getProfileImage(
-                                        documents,
-                                      ) ==
-                                      null
-                                  ? const Icon(
-                                      Icons
-                                          .person,
+                          child: getProfileImage(documents) == null
+                              ? const Icon(
+                                  Icons.person,
 
-                                      size:
-                                          50,
+                                  size: 50,
 
-                                      color:
-                                          AppColors.primary,
-                                    )
-                                  : null,
+                                  color: AppColors.primary,
+                                )
+                              : null,
                         ),
 
-                        const SizedBox(
-                          height: 18,
-                        ),
+                        const SizedBox(height: 18),
 
                         Text(
-                          user["fullName"] ??
-                              "",
+                          user["fullName"] ?? "",
 
-                          style:
-                              const TextStyle(
-                            color:
-                                Colors.white,
+                          style: const TextStyle(
+                            color: Colors.white,
 
-                            fontSize:
-                                28,
+                            fontSize: 28,
 
-                            fontWeight:
-                                FontWeight.bold,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
 
-                        const SizedBox(
-                          height: 8,
-                        ),
+                        const SizedBox(height: 8),
 
                         Text(
-                          user["phone"] ??
-                              "",
+                          user["phone"] ?? "",
 
-                          style:
-                              const TextStyle(
-                            color: Colors
-                                .white70,
-                          ),
+                          style: const TextStyle(color: Colors.white70),
                         ),
 
-                        const SizedBox(
-                          height: 18,
-                        ),
+                        const SizedBox(height: 18),
 
                         Container(
-                          padding:
-                              const EdgeInsets.symmetric(
-                            horizontal:
-                                16,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
 
-                            vertical:
-                                10,
+                            vertical: 10,
                           ),
 
-                          decoration:
-                              BoxDecoration(
-                            color:
-                                getVerificationColor(
-                              student[
-                                  "verificationStatus"],
+                          decoration: BoxDecoration(
+                            color: getVerificationColor(
+                              student["verificationStatus"],
                             ),
 
-                            borderRadius:
-                                BorderRadius.circular(
-                              30,
-                            ),
+                            borderRadius: BorderRadius.circular(30),
                           ),
 
                           child: Text(
-                            student[
-                                    "verificationStatus"] ??
-                                "PENDING",
+                            student["verificationStatus"] ?? "PENDING",
 
-                            style:
-                                const TextStyle(
-                              color:
-                                  Colors.white,
+                            style: const TextStyle(
+                              color: Colors.white,
 
-                              fontWeight:
-                                  FontWeight.bold,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
@@ -615,41 +408,26 @@ class _StudentDetailScreenState
                     ),
                   ),
 
-                  const SizedBox(
-                    height: 30,
-                  ),
+                  const SizedBox(height: 30),
 
-                  buildSectionTitle(
-                    "Personal Details",
-                  ),
-                  const SizedBox(
-                    height: 28,
-                  ),
+                  buildSectionTitle("Personal Details"),
+                  const SizedBox(height: 28),
 
-                  buildSectionTitle(
-                    "Scholarship Analytics",
-                  ),
+                  buildSectionTitle("Scholarship Analytics"),
 
-                  const SizedBox(
-                    height: 16,
-                  ),
+                  const SizedBox(height: 16),
 
                   Container(
                     width: double.infinity,
-                    padding:
-                        const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
 
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius:
-                          BorderRadius.circular(
-                        24,
-                      ),
+                      borderRadius: BorderRadius.circular(24),
                     ),
 
                     child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
 
                       children: [
                         buildDetailTile(
@@ -667,361 +445,201 @@ class _StudentDetailScreenState
                           "₹${remainingAmount.toStringAsFixed(0)}",
                         ),
 
-                        const SizedBox(
-                          height: 16,
-                        ),
+                        const SizedBox(height: 16),
 
                         ClipRRect(
-                          borderRadius:
-                              BorderRadius.circular(
-                            10,
-                          ),
-                          child:
-                              LinearProgressIndicator(
-                            value:
-                                utilizationPercentage,
+                          borderRadius: BorderRadius.circular(10),
+                          child: LinearProgressIndicator(
+                            value: utilizationPercentage,
                             minHeight: 12,
                           ),
                         ),
 
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        const SizedBox(
-                          height: 16,
-                        ),
+                        const SizedBox(height: 10),
+                        const SizedBox(height: 16),
 
                         SizedBox(
                           width: double.infinity,
 
                           child: ElevatedButton.icon(
-                            icon: const Icon(
-                              Icons.currency_rupee,
-                            ),
+                            icon: const Icon(Icons.currency_rupee),
 
-                            label: const Text(
-                              "Update Scholarship Amount",
-                            ),
+                            label: const Text("Update Scholarship Amount"),
 
-                            onPressed:
-                                updateScholarshipAmount,
+                            onPressed: updateScholarshipAmount,
                           ),
                         ),
 
                         Text(
                           "${(utilizationPercentage * 100).toStringAsFixed(1)}% Utilized",
 
-                          style:
-                              const TextStyle(
-                            fontWeight:
-                                FontWeight.bold,
-                          ),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(
-                    height: 16,
-                  ),
+                  const SizedBox(height: 16),
 
-                  buildDetailTile(
-                    "Father Name",
-                    student[
-                        "fatherName"],
-                  ),
+                  buildDetailTile("Father Name", student["fatherName"]),
 
-                  buildDetailTile(
-                    "Gender",
-                    student["gender"],
-                  ),
+                  buildDetailTile("Gender", student["gender"]),
 
-                  buildDetailTile(
-                    "District",
-                    student[
-                        "district"],
-                  ),
+                  buildDetailTile("District", student["district"]),
 
-                  buildDetailTile(
-                    "School",
-                    student[
-                        "schoolName"],
-                  ),
+                  buildDetailTile("School", student["schoolName"]),
 
-                  buildDetailTile(
-                    "Current Class",
-                    student[
-                        "currentClass"],
-                  ),
+                  buildDetailTile("Current Class", student["currentClass"]),
 
                   buildDetailTile(
                     "10th Marks",
                     "${student["marks10th"] ?? 0}%",
                   ),
 
-                  buildDetailTile(
-                    "Samagra ID",
-                    student[
-                        "samagraId"],
-                  ),
+                  buildDetailTile("Samagra ID", student["samagraId"]),
 
-                  buildDetailTile(
-                    "APAAR ID",
-                    student[
-                        "apaarId"],
-                  ),
+                  buildDetailTile("APAAR ID", student["apaarId"]),
 
-                  buildDetailTile(
-                    "Address",
-                    student[
-                        "address"],
-                  ),
+                  buildDetailTile("Address", student["address"]),
 
-                  const SizedBox(
-                    height: 28,
-                  ),
+                  const SizedBox(height: 28),
 
-                const SizedBox(
-                  height: 28,
-                ),
+                  const SizedBox(height: 28),
 
-                buildSectionTitle(
-                  "Student Reports",
-                ),
+                  buildSectionTitle("Student Reports"),
 
-                const SizedBox(
-                  height: 16,
-                ),
+                  const SizedBox(height: 16),
 
-                if (reports.isEmpty)
-                  buildEmptyCard(
-                    "No reports submitted yet",
-                  )
-                else
-                  ...reports.map(
-                    (report) {
-                      return buildReportCard(
-                        report,
-                      );
-                    },
-                  ),
+                  if (reports.isEmpty)
+                    buildEmptyCard("No reports submitted yet")
+                  else
+                    ...reports.map((report) {
+                      return buildReportCard(report);
+                    }),
 
                   /// DOCUMENTS
-                  buildSectionTitle(
-                    "Documents",
-                  ),
+                  buildSectionTitle("Documents"),
 
-                  const SizedBox(
-                    height: 16,
-                  ),
+                  const SizedBox(height: 16),
 
-                  if (documents
-                      .isEmpty)
-                    buildEmptyCard(
-                      "No documents uploaded",
-                    )
+                  if (documents.isEmpty)
+                    buildEmptyCard("No documents uploaded")
                   else
-                    ...documents.map(
-                      (doc) {
-                        return buildDocumentTile(
-                          title:
-                              formatDocumentType(
-                            doc[
-                                "documentType"],
-                          ),
+                    ...documents.map((doc) {
+                      return buildDocumentTile(
+                        title: formatDocumentType(doc["documentType"]),
 
-                          verified:
-                              doc["verified"] ??
-                                  false,
+                        verified: doc["verified"] ?? false,
 
-                          onTap:
-                              () async {
-                            final uri =
-                                Uri.parse(
-                              doc[
-                                  "documentUrl"],
-                            );
+                        onTap: () async {
+                          final uri = Uri.parse(doc["documentUrl"]);
 
-                            await launchUrl(
-                              uri,
+                          await launchUrl(
+                            uri,
 
-                              mode:
-                                  LaunchMode.externalApplication,
-                            );
-                          },
-                        );
-                      },
-                    ),
+                            mode: LaunchMode.externalApplication,
+                          );
+                        },
+                      );
+                    }),
 
-                  const SizedBox(
-                    height: 28,
-                  ),
+                  const SizedBox(height: 28),
 
                   /// ACHIEVEMENTS
-                  buildSectionTitle(
-                    "Achievements",
-                  ),
+                  buildSectionTitle("Achievements"),
 
-                  const SizedBox(
-                    height: 16,
-                  ),
+                  const SizedBox(height: 16),
 
-                  if (achievements
-                      .isEmpty)
-                    buildEmptyCard(
-                      "No achievements added",
-                    )
+                  if (achievements.isEmpty)
+                    buildEmptyCard("No achievements added")
                   else
-                    ...achievements.map(
-                      (achievement) {
-                        return buildAchievementTile(
-                          achievement,
-                        );
-                      },
-                    ),
+                    ...achievements.map((achievement) {
+                      return buildAchievementTile(achievement);
+                    }),
 
-                  const SizedBox(
-                    height: 28,
-                  ),
+                  const SizedBox(height: 28),
 
                   /// EXPENSES
-                  buildSectionTitle(
-                    "Expenses",
-                  ),
+                  buildSectionTitle("Expenses"),
 
-                  const SizedBox(
-                    height: 16,
-                  ),
+                  const SizedBox(height: 16),
 
-                  if (expenses
-                      .isEmpty)
-                    buildEmptyCard(
-                      "No expenses found",
-                    )
+                  if (expenses.isEmpty)
+                    buildEmptyCard("No expenses found")
                   else
-                   ...expenses.map(
-                    (expense) {
-                      return buildExpenseTile(
-                        expense,
-                      );
-                    },
-                  ),
+                    ...expenses.map((expense) {
+                      return buildExpenseTile(expense);
+                    }),
 
-                  const SizedBox(
-                    height: 34,
-                  ),
+                  const SizedBox(height: 34),
 
                   /// ACTIONS
-                  if (student["verificationStatus"] !=
-                    "APPROVED")
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: verifyStudent,
+                  if (student["verificationStatus"] != "APPROVED")
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: verifyStudent,
 
-                          style:
-                              ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Colors.green,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
 
-                            foregroundColor:
-                                Colors.white,
+                              foregroundColor: Colors.white,
 
-                            padding:
-                                const EdgeInsets.symmetric(
-                              vertical: 16,
-                            ),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
 
-                            shape:
-                                RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(
-                                18,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18),
                               ),
                             ),
-                          ),
 
-                          child: const Text(
-                            "Verify",
+                            child: const Text("Verify"),
                           ),
                         ),
-                      ),
 
-                      const SizedBox(
-                        width: 14,
-                      ),
+                        const SizedBox(width: 14),
 
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: rejectStudent,
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: rejectStudent,
 
-                          style:
-                              ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Colors.orange,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
 
-                            foregroundColor:
-                                Colors.white,
+                              foregroundColor: Colors.white,
 
-                            padding:
-                                const EdgeInsets.symmetric(
-                              vertical: 16,
-                            ),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
 
-                            shape:
-                                RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(
-                                18,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18),
                               ),
                             ),
-                          ),
 
-                          child: const Text(
-                            "Reject",
+                            child: const Text("Reject"),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
 
-                  const SizedBox(
-                    height: 16,
-                  ),
+                  const SizedBox(height: 16),
 
                   SizedBox(
-                    width:
-                        double.infinity,
+                    width: double.infinity,
 
-                    child:
-                        ElevatedButton(
-                      onPressed:
-                          suspendUser,
+                    child: ElevatedButton(
+                      onPressed: suspendUser,
 
-                      style:
-                          ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Colors.red,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
 
-                        padding:
-                            const EdgeInsets.symmetric(
-                          vertical: 16,
-                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
 
-                        shape:
-                            RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(
-                            18,
-                          ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
                         ),
                       ),
 
-                      child:
-                          const Text(
-                        "Suspend User",
-                      ),
+                      child: const Text("Suspend User"),
                     ),
                   ),
                 ],
@@ -1030,66 +648,37 @@ class _StudentDetailScreenState
     );
   }
 
-  Widget buildSectionTitle(
-    String title,
-  ) {
+  Widget buildSectionTitle(String title) {
     return Text(
       title,
 
-      style: const TextStyle(
-        fontSize: 22,
-
-        fontWeight:
-            FontWeight.bold,
-      ),
+      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
     );
   }
 
-  Widget buildDetailTile(
-    String title,
-    dynamic value,
-  ) {
+  Widget buildDetailTile(String title, dynamic value) {
     return Container(
-      margin:
-          const EdgeInsets.only(
-        bottom: 14,
-      ),
+      margin: const EdgeInsets.only(bottom: 14),
 
-      padding:
-          const EdgeInsets.all(
-        18,
-      ),
+      padding: const EdgeInsets.all(18),
 
       decoration: BoxDecoration(
         color: Colors.white,
 
-        borderRadius:
-            BorderRadius.circular(
-          20,
-        ),
+        borderRadius: BorderRadius.circular(20),
       ),
 
       child: Row(
         children: [
-          Expanded(
-            child: Text(
-              title,
-            ),
-          ),
+          Expanded(child: Text(title)),
 
           Expanded(
             child: Text(
-              value?.toString() ??
-                  "-",
+              value?.toString() ?? "-",
 
-              textAlign:
-                  TextAlign.end,
+              textAlign: TextAlign.end,
 
-              style:
-                  const TextStyle(
-                fontWeight:
-                    FontWeight.bold,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -1097,129 +686,81 @@ class _StudentDetailScreenState
     );
   }
 
-Widget buildReportCard(
-  Map<String, dynamic> report,
-) {
-  return Container(
-    width: double.infinity,
+  Widget buildReportCard(Map<String, dynamic> report) {
+    return Container(
+      width: double.infinity,
 
-    margin:
-        const EdgeInsets.only(
-      bottom: 16,
-    ),
+      margin: const EdgeInsets.only(bottom: 16),
 
-    padding:
-        const EdgeInsets.all(
-      18,
-    ),
+      padding: const EdgeInsets.all(18),
 
-    decoration: BoxDecoration(
-      color: Colors.white,
+      decoration: BoxDecoration(
+        color: Colors.white,
 
-      borderRadius:
-          BorderRadius.circular(
-        22,
+        borderRadius: BorderRadius.circular(22),
       ),
-    ),
 
-    child: Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
 
-      children: [
-        Row(
-          children: [
-            Container(
-              padding:
-                  const EdgeInsets.all(
-                10,
-              ),
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
 
-              decoration:
-                  BoxDecoration(
-                color: Colors.blue
-                    .withValues(
-                  alpha: 0.1,
+                decoration: BoxDecoration(
+                  color: Colors.blue.withValues(alpha: 0.1),
+
+                  borderRadius: BorderRadius.circular(12),
                 ),
 
-                borderRadius:
-                    BorderRadius.circular(
-                  12,
+                child: const Icon(Icons.description, color: Colors.blue),
+              ),
+
+              const SizedBox(width: 12),
+
+              Expanded(
+                child: Text(
+                  report["reportType"] ?? "Report",
+
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
+            ],
+          ),
 
-              child: const Icon(
-                Icons.description,
-                color: Colors.blue,
-              ),
+          const SizedBox(height: 16),
+
+          if (report["quarter"] != null)
+            Text(
+              "Quarter ${report["quarter"]}",
+              style: const TextStyle(fontWeight: FontWeight.w600),
             ),
 
-            const SizedBox(
-              width: 12,
-            ),
+          if (report["year"] != null) Text("Year ${report["year"]}"),
 
-            Expanded(
-              child: Text(
-                report["reportType"] ??
-                    "Report",
+          const SizedBox(height: 12),
 
-                style:
-                    const TextStyle(
-                  fontSize: 16,
-                  fontWeight:
-                      FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
+          Text(report["content"] ?? ""),
 
-        const SizedBox(
-          height: 16,
-        ),
+          const SizedBox(height: 12),
 
-        if (report["quarter"] != null)
           Text(
-            "Quarter ${report["quarter"]}",
-            style:
-                const TextStyle(
-              fontWeight:
-                  FontWeight.w600,
+            "Submitted: ${report["createdAt"]?.toString().substring(0, 10) ?? "-"}",
+
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 12,
             ),
           ),
-
-        if (report["year"] != null)
-          Text(
-            "Year ${report["year"]}",
-          ),
-
-        const SizedBox(
-          height: 12,
-        ),
-
-        Text(
-          report["content"] ??
-              "",
-        ),
-
-        const SizedBox(
-          height: 12,
-        ),
-
-        Text(
-          "Submitted: ${report["createdAt"]?.toString().substring(0, 10) ?? "-"}",
-
-          style:
-              const TextStyle(
-            color: AppColors
-                .textSecondary,
-            fontSize: 12,
-          ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
   Widget buildDocumentTile({
     required String title,
@@ -1230,50 +771,28 @@ Widget buildReportCard(
       onTap: onTap,
 
       child: Container(
-        margin:
-            const EdgeInsets.only(
-          bottom: 14,
-        ),
+        margin: const EdgeInsets.only(bottom: 14),
 
-        padding:
-            const EdgeInsets.all(
-          18,
-        ),
+        padding: const EdgeInsets.all(18),
 
-        decoration:
-            BoxDecoration(
+        decoration: BoxDecoration(
           color: Colors.white,
 
-          borderRadius:
-              BorderRadius.circular(
-            22,
-          ),
+          borderRadius: BorderRadius.circular(22),
         ),
 
         child: Row(
           children: [
-            const Icon(
-              Icons.description,
-            ),
+            const Icon(Icons.description),
 
-            const SizedBox(
-              width: 14,
-            ),
+            const SizedBox(width: 14),
 
-            Expanded(
-              child: Text(
-                title,
-              ),
-            ),
+            Expanded(child: Text(title)),
 
             Icon(
-              verified
-                  ? Icons.verified
-                  : Icons.pending,
+              verified ? Icons.verified : Icons.pending,
 
-              color: verified
-                  ? Colors.green
-                  : Colors.orange,
+              color: verified ? Colors.green : Colors.orange,
             ),
           ],
         ),
@@ -1281,12 +800,8 @@ Widget buildReportCard(
     );
   }
 
-  Widget buildAchievementTile(
-    Map<String, dynamic> achievement,
-  ) {
-    final status =
-        achievement["status"] ??
-        "PENDING";
+  Widget buildAchievementTile(Map<String, dynamic> achievement) {
+    final status = achievement["status"] ?? "PENDING";
 
     Color statusColor;
 
@@ -1306,117 +821,73 @@ Widget buildReportCard(
     return Container(
       width: double.infinity,
 
-      margin:
-          const EdgeInsets.only(
-        bottom: 16,
-      ),
+      margin: const EdgeInsets.only(bottom: 16),
 
-      padding:
-          const EdgeInsets.all(
-        18,
-      ),
+      padding: const EdgeInsets.all(18),
 
       decoration: BoxDecoration(
         color: Colors.white,
 
-        borderRadius:
-            BorderRadius.circular(
-          22,
-        ),
+        borderRadius: BorderRadius.circular(22),
       ),
 
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
 
         children: [
           Row(
             children: [
-              const Icon(
-                Icons.emoji_events,
-                color: Colors.amber,
-              ),
+              const Icon(Icons.emoji_events, color: Colors.amber),
 
-              const SizedBox(
-                width: 10,
-              ),
+              const SizedBox(width: 10),
 
               Expanded(
                 child: Text(
-                  achievement["title"] ??
-                      "-",
+                  achievement["title"] ?? "-",
 
-                  style:
-                      const TextStyle(
+                  style: const TextStyle(
                     fontSize: 18,
-                    fontWeight:
-                        FontWeight.bold,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
 
               Container(
-                padding:
-                    const EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 6,
                 ),
 
-                decoration:
-                    BoxDecoration(
-                  color:
-                      statusColor
-                          .withValues(
-                    alpha: 0.1,
-                  ),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.1),
 
-                  borderRadius:
-                      BorderRadius.circular(
-                    20,
-                  ),
+                  borderRadius: BorderRadius.circular(20),
                 ),
 
                 child: Text(
                   status,
 
-                  style:
-                      TextStyle(
-                    color:
-                        statusColor,
+                  style: TextStyle(
+                    color: statusColor,
 
-                    fontWeight:
-                        FontWeight.bold,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ],
           ),
 
-          const SizedBox(
-            height: 12,
-          ),
+          const SizedBox(height: 12),
 
-          Text(
-            achievement[
-                    "description"] ??
-                "",
-          ),
+          Text(achievement["description"] ?? ""),
 
-          const SizedBox(
-            height: 16,
-          ),
+          const SizedBox(height: 16),
 
-          if (achievement[
-                  "proofImageUrl"] !=
-              null)
+          if (achievement["proofImageUrl"] != null)
             OutlinedButton.icon(
-              icon: const Icon(
-                Icons.image,
-              ),
+              icon: const Icon(Icons.image),
 
-              label: const Text(
-                "View Proof",
-              ),
+              label: const Text("View Proof"),
 
               onPressed: () {
                 showDialog(
@@ -1424,49 +895,33 @@ Widget buildReportCard(
 
                   builder: (_) {
                     return Dialog(
-                      insetPadding:
-                          const EdgeInsets.all(
-                        16,
-                      ),
+                      insetPadding: const EdgeInsets.all(16),
 
                       child: Column(
-                        mainAxisSize:
-                            MainAxisSize.min,
+                        mainAxisSize: MainAxisSize.min,
 
                         children: [
                           AppBar(
-                            title:
-                                const Text(
-                              "Achievement Proof",
-                            ),
+                            title: const Text("Achievement Proof"),
 
-                            automaticallyImplyLeading:
-                                false,
+                            automaticallyImplyLeading: false,
 
                             actions: [
                               IconButton(
-                                icon:
-                                    const Icon(
-                                  Icons.close,
-                                ),
+                                icon: const Icon(Icons.close),
 
-                                onPressed:
-                                    () {
-                                  Navigator.pop(
-                                    context,
-                                  );
+                                onPressed: () {
+                                  Navigator.pop(context);
                                 },
                               ),
                             ],
                           ),
 
                           Flexible(
-                            child:
-                                InteractiveViewer(
-                              child:
-                                  Image.network(
-                                    achievement["proofImageUrl"]?.toString() ?? "",
-                                  ),
+                            child: InteractiveViewer(
+                              child: Image.network(
+                                achievement["proofImageUrl"]?.toString() ?? "",
+                              ),
                             ),
                           ),
                         ],
@@ -1477,17 +932,13 @@ Widget buildReportCard(
               },
             ),
 
-          const SizedBox(
-            height: 12,
-          ),
+          const SizedBox(height: 12),
 
           Text(
             "Submitted: ${achievement["createdAt"]?.toString().substring(0, 10) ?? "-"}",
 
-            style:
-                const TextStyle(
-              color: AppColors
-                  .textSecondary,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
               fontSize: 12,
             ),
           ),
@@ -1496,305 +947,204 @@ Widget buildReportCard(
     );
   }
 
-Widget buildExpenseTile(
-  Map<String, dynamic> expense,
-) {
-  final status =
-      expense["status"] ??
-      "PENDING";
+  Widget buildExpenseTile(Map<String, dynamic> expense) {
+    final status = expense["status"] ?? "PENDING";
 
-  Color statusColor;
+    Color statusColor;
 
-  switch (status) {
-    case "APPROVED":
-      statusColor = Colors.green;
-      break;
+    switch (status) {
+      case "APPROVED":
+        statusColor = Colors.green;
+        break;
 
-    case "REJECTED":
-      statusColor = Colors.red;
-      break;
+      case "REJECTED":
+        statusColor = Colors.red;
+        break;
 
-    default:
-      statusColor = Colors.orange;
-  }
+      default:
+        statusColor = Colors.orange;
+    }
 
-  return Container(
-    width: double.infinity,
-
-    margin:
-        const EdgeInsets.only(
-      bottom: 16,
-    ),
-
-    decoration: BoxDecoration(
-      color: Colors.white,
-
-      borderRadius:
-          BorderRadius.circular(
-        22,
-      ),
-    ),
-
-    child: Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
-
-      children: [
-        
-
-        Padding(
-          padding:
-              const EdgeInsets.all(
-            18,
-          ),
-
-          child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment
-                    .start,
-
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      expense["title"] ??
-                          "-",
-
-                      style:
-                          const TextStyle(
-                        fontSize: 18,
-
-                        fontWeight:
-                            FontWeight
-                                .bold,
-                      ),
-                    ),
-                  ),
-
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-
-                    decoration:
-                        BoxDecoration(
-                      color:
-                          statusColor
-                              .withValues(
-                        alpha: 0.1,
-                      ),
-
-                      borderRadius:
-                          BorderRadius.circular(
-                        20,
-                      ),
-                    ),
-
-                    child: Text(
-                      status,
-
-                      style:
-                          TextStyle(
-                        color:
-                            statusColor,
-
-                        fontWeight:
-                            FontWeight
-                                .bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(
-                height: 12,
-              ),
-
-              Text(
-                "₹ ${expense["amount"]}",
-                style:
-                    const TextStyle(
-                  fontSize: 22,
-                  fontWeight:
-                      FontWeight.bold,
-                ),
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-
-              if (expense["receiptUrl"] != null)
-                OutlinedButton.icon(
-                  icon: const Icon(
-                    Icons.receipt_long,
-                  ),
-
-                  label: const Text(
-                    "View Receipt",
-                  ),
-
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-
-                      builder: (_) {
-                        return Dialog(
-                          insetPadding:
-                              const EdgeInsets.all(
-                            16,
-                          ),
-
-                          child: Column(
-                            mainAxisSize:
-                                MainAxisSize.min,
-
-                            children: [
-                              AppBar(
-                                title: const Text(
-                                  "Receipt",
-                                ),
-
-                                automaticallyImplyLeading:
-                                    false,
-
-                                actions: [
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.close,
-                                    ),
-
-                                    onPressed: () {
-                                      Navigator.pop(
-                                        context,
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
-
-                              Flexible(
-                                child:
-                                    InteractiveViewer(
-                                  child:
-                                      Image.network(
-                                        expense["receiptUrl"]?.toString() ?? "",
-                                      ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-
-              const SizedBox(
-                height: 12,
-              ),
-
-              if (expense[
-                      "expenseCategory"] !=
-                  null)
-                Text(
-                  "Category: ${expense["expenseCategory"]}",
-                ),
-
-              if (expense[
-                      "description"] !=
-                  null)
-                Padding(
-                  padding:
-                      const EdgeInsets.only(
-                    top: 8,
-                  ),
-
-                  child: Text(
-                    expense[
-                        "description"],
-                  ),
-                ),
-
-              if (expense["remarks"] !=
-                  null)
-                Padding(
-                  padding:
-                      const EdgeInsets.only(
-                    top: 8,
-                  ),
-
-                  child: Text(
-                    "Remarks: ${expense["remarks"]}",
-                    style:
-                        const TextStyle(
-                      color:
-                          Colors.red,
-                    ),
-                  ),
-                ),
-
-              const SizedBox(
-                height: 12,
-              ),
-
-              Text(
-                "Submitted: ${expense["createdAt"]?.toString().substring(0, 10) ?? "-"}",
-
-                style:
-                    const TextStyle(
-                  color: AppColors
-                      .textSecondary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
-  Widget buildEmptyCard(
-    String text,
-  ) {
     return Container(
       width: double.infinity,
 
-      margin:
-          const EdgeInsets.only(
-        bottom: 14,
-      ),
-
-      padding:
-          const EdgeInsets.all(
-        20,
-      ),
+      margin: const EdgeInsets.only(bottom: 16),
 
       decoration: BoxDecoration(
         color: Colors.white,
 
-        borderRadius:
-            BorderRadius.circular(
-          22,
-        ),
+        borderRadius: BorderRadius.circular(22),
+      ),
+
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(18),
+
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        expense["title"] ?? "-",
+
+                        style: const TextStyle(
+                          fontSize: 18,
+
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+
+                      decoration: BoxDecoration(
+                        color: statusColor.withValues(alpha: 0.1),
+
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+
+                      child: Text(
+                        status,
+
+                        style: TextStyle(
+                          color: statusColor,
+
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 12),
+
+                Text(
+                  "₹ ${expense["amount"]}",
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                if (expense["receiptUrl"] != null)
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.receipt_long),
+
+                    label: const Text("View Receipt"),
+
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+
+                        builder: (_) {
+                          return Dialog(
+                            insetPadding: const EdgeInsets.all(16),
+
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+
+                              children: [
+                                AppBar(
+                                  title: const Text("Receipt"),
+
+                                  automaticallyImplyLeading: false,
+
+                                  actions: [
+                                    IconButton(
+                                      icon: const Icon(Icons.close),
+
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ],
+                                ),
+
+                                Flexible(
+                                  child: InteractiveViewer(
+                                    child: Image.network(
+                                      expense["receiptUrl"]?.toString() ?? "",
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+
+                const SizedBox(height: 12),
+
+                if (expense["expenseCategory"] != null)
+                  Text("Category: ${expense["expenseCategory"]}"),
+
+                if (expense["description"] != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+
+                    child: Text(expense["description"]),
+                  ),
+
+                if (expense["remarks"] != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+
+                    child: Text(
+                      "Remarks: ${expense["remarks"]}",
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+
+                const SizedBox(height: 12),
+
+                Text(
+                  "Submitted: ${expense["createdAt"]?.toString().substring(0, 10) ?? "-"}",
+
+                  style: const TextStyle(color: AppColors.textSecondary),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildEmptyCard(String text) {
+    return Container(
+      width: double.infinity,
+
+      margin: const EdgeInsets.only(bottom: 14),
+
+      padding: const EdgeInsets.all(20),
+
+      decoration: BoxDecoration(
+        color: Colors.white,
+
+        borderRadius: BorderRadius.circular(22),
       ),
 
       child: Text(text),
     );
   }
 
-  String? getProfileImage(
-    List documents,
-  ) {
+  String? getProfileImage(List documents) {
     try {
-      final photo =
-          documents.firstWhere(
-        (doc) =>
-            doc["documentType"] ==
-            "PHOTO",
+      final photo = documents.firstWhere(
+        (doc) => doc["documentType"] == "PHOTO",
       );
 
       return photo["documentUrl"];
@@ -1803,9 +1153,7 @@ Widget buildExpenseTile(
     }
   }
 
-  Color getVerificationColor(
-    String? status,
-  ) {
+  Color getVerificationColor(String? status) {
     switch (status) {
       case "APPROVED":
         return Colors.green;
@@ -1818,12 +1166,7 @@ Widget buildExpenseTile(
     }
   }
 
-  String formatDocumentType(
-    String type,
-  ) {
-    return type.replaceAll(
-      "_",
-      " ",
-    );
+  String formatDocumentType(String type) {
+    return type.replaceAll("_", " ");
   }
 }

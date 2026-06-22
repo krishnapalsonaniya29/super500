@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/services/auth/auth_service.dart';
 
-
 class AuthTestScreen extends StatefulWidget {
   const AuthTestScreen({super.key});
 
   @override
-  State<AuthTestScreen> createState() =>
-      _AuthTestScreenState();
+  State<AuthTestScreen> createState() => _AuthTestScreenState();
 }
 
-class _AuthTestScreenState
-    extends State<AuthTestScreen> {
+class _AuthTestScreenState extends State<AuthTestScreen> {
   final phoneController = TextEditingController();
 
   final otpController = TextEditingController();
@@ -29,10 +26,8 @@ class _AuthTestScreenState
       });
 
       final data = await AuthService.sendOtp(
-  phone:
-      phoneController.text.trim(),
-  role: "ADMIN",
-
+        phone: phoneController.text.trim(),
+        role: "ADMIN",
       );
 
       setState(() {
@@ -63,8 +58,7 @@ class _AuthTestScreenState
       );
 
       setState(() {
-        result =
-            "Login Success\n\n${data.toString()}";
+        result = "Login Success\n\n${data.toString()}";
       });
     } catch (e) {
       setState(() {
@@ -80,9 +74,7 @@ class _AuthTestScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("OTP Login"),
-      ),
+      appBar: AppBar(title: const Text("OTP Login")),
 
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -124,40 +116,33 @@ class _AuthTestScreenState
                   onPressed: loading
                       ? null
                       : otpSent
-                          ? verifyOtp
-                          : sendOtp,
+                      ? verifyOtp
+                      : sendOtp,
 
                   child: loading
                       ? const CircularProgressIndicator()
-                      : Text(
-                          otpSent
-                              ? "Verify OTP"
-                              : "Send OTP",
-                        ),
+                      : Text(otpSent ? "Verify OTP" : "Send OTP"),
                 ),
               ),
               ElevatedButton(
-                  onPressed: () async {
-                    try {
-                      final data = await AuthService.getMe();
+                onPressed: () async {
+                  try {
+                    final data = await AuthService.getMe();
 
-                      setState(() {
-                        result = data.toString();
-                      });
-                    } catch (e) {
-                      setState(() {
-                        result = e.toString();
-                      });
-                    }
-                  },
-                  child: const Text("Get Me"),
-                ),
+                    setState(() {
+                      result = data.toString();
+                    });
+                  } catch (e) {
+                    setState(() {
+                      result = e.toString();
+                    });
+                  }
+                },
+                child: const Text("Get Me"),
+              ),
               const SizedBox(height: 30),
 
-              Text(
-                result,
-                style: const TextStyle(fontSize: 16),
-              ),
+              Text(result, style: const TextStyle(fontSize: 16)),
             ],
           ),
         ),

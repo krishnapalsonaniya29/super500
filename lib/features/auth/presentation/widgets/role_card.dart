@@ -41,14 +41,9 @@ class RoleCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 30,
-              backgroundColor:
-                  AppColors.secondary.withValues(alpha: 0.15),
+              backgroundColor: AppColors.secondary.withValues(alpha: 0.15),
 
-              child: Icon(
-                icon,
-                size: 30,
-                color: AppColors.secondary,
-              ),
+              child: Icon(icon, size: 30, color: AppColors.secondary),
             ),
 
             const SizedBox(height: 16),
@@ -57,10 +52,7 @@ class RoleCard extends StatelessWidget {
               title,
               textAlign: TextAlign.center,
 
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
           ],
         ),

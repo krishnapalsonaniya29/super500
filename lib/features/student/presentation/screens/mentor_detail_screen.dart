@@ -4,366 +4,271 @@ import 'package:flutter/material.dart';
 
 import '../../../../../theme/app_colors.dart';
 
-class MentorDetailScreen
-    extends StatelessWidget {
+class MentorDetailScreen extends StatelessWidget {
   final Map<String, dynamic> mentor;
 
-  const MentorDetailScreen({
-    super.key,
-    required this.mentor,
-  });
+  const MentorDetailScreen({super.key, required this.mentor});
 
   @override
   Widget build(BuildContext context) {
-    final user =
-        mentor["user"] ?? {};
+    final user = mentor["user"] ?? {};
 
-    final fullName =
-        user["fullName"] ??
-            "Mentor";
+    final fullName = user["fullName"] ?? "Mentor";
 
-    final phone =
-        user["phone"] ?? "N/A";
+    final phone = user["phone"] ?? "N/A";
 
-    final email =
-        user["email"] ?? "N/A";
+    final email = user["email"] ?? "N/A";
 
-    final avatar =
-        user["avatar"];
+    final avatar = user["avatar"];
 
-    final specialization =
-        mentor["specialization"] ??
-            "N/A";
+    final specialization = mentor["specialization"] ?? "N/A";
 
-    final experience =
-        mentor["experience"] ??
-            "N/A";
+    final experience = mentor["experience"] ?? "N/A";
 
-    final qualification =
-        mentor["qualification"] ??
-            "N/A";
+    final qualification = mentor["qualification"] ?? "N/A";
 
-    final bio =
-        mentor["bio"] ??
-            "No bio available";
+    final bio = mentor["bio"] ?? "No bio available";
 
-    final district =
-        mentor["district"] ??
-            "N/A";
+    final district = mentor["district"] ?? "N/A";
 
-    final state =
-        mentor["state"] ??
-            "N/A";
+    final state = mentor["state"] ?? "N/A";
 
-   
     return Scaffold(
-      backgroundColor:
-          const Color(
-        0xFFF5F7FB,
-      ),
+      backgroundColor: const Color(0xFFF5F7FB),
 
       body: CustomScrollView(
         slivers: [
-          
-SliverAppBar(
-  automaticallyImplyLeading: false,
-  expandedHeight: 480,
-  pinned: true,
-  backgroundColor: AppColors.primary,
+          SliverAppBar(
+            automaticallyImplyLeading: false,
+            expandedHeight: 480,
+            pinned: true,
+            backgroundColor: AppColors.primary,
 
-  flexibleSpace: FlexibleSpaceBar(
-    background: Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.white,
-            Colors.white,
-          ],
-        ),
-      ),
-
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-
-          child: Column(
-            children: [
-              /// =========================
-              /// HEADER CARD
-              /// =========================
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
-
-                  borderRadius:
-                      BorderRadius.circular(20),
-
-                  border: Border.all(
-                    color: Colors.white.withValues(
-                      alpha: 0.15,
-                    ),
-                  ),
-
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(
-                        alpha: 0.08,
-                      ),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-
-                child: Row(
-                  children: [
-                    Container(
-                      height: 70,
-                      width: 70,
-                      padding:
-                          const EdgeInsets.all(8),
-
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                            BorderRadius.circular(
-                          16,
-                        ),
-                      ),
-
-                      child: ClipRRect(
-                        borderRadius:
-                            BorderRadius.circular(
-                          12,
-                        ),
-
-                        child: Image.asset(
-                          "assets/images/app_logo2.png",
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(width: 16),
-
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
-
-                        mainAxisSize:
-                            MainAxisSize.min,
-
-                        children: [
-                          Text(
-                            "Mentor Details",
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight:
-                                  FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-
-                          SizedBox(height: 4),
-
-                          Text(
-                            "Details of Mentor",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color:
-                                  Colors.white70,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 40),
-
-              /// =========================
-              /// PROFILE CARD
-              /// =========================
-              Container(
-                width: double.infinity,
-                padding:
-                    const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 28,
-                ),
-
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-
-                  borderRadius:
-                      BorderRadius.circular(24),
-
-                  border: Border.all(
-                    color: Colors.white.withValues(
-                      alpha: 0.15,
-                    ),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Colors.white, Colors.white],
                   ),
                 ),
 
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 52,
-                      backgroundColor:
-                          Colors.white,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
 
-                      backgroundImage:
-                          avatar != null
-                              ? NetworkImage(
-                                  avatar,
-                                )
-                              : null,
+                    child: Column(
+                      children: [
+                        /// =========================
+                        /// HEADER CARD
+                        /// =========================
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
 
-                      child: avatar == null
-                          ? Text(
-                              fullName[0]
-                                  .toUpperCase(),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
 
-                              style:
-                                  const TextStyle(
-                                color:
-                                    Colors.blueGrey,
+                            borderRadius: BorderRadius.circular(20),
 
-                                fontWeight:
-                                    FontWeight.bold,
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.15),
+                            ),
 
-                                fontSize: 34,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.08),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
                               ),
-                            )
-                          : null,
-                    ),
+                            ],
+                          ),
 
-                    const SizedBox(
-                      height: 16,
-                    ),
+                          child: Row(
+                            children: [
+                              Container(
+                                height: 70,
+                                width: 70,
+                                padding: const EdgeInsets.all(8),
 
-                    Text(
-                      fullName,
-                      textAlign:
-                          TextAlign.center,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
 
-                      style:
-                          const TextStyle(
-                        color: Colors.white,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
 
-                        fontSize: 26,
+                                  child: Image.asset(
+                                    "assets/images/app_logo2.png",
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              ),
 
-                        fontWeight:
-                            FontWeight.bold,
-                      ),
-                    ),
+                              const SizedBox(width: 16),
 
-                    const SizedBox(
-                      height: 10,
-                    ),
+                              const Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
 
-                    Container(
-                      padding:
-                          const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
+                                  mainAxisSize: MainAxisSize.min,
 
-                      decoration:
-                          BoxDecoration(
-                        color: Colors.white
-                            .withValues(
-                          alpha: 0.15,
+                                  children: [
+                                    Text(
+                                      "Mentor Details",
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+
+                                    SizedBox(height: 4),
+
+                                    Text(
+                                      "Details of Mentor",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.white70,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
 
-                        borderRadius:
-                            BorderRadius.circular(
-                          20,
+                        const SizedBox(height: 40),
+
+                        /// =========================
+                        /// PROFILE CARD
+                        /// =========================
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 28,
+                          ),
+
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+
+                            borderRadius: BorderRadius.circular(24),
+
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.15),
+                            ),
+                          ),
+
+                          child: Column(
+                            children: [
+                              CircleAvatar(
+                                radius: 52,
+                                backgroundColor: Colors.white,
+
+                                backgroundImage: avatar != null
+                                    ? NetworkImage(avatar)
+                                    : null,
+
+                                child: avatar == null
+                                    ? Text(
+                                        fullName[0].toUpperCase(),
+
+                                        style: const TextStyle(
+                                          color: Colors.blueGrey,
+
+                                          fontWeight: FontWeight.bold,
+
+                                          fontSize: 34,
+                                        ),
+                                      )
+                                    : null,
+                              ),
+
+                              const SizedBox(height: 16),
+
+                              Text(
+                                fullName,
+                                textAlign: TextAlign.center,
+
+                                style: const TextStyle(
+                                  color: Colors.white,
+
+                                  fontSize: 26,
+
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+
+                              const SizedBox(height: 10),
+
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.15),
+
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+
+                                child: Text(
+                                  specialization,
+                                  textAlign: TextAlign.center,
+
+                                  style: const TextStyle(
+                                    color: Colors.white,
+
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-
-                      child: Text(
-                        specialization,
-                        textAlign:
-                            TextAlign.center,
-
-                        style:
-                            const TextStyle(
-                          color:
-                              Colors.white,
-
-                          fontWeight:
-                              FontWeight.w600,
-                        ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ],
+            ),
           ),
-        ),
-      ),
-    ),
-  ),
-),
+
           /// =====================================
           /// BODY
           /// =====================================
-
           SliverToBoxAdapter(
             child: Padding(
-              padding:
-                  const EdgeInsets.all(
-                20,
-              ),
+              padding: const EdgeInsets.all(20),
 
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment
-                        .start,
+                crossAxisAlignment: CrossAxisAlignment.start,
 
                 children: [
                   /// ABOUT
-                  _buildSectionTitle(
-                    "About Mentor",
-                  ),
+                  _buildSectionTitle("About Mentor"),
 
                   Container(
-                    width:
-                        double.infinity,
+                    width: double.infinity,
 
-                    padding:
-                        const EdgeInsets.all(
-                      18,
-                    ),
+                    padding: const EdgeInsets.all(18),
 
-                    decoration:
-                        BoxDecoration(
-                      color:
-                          Colors.white,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
 
-                      borderRadius:
-                          BorderRadius.circular(
-                        22,
-                      ),
+                      borderRadius: BorderRadius.circular(22),
                     ),
 
                     child: Text(
                       bio,
 
-                      style:
-                          TextStyle(
-                        color: Colors
-                            .grey[800],
+                      style: TextStyle(
+                        color: Colors.grey[800],
 
                         height: 1.7,
 
@@ -372,19 +277,14 @@ SliverAppBar(
                     ),
                   ),
 
-                  const SizedBox(
-                    height: 26,
-                  ),
+                  const SizedBox(height: 26),
 
                   /// CONTACT INFO
-                  _buildSectionTitle(
-                    "Contact Information",
-                  ),
+                  _buildSectionTitle("Contact Information"),
 
                   _buildInfoCard(
                     icon: Icons.phone,
-                    title:
-                        "Phone Number",
+                    title: "Phone Number",
                     value: phone,
                   ),
 
@@ -395,99 +295,64 @@ SliverAppBar(
                   ),
 
                   _buildInfoCard(
-                    icon:
-                        Icons.location_on,
+                    icon: Icons.location_on,
                     title: "Location",
-                    value:
-                        "$district, $state",
+                    value: "$district, $state",
                   ),
 
-                  const SizedBox(
-                    height: 26,
-                  ),
+                  const SizedBox(height: 26),
 
                   /// PROFESSIONAL DETAILS
-                  _buildSectionTitle(
-                    "Professional Details",
+                  _buildSectionTitle("Professional Details"),
+
+                  _buildInfoCard(
+                    icon: Icons.school,
+                    title: "Qualification",
+                    value: qualification,
                   ),
 
                   _buildInfoCard(
-                    icon:
-                        Icons.school,
-                    title:
-                        "Qualification",
-                    value:
-                        qualification,
+                    icon: Icons.work,
+                    title: "Experience",
+                    value: "$experience Years",
                   ),
 
                   _buildInfoCard(
-                    icon:
-                        Icons.work,
-                    title:
-                        "Experience",
-                    value:
-                        "$experience Years",
+                    icon: Icons.psychology,
+                    title: "Specialization",
+                    value: specialization,
                   ),
 
-                  _buildInfoCard(
-                    icon:
-                        Icons.psychology,
-                    title:
-                        "Specialization",
-                    value:
-                        specialization,
-                  ),
-
-                  const SizedBox(
-                    height: 30,
-                  ),
+                  const SizedBox(height: 30),
 
                   /// ACTIONS
                   SizedBox(
-                    width:
-                        double.infinity,
+                    width: double.infinity,
 
                     height: 56,
 
-                    child:
-                        ElevatedButton.icon(
+                    child: ElevatedButton.icon(
                       onPressed: () {
-                        Navigator.pop(
-                          context,
-                        );
+                        Navigator.pop(context);
                       },
 
-                      icon: const Icon(
-                        Icons.message,
-                      ),
+                      icon: const Icon(Icons.message),
 
-                      label: const Text(
-                        "Continue Mentorship",
-                      ),
+                      label: const Text("Continue Mentorship"),
 
-                      style:
-                          ElevatedButton.styleFrom(
-                        backgroundColor:
-                            AppColors
-                                .primary,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
 
-                        foregroundColor:
-                            Colors.white,
+                        foregroundColor: Colors.white,
 
-                        shape:
-                            RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(
-                            16,
-                          ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                     ),
                   ),
 
-                  const SizedBox(
-                    height: 40,
-                  ),
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
@@ -501,24 +366,14 @@ SliverAppBar(
   /// SECTION TITLE
   /// =====================================
 
-  Widget _buildSectionTitle(
-    String title,
-  ) {
+  Widget _buildSectionTitle(String title) {
     return Padding(
-      padding:
-          const EdgeInsets.only(
-        bottom: 16,
-      ),
+      padding: const EdgeInsets.only(bottom: 16),
 
       child: Text(
         title,
 
-        style: const TextStyle(
-          fontSize: 20,
-
-          fontWeight:
-              FontWeight.bold,
-        ),
+        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -533,23 +388,14 @@ SliverAppBar(
     required String value,
   }) {
     return Container(
-      margin:
-          const EdgeInsets.only(
-        bottom: 14,
-      ),
+      margin: const EdgeInsets.only(bottom: 14),
 
-      padding:
-          const EdgeInsets.all(
-        18,
-      ),
+      padding: const EdgeInsets.all(18),
 
       decoration: BoxDecoration(
         color: Colors.white,
 
-        borderRadius:
-            BorderRadius.circular(
-          20,
-        ),
+        borderRadius: BorderRadius.circular(20),
       ),
 
       child: Row(
@@ -558,62 +404,35 @@ SliverAppBar(
             height: 50,
             width: 50,
 
-            decoration:
-                BoxDecoration(
-              color:
-                  AppColors.primary
-                      .withValues(alpha:
-                0.1,
-              ),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
 
-              borderRadius:
-                  BorderRadius.circular(
-                14,
-              ),
+              borderRadius: BorderRadius.circular(14),
             ),
 
-            child: Icon(
-              icon,
-
-              color:
-                  AppColors.primary,
-            ),
+            child: Icon(icon, color: AppColors.primary),
           ),
 
-          const SizedBox(
-            width: 16,
-          ),
+          const SizedBox(width: 16),
 
           Expanded(
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment
-                      .start,
+              crossAxisAlignment: CrossAxisAlignment.start,
 
               children: [
                 Text(
                   title,
 
-                  style: TextStyle(
-                    color:
-                        Colors.grey[
-                            600],
-
-                    fontSize: 13,
-                  ),
+                  style: TextStyle(color: Colors.grey[600], fontSize: 13),
                 ),
 
-                const SizedBox(
-                  height: 4,
-                ),
+                const SizedBox(height: 4),
 
                 Text(
                   value,
 
-                  style:
-                      const TextStyle(
-                    fontWeight:
-                        FontWeight.w600,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
 
                     fontSize: 16,
                   ),
@@ -629,65 +448,4 @@ SliverAppBar(
   /// =====================================
   /// STAT CARD
   /// =====================================
-
-  Widget _buildStatCard(
-    String title,
-    String value,
-  ) {
-    return Container(
-      width: 90,
-
-      padding:
-          const EdgeInsets.symmetric(
-        vertical: 14,
-      ),
-
-      decoration: BoxDecoration(
-        color:
-            Colors.white.withValues(alpha:
-          0.15,
-        ),
-
-        borderRadius:
-            BorderRadius.circular(
-          18,
-        ),
-      ),
-
-      child: Column(
-        children: [
-          Text(
-            value,
-
-            style:
-                const TextStyle(
-              color:
-                  Colors.white,
-
-              fontSize: 22,
-
-              fontWeight:
-                  FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(
-            height: 4,
-          ),
-
-          Text(
-            title,
-
-            style:
-                const TextStyle(
-              color:
-                  Colors.white70,
-
-              fontSize: 13,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

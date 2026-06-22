@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../services/super_admin/super_admin_service.dart';
 import '../../../../../theme/app_colors.dart';
-import 'student_ranking_screen.dart'; 
+import 'student_ranking_screen.dart';
 import 'student_detail_screen.dart';
 
 class StudentsScreen extends StatefulWidget {
@@ -42,15 +42,15 @@ class _StudentsScreenState extends State<StudentsScreen> {
 
       final districtList = <String>[];
 
-for (final student in data) {
-  final district = student["district"]?.toString();
+      for (final student in data) {
+        final district = student["district"]?.toString();
 
-  if (district != null && district.isNotEmpty) {
-    districtList.add(district);
-  }
-}
+        if (district != null && district.isNotEmpty) {
+          districtList.add(district);
+        }
+      }
 
-districts = ["All", ...districtList.toSet()];
+      districts = ["All", ...districtList.toSet()];
 
       setState(() {
         students = data;
@@ -134,17 +134,13 @@ districts = ["All", ...districtList.toSet()];
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(20),
-                        margin: const EdgeInsets.only(
-                          bottom: 20,
-                        ),
+                        margin: const EdgeInsets.only(bottom: 20),
                         decoration: BoxDecoration(
                           color: AppColors.primary,
-                          borderRadius:
-                              BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary
-                                  .withValues(alpha:0.25),
+                              color: AppColors.primary.withValues(alpha: 0.25),
                               blurRadius: 12,
                               offset: const Offset(0, 6),
                             ),
@@ -155,20 +151,13 @@ districts = ["All", ...districtList.toSet()];
                             Container(
                               height: 70,
                               width: 70,
-                              padding:
-                                  const EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.circular(
-                                  16,
-                                ),
+                                borderRadius: BorderRadius.circular(16),
                               ),
                               child: ClipRRect(
-                                borderRadius:
-                                    BorderRadius.circular(
-                                  12,
-                                ),
+                                borderRadius: BorderRadius.circular(12),
                                 child: Image.asset(
                                   "assets/images/app_logo2.png",
                                   fit: BoxFit.contain,
@@ -180,17 +169,14 @@ districts = ["All", ...districtList.toSet()];
 
                             const Expanded(
                               child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
                                     "Super Admin",
                                     style: TextStyle(
                                       fontSize: 24,
-                                      fontWeight:
-                                          FontWeight.bold,
+                                      fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                     ),
                                   ),
@@ -235,21 +221,16 @@ districts = ["All", ...districtList.toSet()];
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 16,
-                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                16,
-                              ),
+                              borderRadius: BorderRadius.circular(16),
                             ),
                           ),
                           onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    const StudentRankingScreen(),
+                                builder: (_) => const StudentRankingScreen(),
                               ),
                             );
                           },

@@ -10,27 +10,18 @@ import '../widgets/auth_switch_text.dart';
 import 'mentor_register_screen.dart';
 import 'mentor_otp_screen.dart';
 import '../../../../services/auth/auth_service.dart';
-class MentorLoginScreen
-    extends StatefulWidget {
-  const MentorLoginScreen({
-    super.key,
-  });
+
+class MentorLoginScreen extends StatefulWidget {
+  const MentorLoginScreen({super.key});
 
   @override
-  State<MentorLoginScreen>
-      createState() =>
-          _MentorLoginScreenState();
+  State<MentorLoginScreen> createState() => _MentorLoginScreenState();
 }
 
-class _MentorLoginScreenState
-    extends State<MentorLoginScreen> {
-  final TextEditingController
-  phoneController =
-      TextEditingController();
+class _MentorLoginScreenState extends State<MentorLoginScreen> {
+  final TextEditingController phoneController = TextEditingController();
 
-  final GlobalKey<FormState>
-  _formKey =
-      GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   bool isLoading = false;
 
@@ -42,8 +33,7 @@ class _MentorLoginScreenState
   }
 
   Future<void> sendOtp() async {
-    if (!_formKey.currentState!
-        .validate()) {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
@@ -53,8 +43,7 @@ class _MentorLoginScreenState
 
     try {
       await AuthService.sendOtp(
-        phone:
-            phoneController.text.trim(),
+        phone: phoneController.text.trim(),
         role: "MENTOR",
       );
 
@@ -63,32 +52,17 @@ class _MentorLoginScreenState
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder:
-              (_) => MentorOtpScreen(
-                phone:
-                    phoneController.text
-                        .trim(),
-              ),
+          builder: (_) => MentorOtpScreen(phone: phoneController.text.trim()),
         ),
       );
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-          content: Text(
-            "OTP Sent Successfully",
-          ),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("OTP Sent Successfully")));
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        SnackBar(
-          content: Text(
-            e.toString(),
-          ),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
       setState(() {
         isLoading = false;
@@ -99,27 +73,20 @@ class _MentorLoginScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          AppColors.background,
-
-      
+      backgroundColor: AppColors.background,
 
       body: SafeArea(
         child: SingleChildScrollView(
-          padding:
-              const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(24),
 
           child: Form(
             key: _formKey,
 
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
 
               children: [
-                const SizedBox(
-                  height: 40,
-                ),
+                const SizedBox(height: 40),
 
                 Container(
                   width: double.infinity,
@@ -145,12 +112,10 @@ class _MentorLoginScreenState
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(16),
                             ),
                             child: ClipRRect(
-                              borderRadius:
-                                  BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(12),
                               child: Image.asset(
                                 "assets/images/app_logo2.png",
                                 fit: BoxFit.contain,
@@ -162,15 +127,13 @@ class _MentorLoginScreenState
 
                           const Expanded(
                             child: Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   "Mentor Portal",
                                   style: TextStyle(
                                     fontSize: 24,
-                                    fontWeight:
-                                        FontWeight.bold,
+                                    fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
                                 ),
@@ -192,10 +155,7 @@ class _MentorLoginScreenState
 
                       const SizedBox(height: 20),
 
-                      Image.asset(
-                        "assets/images/mentor_role.png",
-                        height: 120,
-                      ),
+                      Image.asset("assets/images/mentor_role.png", height: 120),
 
                       const SizedBox(height: 12),
 
@@ -222,30 +182,21 @@ class _MentorLoginScreenState
                   ),
                 ),
 
-
-
-                const SizedBox(
-                  height: 40,
-                ),
+                const SizedBox(height: 40),
 
                 CustomTextField(
-                  hintText:
-                      'Enter Mobile Number',
+                  hintText: 'Enter Mobile Number',
 
-                  controller:
-                      phoneController,
+                  controller: phoneController,
 
-                  keyboardType:
-                      TextInputType.phone,
+                  keyboardType: TextInputType.phone,
 
                   validator: (value) {
-                    if (value == null ||
-                        value.isEmpty) {
+                    if (value == null || value.isEmpty) {
                       return "Phone number is required";
                     }
 
-                    if (value.length <
-                        10) {
+                    if (value.length < 10) {
                       return "Enter valid mobile number";
                     }
 
@@ -253,40 +204,27 @@ class _MentorLoginScreenState
                   },
                 ),
 
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 30),
 
                 CustomButton(
-                  text: isLoading
-                      ? 'Sending OTP...'
-                      : 'Send OTP',
+                  text: isLoading ? 'Sending OTP...' : 'Send OTP',
 
-                  onPressed:
-                      isLoading
-                          ? null
-                          : sendOtp,
+                  onPressed: isLoading ? null : sendOtp,
                 ),
 
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 30),
 
                 Center(
                   child: AuthSwitchText(
-                    normalText:
-                        "Don't have an account? ",
+                    normalText: "Don't have an account? ",
 
-                    actionText:
-                        'Register',
+                    actionText: 'Register',
 
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder:
-                              (_) =>
-                                  const MentorRegisterScreen(),
+                          builder: (_) => const MentorRegisterScreen(),
                         ),
                       );
                     },

@@ -7,24 +7,15 @@ import '../../../../theme/app_colors.dart';
 
 import '../../../../services/student/student_service.dart';
 
-
-class StudentReportsScreen
-    extends StatefulWidget {
-       final Function(int index)
-      onNavigate;
-  const StudentReportsScreen({
-    super.key,
-    required this.onNavigate,
-  }); 
+class StudentReportsScreen extends StatefulWidget {
+  final Function(int index) onNavigate;
+  const StudentReportsScreen({super.key, required this.onNavigate});
 
   @override
-  State<StudentReportsScreen>
-      createState() =>
-          _StudentReportsScreenState();
+  State<StudentReportsScreen> createState() => _StudentReportsScreenState();
 }
 
-class _StudentReportsScreenState
-    extends State<StudentReportsScreen> {
+class _StudentReportsScreenState extends State<StudentReportsScreen> {
   bool isLoading = true;
 
   List reports = [];
@@ -46,16 +37,11 @@ class _StudentReportsScreenState
         isLoading = true;
       });
 
-      final response =
-          await StudentService
-              .getReports();
+      final response = await StudentService.getReports();
 
-      reports =
-          response["data"] ?? [];
+      reports = response["data"] ?? [];
     } catch (e) {
-      debugPrint(
-        "Reports Error: $e",
-      );
+      debugPrint("Reports Error: $e");
     }
 
     if (mounted) {
@@ -68,59 +54,39 @@ class _StudentReportsScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          AppColors.background,
+      backgroundColor: AppColors.background,
 
       appBar: AppBar(
-        backgroundColor:
-            Colors.transparent,
+        backgroundColor: Colors.transparent,
 
         elevation: 0,
 
         title: const Text(
           "My Reports",
 
-          style: TextStyle(
-            fontWeight:
-                FontWeight.bold,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
 
       body: isLoading
-          ? const Center(
-              child:
-                  CircularProgressIndicator(),
-            )
+          ? const Center(child: CircularProgressIndicator())
           : reports.isEmpty
-              ? _buildEmptyState()
-              : RefreshIndicator(
-                  onRefresh:
-                      loadReports,
+          ? _buildEmptyState()
+          : RefreshIndicator(
+              onRefresh: loadReports,
 
-                  child: ListView.builder(
-                    padding:
-                        const EdgeInsets.all(
-                      16,
-                    ),
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
 
-                    itemCount:
-                        reports.length,
+                itemCount: reports.length,
 
-                    itemBuilder:
-                        (
-                          context,
-                          index,
-                        ) {
-                      final report =
-                          reports[index];
+                itemBuilder: (context, index) {
+                  final report = reports[index];
 
-                      return _buildReportCard(
-                        report,
-                      );
-                    },
-                  ),
-                ),
+                  return _buildReportCard(report);
+                },
+              ),
+            ),
     );
   }
 
@@ -128,45 +94,26 @@ class _StudentReportsScreenState
   /// REPORT CARD
   /// =====================================
 
-  Widget _buildReportCard(
-    Map<String, dynamic>
-        report,
-  ) {
-    final mentor =
-        report["mentor"];
+  Widget _buildReportCard(Map<String, dynamic> report) {
+    final mentor = report["mentor"];
 
-    final mentorUser =
-        mentor?["user"];
+    final mentorUser = mentor?["user"];
 
-    final createdAt =
-        report["createdAt"];
+    final createdAt = report["createdAt"];
 
     return Container(
-      margin:
-          const EdgeInsets.only(
-        bottom: 18,
-      ),
+      margin: const EdgeInsets.only(bottom: 18),
 
-      padding:
-          const EdgeInsets.all(
-        18,
-      ),
+      padding: const EdgeInsets.all(18),
 
       decoration: BoxDecoration(
         color: Colors.white,
 
-        borderRadius:
-            BorderRadius.circular(
-          22,
-        ),
+        borderRadius: BorderRadius.circular(22),
 
         boxShadow: [
           BoxShadow(
-            color:
-                Colors.black
-                    .withValues(
-              alpha: 0.05,
-            ),
+            color: Colors.black.withValues(alpha: 0.05),
 
             blurRadius: 10,
           ),
@@ -174,8 +121,7 @@ class _StudentReportsScreenState
       ),
 
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
 
         children: [
           /// HEADER
@@ -184,71 +130,48 @@ class _StudentReportsScreenState
               CircleAvatar(
                 radius: 24,
 
-                backgroundColor:
-                    AppColors.primary,
+                backgroundColor: AppColors.primary,
 
                 child: Text(
-                  mentorUser?["name"] !=
-                          null
-                      ? mentorUser["name"][0]
-                          .toUpperCase()
+                  mentorUser?["name"] != null
+                      ? mentorUser["name"][0].toUpperCase()
                       : "M",
 
-                  style:
-                      const TextStyle(
-                    color:
-                        Colors.white,
+                  style: const TextStyle(
+                    color: Colors.white,
 
-                    fontWeight:
-                        FontWeight.bold,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
 
-              const SizedBox(
-                width: 14,
-              ),
+              const SizedBox(width: 14),
 
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment
-                          .start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
 
                   children: [
                     Text(
-                      mentorUser?["name"] ??
-                          "Mentor",
+                      mentorUser?["name"] ?? "Mentor",
 
-                      style:
-                          const TextStyle(
+                      style: const TextStyle(
                         fontSize: 17,
 
-                        fontWeight:
-                            FontWeight
-                                .bold,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
 
-                    const SizedBox(
-                      height: 4,
-                    ),
+                    const SizedBox(height: 4),
 
                     Text(
                       createdAt != null
                           ? DateFormat(
                               "dd MMM yyyy",
-                            ).format(
-                              DateTime.parse(
-                                createdAt,
-                              ),
-                            )
+                            ).format(DateTime.parse(createdAt))
                           : "",
 
-                      style: TextStyle(
-                        color: Colors
-                            .grey[700],
-                      ),
+                      style: TextStyle(color: Colors.grey[700]),
                     ),
                   ],
                 ),
@@ -256,80 +179,49 @@ class _StudentReportsScreenState
             ],
           ),
 
-          const SizedBox(
-            height: 20,
-          ),
+          const SizedBox(height: 20),
 
           /// TITLE
           Text(
-            report["title"] ??
-                "Progress Report",
+            report["title"] ?? "Progress Report",
 
-            style: const TextStyle(
-              fontSize: 20,
-
-              fontWeight:
-                  FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
 
-          const SizedBox(
-            height: 18,
-          ),
+          const SizedBox(height: 18),
 
           /// ACADEMIC PERFORMANCE
           _buildSection(
-            title:
-                "Academic Performance",
+            title: "Academic Performance",
 
-            content:
-                report[
-                        "academicPerformance"] ??
-                    "No academic feedback",
+            content: report["academicPerformance"] ?? "No academic feedback",
           ),
 
-          const SizedBox(
-            height: 14,
-          ),
+          const SizedBox(height: 14),
 
           /// BEHAVIOR
           _buildSection(
-            title:
-                "Behavior & Discipline",
+            title: "Behavior & Discipline",
 
-            content:
-                report[
-                        "behaviorFeedback"] ??
-                    "No behavior feedback",
+            content: report["behaviorFeedback"] ?? "No behavior feedback",
           ),
 
-          const SizedBox(
-            height: 14,
-          ),
+          const SizedBox(height: 14),
 
           /// IMPROVEMENT
           _buildSection(
-            title:
-                "Improvement Suggestions",
+            title: "Improvement Suggestions",
 
-            content:
-                report[
-                        "improvementAreas"] ??
-                    "No suggestions",
+            content: report["improvementAreas"] ?? "No suggestions",
           ),
 
-          const SizedBox(
-            height: 14,
-          ),
+          const SizedBox(height: 14),
 
           /// REMARKS
           _buildSection(
-            title:
-                "Mentor Remarks",
+            title: "Mentor Remarks",
 
-            content:
-                report["remarks"] ??
-                    "No remarks",
+            content: report["remarks"] ?? "No remarks",
           ),
         ],
       ),
@@ -340,40 +232,20 @@ class _StudentReportsScreenState
   /// SECTION
   /// =====================================
 
-  Widget _buildSection({
-    required String title,
-    required String content,
-  }) {
+  Widget _buildSection({required String title, required String content}) {
     return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
 
       children: [
         Text(
           title,
 
-          style: const TextStyle(
-            fontSize: 15,
-
-            fontWeight:
-                FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
         ),
 
-        const SizedBox(
-          height: 6,
-        ),
+        const SizedBox(height: 6),
 
-        Text(
-          content,
-
-          style: TextStyle(
-            color:
-                Colors.grey[800],
-
-            height: 1.5,
-          ),
-        ),
+        Text(content, style: TextStyle(color: Colors.grey[800], height: 1.5)),
       ],
     );
   }
@@ -385,53 +257,30 @@ class _StudentReportsScreenState
   Widget _buildEmptyState() {
     return Center(
       child: Padding(
-        padding:
-            const EdgeInsets.all(
-          30,
-        ),
+        padding: const EdgeInsets.all(30),
 
         child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
 
           children: [
-            Icon(
-              Icons.description,
-              size: 90,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.description, size: 90, color: Colors.grey[400]),
 
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
 
             const Text(
               "No Reports Available",
 
-              style: TextStyle(
-                fontSize: 22,
-
-                fontWeight:
-                    FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
 
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
 
             Text(
               "Mentor reports and feedback will appear here.",
 
-              textAlign:
-                  TextAlign.center,
+              textAlign: TextAlign.center,
 
-              style: TextStyle(
-                color:
-                    Colors.grey[700],
-
-                height: 1.5,
-              ),
+              style: TextStyle(color: Colors.grey[700], height: 1.5),
             ),
           ],
         ),
