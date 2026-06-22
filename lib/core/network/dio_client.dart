@@ -1,12 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
+
 class DioClient {
   static final Dio instance = Dio(
     BaseOptions(
       baseUrl:
-          "http://localhost:5000/api/",
+          "https://super500-backend.onrender.com",
+         // "http://localhost:5000/api/",
          // "http://10.135.83.149:5000/api/",
+         
 
       connectTimeout:
           const Duration(
