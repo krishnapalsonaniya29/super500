@@ -90,7 +90,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   const SizedBox(height: 4),
 
                   const Text(
-                    "School Education Department",
+                    "Labour Department",
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.white70, fontSize: 13),
                   ),
@@ -110,7 +110,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   const SizedBox(height: 8),
 
                   const Text(
-                    "Excellence Program for Future Engineers & Doctors",
+                    "Excellence Program for Future Leaders",
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
@@ -238,7 +238,7 @@ class RoleSelectionScreen extends StatelessWidget {
                     const SizedBox(height: 10),
 
                     const Text(
-                      "School Education Department",
+                      "Labour Department",
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
