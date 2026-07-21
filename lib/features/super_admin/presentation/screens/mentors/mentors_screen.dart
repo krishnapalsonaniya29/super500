@@ -67,15 +67,7 @@ class _MentorsScreenState extends State<MentorsScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
 
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
-
-        backgroundColor: AppColors.primary,
-
-        icon: const Icon(Icons.person_add_alt_1, color: Colors.white),
-
-        label: const Text("Add Mentor", style: TextStyle(color: Colors.white)),
-      ),
+      
 
       body: SafeArea(
         child: loading

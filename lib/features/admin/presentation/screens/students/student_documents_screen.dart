@@ -311,7 +311,7 @@ class _StudentDocumentsScreenState extends State<StudentDocumentsScreen> {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
 
-                                color: Colors.blue,
+                                color: Color.fromARGB(255, 1, 26, 46),
 
                                 decoration: TextDecoration.underline,
                               ),
@@ -326,80 +326,41 @@ class _StudentDocumentsScreenState extends State<StudentDocumentsScreen> {
                       Column(
                         children: [
                           /// VIEW DOCUMENT
-                          SizedBox(
-                            width: double.infinity,
-
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                final url = doc["documentUrl"];
-
-                                showDialog(
-                                  context: context,
-
-                                  builder: (_) => AlertDialog(
-                                    title: const Text("Document URL"),
-
-                                    content: SelectableText(url ?? "-"),
-
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-
-                                        child: const Text("Close"),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                              ),
-
-                              icon: const Icon(Icons.remove_red_eye),
-
-                              label: const Text("View Document"),
-                            ),
-                          ),
+                          
 
                           const SizedBox(height: 14),
 
                           /// APPROVE / REJECT
-                          Row(
-                            children: [
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    approveDocument(doc["id"]);
-                                  },
+                          if (!verified)
+  Row(
+    children: [
+      Expanded(
+        child: ElevatedButton(
+          onPressed: () {
+            approveDocument(doc["id"]);
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+          ),
+          child: const Text("Approve"),
+        ),
+      ),
 
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
-                                  ),
+      const SizedBox(width: 14),
 
-                                  child: const Text("Approve"),
-                                ),
-                              ),
-
-                              const SizedBox(width: 14),
-
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    showRejectDialog(doc["id"]);
-                                  },
-
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
-                                  ),
-
-                                  child: const Text("Reject"),
-                                ),
-                              ),
-                            ],
-                          ),
+      Expanded(
+        child: ElevatedButton(
+          onPressed: () {
+            showRejectDialog(doc["id"]);
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+          ),
+          child: const Text("Reject"),
+        ),
+      ),
+    ],
+  ),
                         ],
                       ),
                     ],

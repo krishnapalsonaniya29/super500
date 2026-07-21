@@ -350,10 +350,13 @@ class _StudentsScreenState extends State<StudentsScreen> {
                         itemBuilder: (_, index) {
                           final student = filteredStudents[index];
 
-                          final user = student["user"];
+                         // final user = student["user"];
 
                           final status =
                               student["verificationStatus"] ?? "PENDING";
+                              final user = student["user"] ?? {};
+
+final fullName = (user["fullName"] ?? "").toString().trim();
 
                           return Container(
                             margin: const EdgeInsets.only(bottom: 18),
@@ -380,22 +383,20 @@ class _StudentsScreenState extends State<StudentsScreen> {
                               children: [
                                 Row(
                                   children: [
+                                    
                                     CircleAvatar(
                                       radius: 28,
 
                                       backgroundColor: AppColors.primary,
 
                                       child: Text(
-                                        user["fullName"][0],
-
-                                        style: const TextStyle(
-                                          color: Colors.white,
-
-                                          fontWeight: FontWeight.bold,
-
-                                          fontSize: 22,
-                                        ),
-                                      ),
+  fullName.isNotEmpty ? fullName[0].toUpperCase() : "?",
+  style: const TextStyle(
+    color: Colors.white,
+    fontWeight: FontWeight.bold,
+    fontSize: 22,
+  ),
+),
                                     ),
 
                                     const SizedBox(width: 16),
@@ -407,14 +408,12 @@ class _StudentsScreenState extends State<StudentsScreen> {
 
                                         children: [
                                           Text(
-                                            user["fullName"],
-
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-
-                                              fontSize: 18,
-                                            ),
-                                          ),
+  fullName.isNotEmpty ? fullName : "Unknown Student",
+  style: const TextStyle(
+    fontWeight: FontWeight.bold,
+    fontSize: 18,
+  ),
+),
 
                                           const SizedBox(height: 6),
 
